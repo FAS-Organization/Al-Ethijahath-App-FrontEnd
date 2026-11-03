@@ -510,3 +510,439 @@
     transform: none;
   }
 }
+
+/* Keep the form anchored while switching modes */
+.auth-panel {
+  align-self: start;
+}
+
+/* Reserve space so the footer stays steady on desktop */
+@media (min-width: 901px) {
+  .auth-panel {
+    min-height: 490px;
+  }
+}
+
+.fields--login {
+  grid-template-columns: 1fr;
+}
+
+/* Password controls also work with login autocomplete */
+.field input[autocomplete='current-password'] {
+  padding-right: 52px;
+}
+
+/* Heading receives focus after switching for keyboard users */
+.auth-content h2:focus {
+  outline: none;
+}
+
+/* Signup / login switch */
+.auth-switch {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+
+  margin-top: 26px;
+  padding-top: 18px;
+
+  border-top: 1px solid var(--line);
+
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--body);
+}
+
+.auth-switch button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  padding: 6px 10px;
+
+  border: 0;
+  border-radius: 6px;
+
+  background: transparent;
+  color: var(--primary);
+
+  font: inherit;
+  font-weight: 700;
+
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.auth-switch button:hover:not(:disabled) {
+  background: rgba(242, 217, 211, 0.65);
+  color: var(--heading);
+}
+
+.auth-switch button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+/* Opposite directions make the transition easy to follow */
+.auth-content--login {
+  animation: login-enter 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.auth-content--signup {
+  animation: signup-enter 280ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes login-enter {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes signup-enter {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-content--login,
+  .auth-content--signup {
+    animation: none;
+  }
+
+  .auth-switch button {
+    transition: none;
+  }
+}
+
+
+/* Compact layout that fits typical laptop screens */
+.portal-header {
+  height: 72px;
+}
+
+.portal-footer {
+  padding-block: 16px;
+}
+
+.registration-layout {
+  padding-block: 24px;
+}
+
+.auth-panel {
+  min-height: 0;
+  align-self: center;
+  min-width: 0;
+}
+
+/* Switch stays above the animated form */
+.auth-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.auth-topbar > span {
+  color: var(--body);
+  font-size: 13px;
+}
+
+.auth-mode-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 44px;
+  min-width: 88px;
+  padding: 8px 20px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  background: var(--pale);
+  color: var(--primary);
+
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.auth-mode-button:hover:not(:disabled) {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #ffffff;
+}
+
+.auth-mode-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.registration h2 {
+  margin-bottom: 8px;
+}
+
+.form-intro {
+  margin-bottom: 18px;
+}
+
+.required-note {
+  margin-bottom: 14px;
+}
+
+.fields {
+  gap: 16px 18px;
+}
+
+.field label {
+  margin-bottom: 7px;
+}
+
+.submit-button {
+  margin-top: 22px;
+}
+
+/* Reserve consistent desktop height for either form */
+@media (min-width: 901px) {
+  .auth-content {
+    min-height: 405px;
+  }
+}
+
+/* Animate individual form elements when the mode changes */
+.auth-content--login,
+.auth-content--signup {
+  animation: none;
+  --swap-offset: 24px;
+}
+
+.auth-content--signup {
+  --swap-offset: -24px;
+}
+
+.auth-content > h2,
+.auth-content > .form-intro,
+.auth-content .required-note,
+.auth-content .field,
+.auth-content .submit-button {
+  animation: auth-element-enter 340ms
+    cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+.auth-content > .form-intro {
+  animation-delay: 25ms;
+}
+
+.auth-content .required-note {
+  animation-delay: 40ms;
+}
+
+.auth-content .field:nth-child(1) {
+  animation-delay: 55ms;
+}
+
+.auth-content .field:nth-child(2) {
+  animation-delay: 75ms;
+}
+
+.auth-content .field:nth-child(3) {
+  animation-delay: 95ms;
+}
+
+.auth-content .field:nth-child(4) {
+  animation-delay: 115ms;
+}
+
+.auth-content .field:nth-child(5) {
+  animation-delay: 135ms;
+}
+
+.auth-content .field:nth-child(6) {
+  animation-delay: 155ms;
+}
+
+.auth-content .submit-button {
+  animation-delay: 175ms;
+}
+
+@keyframes auth-element-enter {
+  from {
+    opacity: 0;
+    transform: translateX(var(--swap-offset));
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Use available width on tablets */
+@media (min-width: 641px) and (max-width: 900px) {
+  .registration-layout {
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 28px;
+  }
+
+  .fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fields--login {
+    grid-template-columns: 1fr;
+  }
+
+  .welcome h1 {
+    font-size: 38px;
+  }
+
+  .welcome > p {
+    font-size: 16px;
+  }
+}
+
+/* Compact phone layout */
+@media (max-width: 640px) {
+  .registration-layout {
+    padding-block: 20px;
+  }
+
+  .welcome h1 {
+    margin-bottom: 8px;
+    font-size: 30px;
+  }
+
+  .welcome > p {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .registration {
+    margin-top: 20px;
+  }
+
+  .auth-topbar {
+    margin-bottom: 12px;
+  }
+
+  .registration h2 {
+    font-size: 27px;
+  }
+
+  .fields {
+    gap: 12px;
+  }
+
+  .field label {
+    margin-bottom: 5px;
+  }
+
+  .hint,
+  .field-error {
+    margin-top: 4px;
+  }
+
+  .portal-footer {
+    padding-block: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-content > h2,
+  .auth-content > .form-intro,
+  .auth-content .required-note,
+  .auth-content .field,
+  .auth-content .submit-button {
+    animation: none;
+  }
+
+  .auth-mode-button {
+    transition: none;
+  }
+}
+
+/* Enable form-switch animations for every motion preference */
+.auth-content > h2,
+.auth-content > .form-intro,
+.auth-content .required-note,
+.auth-content .field,
+.auth-content .submit-button {
+  animation-name: auth-element-enter;
+  animation-duration: 340ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: backwards;
+}
+
+
+
+
+.auth-switch-text {
+  margin: 10px 0 0;
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--body);
+}
+
+.auth-switch-text button {
+  min-height: 44px;
+  padding: 4px;
+
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.auth-switch-text button:hover:not(:disabled) {
+  color: var(--heading);
+  text-decoration-thickness: 2px;
+}
+
+.auth-switch-text button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+
+
+
+
+
+
+
+
+
