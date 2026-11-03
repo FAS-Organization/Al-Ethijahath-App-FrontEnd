@@ -1,5 +1,9 @@
-import { useRef, useState } from 'react'
-import { EyeIcon, EyeSlashIcon } from '@phosphor-icons/react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import {
+  EyeIcon,
+  EyeSlashIcon,
+  HeadsetIcon,
+} from '@phosphor-icons/react'
 import './SignupPage.css'
 
 const signupFields = [
@@ -25,6 +29,69 @@ export default function SignupPage({ onRegister, onLogin }) {
 
   const headingRef = useRef(null)
   const switchingRef = useRef(false)
+  const layoutRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const layout = layoutRef.current
+
+    if (!layout) return
+
+    const sections = [
+      layout.querySelector('.welcome'),
+      layout.querySelector('.registration'),
+    ].filter(Boolean)
+
+    const layoutBounds = layout.getBoundingClientRect()
+    const centerX = layoutBounds.left + layoutBounds.width / 2
+    const centerY = layoutBounds.top + layoutBounds.height / 2
+
+    // Read positions before starting either animation.
+    const positions = sections.map(section => {
+      const bounds = section.getBoundingClientRect()
+
+      return {
+        section,
+        offsetX: centerX - (bounds.left + bounds.width / 2),
+        offsetY: centerY - (bounds.top + bounds.height / 2),
+      }
+    })
+
+    const animations = positions.map(
+      ({ section, offsetX, offsetY }) =>
+        section.animate(
+          [
+            {
+              opacity: 0,
+              transform: `
+                translate(${offsetX}px, ${offsetY}px)
+                scale(0.94)
+              `,
+            },
+            {
+              opacity: 0.45,
+              transform: `
+                translate(${offsetX}px, ${offsetY}px)
+                scale(0.97)
+              `,
+              offset: 0.18,
+            },
+            {
+              opacity: 1,
+              transform: 'translate(0, 0) scale(1)',
+            },
+          ],
+          {
+            duration: 1800,
+            easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+            fill: 'backwards',
+          }
+        )
+    )
+
+    return () => {
+      animations.forEach(animation => animation.cancel())
+    }
+  }, [])
 
   const isLogin = mode === 'login'
   const fields = isLogin ? loginFields : signupFields
@@ -196,14 +263,27 @@ export default function SignupPage({ onRegister, onLogin }) {
         </a>
 
         <nav aria-label="Help">
-          <a href="https://www.alethijahath.com/#dispatch-form">
-            Support
+          <a
+            className="support-link"
+            href="https://www.alethijahath.com/#dispatch-form"
+          >
+            <HeadsetIcon
+              size={20}
+              weight="regular"
+              aria-hidden="true"
+            />
+
+            <span>Support</span>
           </a>
         </nav>
       </header>
 
       <div className="signup-main">
-        <main id="signup" className="registration-layout">
+        <main
+          id="signup"
+          className="registration-layout"
+          ref={layoutRef}
+        >
           <section
             className="welcome"
             aria-labelledby="welcome-heading"

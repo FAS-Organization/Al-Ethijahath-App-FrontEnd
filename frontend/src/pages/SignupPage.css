@@ -511,17 +511,7 @@
   }
 }
 
-/* Keep the form anchored while switching modes */
-.auth-panel {
-  align-self: start;
-}
 
-/* Reserve space so the footer stays steady on desktop */
-@media (min-width: 901px) {
-  .auth-panel {
-    min-height: 490px;
-  }
-}
 
 .fields--login {
   grid-template-columns: 1fr;
@@ -537,101 +527,7 @@
   outline: none;
 }
 
-/* Signup / login switch */
-.auth-switch {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 4px 8px;
 
-  margin-top: 26px;
-  padding-top: 18px;
-
-  border-top: 1px solid var(--line);
-
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--body);
-}
-
-.auth-switch button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 44px;
-  padding: 6px 10px;
-
-  border: 0;
-  border-radius: 6px;
-
-  background: transparent;
-  color: var(--primary);
-
-  font: inherit;
-  font-weight: 700;
-
-  cursor: pointer;
-
-  transition:
-    background-color 180ms ease,
-    color 180ms ease;
-}
-
-.auth-switch button:hover:not(:disabled) {
-  background: rgba(242, 217, 211, 0.65);
-  color: var(--heading);
-}
-
-.auth-switch button:disabled {
-  opacity: 0.5;
-  cursor: wait;
-}
-
-/* Opposite directions make the transition easy to follow */
-.auth-content--login {
-  animation: login-enter 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.auth-content--signup {
-  animation: signup-enter 280ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes login-enter {
-  from {
-    opacity: 0;
-    transform: translateX(16px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes signup-enter {
-  from {
-    opacity: 0;
-    transform: translateX(-16px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .auth-content--login,
-  .auth-content--signup {
-    animation: none;
-  }
-
-  .auth-switch button {
-    transition: none;
-  }
-}
 
 
 /* Compact layout that fits typical laptop screens */
@@ -647,63 +543,9 @@
   padding-block: 24px;
 }
 
-.auth-panel {
-  min-height: 0;
-  align-self: center;
-  min-width: 0;
-}
 
-/* Switch stays above the animated form */
-.auth-topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
-}
 
-.auth-topbar > span {
-  color: var(--body);
-  font-size: 13px;
-}
 
-.auth-mode-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 44px;
-  min-width: 88px;
-  padding: 8px 20px;
-
-  border: 1px solid var(--line);
-  border-radius: 8px;
-
-  background: var(--pale);
-  color: var(--primary);
-
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-
-  cursor: pointer;
-
-  transition:
-    background-color 180ms ease,
-    border-color 180ms ease,
-    color 180ms ease;
-}
-
-.auth-mode-button:hover:not(:disabled) {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: #ffffff;
-}
-
-.auth-mode-button:disabled {
-  opacity: 0.5;
-  cursor: wait;
-}
 
 .registration h2 {
   margin-bottom: 8px;
@@ -752,8 +594,8 @@
 .auth-content .required-note,
 .auth-content .field,
 .auth-content .submit-button {
-  animation: auth-element-enter 340ms
-    cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: auth-element-enter 650ms
+    cubic-bezier(0.22, 1, 0.36, 1) backwards;
 }
 
 .auth-content > .form-intro {
@@ -848,9 +690,6 @@
     margin-top: 20px;
   }
 
-  .auth-topbar {
-    margin-bottom: 12px;
-  }
 
   .registration h2 {
     font-size: 27px;
@@ -873,33 +712,6 @@
     padding-block: 12px;
   }
 }
-
-@media (prefers-reduced-motion: reduce) {
-  .auth-content > h2,
-  .auth-content > .form-intro,
-  .auth-content .required-note,
-  .auth-content .field,
-  .auth-content .submit-button {
-    animation: none;
-  }
-
-  .auth-mode-button {
-    transition: none;
-  }
-}
-
-/* Enable form-switch animations for every motion preference */
-.auth-content > h2,
-.auth-content > .form-intro,
-.auth-content .required-note,
-.auth-content .field,
-.auth-content .submit-button {
-  animation-name: auth-element-enter;
-  animation-duration: 340ms;
-  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
-  animation-fill-mode: backwards;
-}
-
 
 
 
@@ -938,7 +750,39 @@
 }
 
 
+/* Contain the introductory movement within the body area */
+.signup-main {
+  overflow: clip;
+}
 
+.welcome,
+.registration {
+  transform-origin: center;
+}
+
+
+.portal-header .support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 6px;
+
+  text-decoration: none;
+  color: var(--body);
+
+  transition:
+    color 180ms ease,
+    background-color 180ms ease;
+}
+
+.portal-header .support-link:hover {
+  text-decoration: none;
+  color: var(--primary);
+  background: rgba(242, 217, 211, 0.5);
+}
 
 
 
