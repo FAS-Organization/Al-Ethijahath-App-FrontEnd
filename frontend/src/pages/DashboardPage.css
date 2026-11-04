@@ -2230,3 +2230,20 @@ body:has(.ed-dashboard) {
     outline-offset: -2px;
   }
 }
+
+
+.ed-dashboard {
+  --ed-sidebar-width: 252px;
+}
+
+@media (min-width: 1024px) {
+  .ed-dashboard > .ed-main {
+    margin-left: 252px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .ed-dashboard > .ed-main {
+    margin-left: 0;
+  }
+}

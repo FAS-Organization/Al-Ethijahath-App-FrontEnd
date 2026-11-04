@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import CustomerNavbar from '../components/CustomerNavbar'
 import {
   SquaresFourIcon,
   TruckIcon,
@@ -106,12 +107,6 @@ const initialNotifications = [
   { id: 3, title: 'Payment recorded', text: 'SAR 2,000 received against INV-2084', read: true },
 ]
 
-const navigation = [
-  { label: 'Overview', icon: SquaresFourIcon, target: 'overview' },
-  { label: 'Equipment', icon: TruckIcon, target: 'equipment' },
-  { label: 'Services', icon: WrenchIcon, target: 'services' },
-  { label: 'Invoices', icon: ReceiptIcon, target: 'invoices' },
-]
 
 const money = value =>
   new Intl.NumberFormat('en-SA', {
@@ -246,7 +241,6 @@ function DetailsDialog({ item, onClose }) {
 
 export default function DashboardPage() {
   const [theme, setTheme] = useState(initialTheme)
-  const [activeNav, setActiveNav] = useState('overview')
   const [query, setQuery] = useState('')
   const [filter, setFilter] = useState('All equipment')
   const [period, setPeriod] = useState('6')
@@ -309,67 +303,15 @@ export default function DashboardPage() {
     )
   })
 
-  function navigate(target) {
-    setActiveNav(target)
+    function navigate(target) {
     document.getElementById(target)?.scrollIntoView({ block: 'start' })
-  }
+    }
 
   return (
     <div className="ed-dashboard" data-theme={theme}>
       <a className="ed-skip-link" href="#overview">Skip to dashboard</a>
 
-      <aside className="ed-sidebar" aria-label="Portal navigation">
-        <a
-          className="ed-brand"
-          href="https://www.alethijahath.com/"
-          aria-label="Al Ethijahath website"
-        >
-          <img src="/images/logo.webp" alt="Al Ethijahath" width="160" height="50" />
-        </a>
-
-        <div className="ed-workspace">
-          <span className="ed-avatar">DC</span>
-          <div>
-            <strong>Demo company</strong>
-            <span>Customer workspace</span>
-          </div>
-        </div>
-
-        <span className="ed-nav-caption">WORKSPACE</span>
-
-        <nav className="ed-navigation" aria-label="Dashboard sections">
-          {navigation.map(({ label, icon: Icon, target }) => (
-            <button
-              key={target}
-              className={activeNav === target ? 'is-active' : ''}
-              aria-current={activeNav === target ? 'location' : undefined}
-              onClick={() => navigate(target)}
-            >
-              <Icon size={21} aria-hidden="true" />
-              <span>{label}</span>
-              {target === 'equipment' && <small>{equipment.length}</small>}
-            </button>
-          ))}
-        </nav>
-
-        <div className="ed-sidebar-bottom">
-          <div className="ed-help">
-            <HeadsetIcon size={24} aria-hidden="true" />
-            <strong>We’re here to help.</strong>
-            <p>Talk to our team about your equipment or service.</p>
-            <a href="mailto:info@alethijahath.com">
-              Contact support <ArrowUpRightIcon size={17} />
-            </a>
-          </div>
-          <div className="ed-profile">
-            <span className="ed-avatar ed-avatar--small">DC</span>
-            <div>
-              <strong>Demo customer</strong>
-              <span>Company administrator</span>
-            </div>
-          </div>
-        </div>
-      </aside>
+      <CustomerNavbar theme={theme} />
 
       <div className="ed-main">
         <header className="ed-topbar">
