@@ -1,322 +1,485 @@
-import { useEffect, useRef, useState } from 'react'
-import CustomerNavbar from '../components/CustomerNavbar'
+import { useEffect, useState } from 'react'
 import {
-  SquaresFourIcon,
+  ArrowDownIcon,
+  ArrowUpRightIcon,
+  BellIcon,
+  CalendarBlankIcon,
+  CheckCircleIcon,
+  FilePdfIcon,
+  FileTextIcon,
+  LightningIcon,
+  MoonIcon,
+  ReceiptIcon,
+  SunIcon,
   TruckIcon,
   WrenchIcon,
-  ReceiptIcon,
-  BellIcon,
-  SunIcon,
-  MoonIcon,
-  MagnifyingGlassIcon,
-  ArrowUpRightIcon,
-  ArrowRightIcon,
-  LightningIcon,
-  HeadsetIcon,
-  XIcon,
-  CheckCircleIcon,
-  CalendarBlankIcon,
 } from '@phosphor-icons/react'
 import {
-  ResponsiveContainer,
-  AreaChart,
   Area,
+  AreaChart,
   CartesianGrid,
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts'
+
+import CustomerNavbar from '../components/CustomerNavbar'
 import './DashboardPage.css'
 
-const equipment = [
-  {
-    id: 'EQ-001',
-    name: 'Toyota forklift',
-    model: '8FG25 · 2.5 tonne',
-    site: 'Riyadh warehouse',
-    status: 'In service',
-    coverage: 'AMC',
-    next: '12 Nov 2026',
-    job: 'JOB-1042',
-    description:
-      'Hydraulic leak inspection is underway. The technician is checking hose connections and seals.',
-    steps: ['Request received', 'Technician assigned', 'Inspection underway'],
-  },
-  {
-    id: 'EQ-002',
-    name: 'Perkins generator',
-    model: '1104A · 100 kVA',
-    site: 'Riyadh warehouse',
-    status: 'Operational',
-    coverage: 'AMC',
-    next: '16 Nov 2026',
-    job: 'JOB-1038',
-    description:
-      'Preventive maintenance completed. Oil, filters and electrical connections were inspected.',
-    steps: ['Inspection completed', 'Service completed', 'Equipment operational'],
-  },
-  {
-    id: 'EQ-003',
-    name: 'Electric shutter',
-    model: 'Industrial roller door',
-    site: 'Jeddah facility',
-    status: 'Attention needed',
-    coverage: 'Non-AMC',
-    next: '10 Nov 2026',
-    job: 'JOB-1045',
-    description:
-      'Intermittent opening reported. A diagnostic visit is scheduled to inspect the controller and safety sensors.',
-    steps: ['Issue reported', 'Visit scheduled'],
-  },
-  {
-    id: 'EQ-004',
-    name: 'Hyster forklift',
-    model: 'H3.0FT · 3 tonne',
-    site: 'Dammam depot',
-    status: 'Operational',
-    coverage: 'AMC',
-    next: '21 Nov 2026',
-    job: 'JOB-1029',
-    description:
-      'The last maintenance visit is complete. The next scheduled visit includes brake and battery checks.',
-    steps: ['Service completed', 'Report issued', 'Next visit scheduled'],
-  },
-]
+// =========================================================
+// DEMO DATA
+// Money is stored in integer halalas: 100 halalas = SAR 1.
+// Replace this frontend data structure with mapped API data.
+// =========================================================
 
-const history = [
-  { month: 'Jun', completed: 4 },
-  { month: 'Jul', completed: 7 },
-  { month: 'Aug', completed: 5 },
-  { month: 'Sep', completed: 9 },
-  { month: 'Oct', completed: 7 },
-  { month: 'Nov', completed: 11 },
-]
+const DEMO_DATA = {
+  companyName: 'Demo company',
 
-const invoices = [
-  { id: 'INV-2084', item: 'Forklift maintenance', total: 4200, paid: 2000 },
-  { id: 'INV-2079', item: 'Generator service', total: 1850, paid: 1850 },
-  { id: 'INV-2072', item: 'Annual maintenance contract', total: 6800, paid: 3400 },
-]
+  equipment: [
+    {
+      id: 'EQ-001',
+      name: 'Toyota forklift',
+      model: '8FG25',
+      site: 'Riyadh warehouse',
+      coverage: 'AMC',
+      status: 'In service',
+      lastService: '2026-10-12',
+    },
+    {
+      id: 'EQ-002',
+      name: 'Perkins generator',
+      model: '1104A',
+      site: 'Riyadh warehouse',
+      coverage: 'AMC',
+      status: 'Operational',
+      lastService: '2026-10-16',
+    },
+    {
+      id: 'EQ-003',
+      name: 'Electric shutter',
+      model: 'Industrial roller door',
+      site: 'Jeddah facility',
+      coverage: 'Non-AMC',
+      status: 'Inspection scheduled',
+      lastService: null,
+    },
+    {
+      id: 'EQ-004',
+      name: 'Hyster forklift',
+      model: 'H3.0FT',
+      site: 'Dammam depot',
+      coverage: 'AMC',
+      status: 'Operational',
+      lastService: '2026-10-21',
+    },
+  ],
 
-const initialNotifications = [
-  { id: 1, title: 'Inspection in progress', text: 'Toyota forklift · JOB-1042', read: false },
-  { id: 2, title: 'Upcoming maintenance', text: 'Electric shutter · 10 Nov 2026', read: false },
-  { id: 3, title: 'Payment recorded', text: 'SAR 2,000 received against INV-2084', read: true },
-]
+  activeJobs: [
+    {
+      id: 'JOB-1042',
+      equipment: 'Toyota forklift',
+      site: 'Riyadh warehouse',
+      status: 'Awaiting approval',
+      damage: 'Hydraulic hose leak detected during inspection.',
+      work: 'Inspection completed. Replacement quotation issued.',
+      updatedAt: '2026-11-04T09:00:00+03:00',
+    },
+    {
+      id: 'JOB-1045',
+      equipment: 'Electric shutter',
+      site: 'Jeddah facility',
+      status: 'Inspection scheduled',
+      damage: 'Intermittent opening reported by the customer.',
+      work: 'Controller and safety-sensor inspection scheduled.',
+      updatedAt: '2026-11-03T14:30:00+03:00',
+    },
+  ],
 
+  appointments: [
+    {
+      id: 'APT-1045',
+      equipment: 'Electric shutter',
+      site: 'Jeddah facility',
+      startsAt: '2026-11-10T09:00:00+03:00',
+      status: 'Confirmed',
+      reschedulePending: false,
+    },
+    {
+      id: 'APT-1046',
+      equipment: 'Perkins generator',
+      site: 'Riyadh warehouse',
+      startsAt: '2026-11-16T10:00:00+03:00',
+      status: 'Reschedule requested',
+      reschedulePending: true,
+    },
+  ],
 
-const money = value =>
+  quotations: [
+    {
+      id: 'QUO-1042',
+      job: 'JOB-1042',
+      title: 'Hydraulic hose replacement',
+      equipment: 'Toyota forklift',
+      totalMinor: 420000,
+    },
+  ],
+
+  invoices: [
+    {
+      id: 'INV-2084',
+      description: 'Completed forklift maintenance',
+      totalMinor: 420000,
+      paidMinor: 200000,
+      balanceMinor: 220000,
+      dueDate: '2026-11-02',
+      overdue: true,
+    },
+    {
+      id: 'INV-2079',
+      description: 'Generator service',
+      totalMinor: 185000,
+      paidMinor: 185000,
+      balanceMinor: 0,
+      dueDate: '2026-11-10',
+      overdue: false,
+    },
+    {
+      id: 'INV-2072',
+      description: 'Annual maintenance contract',
+      totalMinor: 680000,
+      paidMinor: 340000,
+      balanceMinor: 340000,
+      dueDate: '2026-11-15',
+      overdue: false,
+    },
+  ],
+
+  // Completed service counts, not revenue or estimated progress.
+  serviceActivity: [
+    { month: 'Jun', completed: 4 },
+    { month: 'Jul', completed: 7 },
+    { month: 'Aug', completed: 5 },
+    { month: 'Sep', completed: 9 },
+    { month: 'Oct', completed: 7 },
+    { month: 'Nov', completed: 3 },
+  ],
+
+  documents: [
+    {
+      id: 'DOC-1042',
+      title: 'Forklift inspection report',
+      job: 'JOB-1042',
+      type: 'Inspection report',
+      issuedOn: '2026-11-04',
+      url: null,
+    },
+    {
+      id: 'DOC-1038',
+      title: 'Generator completion card',
+      job: 'JOB-1038',
+      type: 'Job completion card',
+      issuedOn: '2026-10-16',
+      url: null,
+    },
+  ],
+
+  notifications: [
+    {
+      id: 'N-1',
+      title: 'Quotation awaiting approval',
+      message: 'Review QUO-1042 for your Toyota forklift.',
+      read: false,
+      tone: 'warning',
+    },
+    {
+      id: 'N-2',
+      title: 'Invoice payment reminder',
+      message: 'INV-2084 has an overdue remaining balance.',
+      read: false,
+      tone: 'warning',
+    },
+    {
+      id: 'N-3',
+      title: 'Generator service completed',
+      message: 'Your job completion card has been issued.',
+      read: true,
+      tone: 'success',
+    },
+  ],
+}
+
+// =========================================================
+// FORMATTERS AND SMALL COMPONENTS
+// =========================================================
+
+const money = minor =>
   new Intl.NumberFormat('en-SA', {
     style: 'currency',
     currency: 'SAR',
-    maximumFractionDigits: 0,
-  }).format(value)
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(minor / 100)
+
+function formatDate(value, includeTime = false) {
+  if (!value) return 'Not recorded'
+
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: 'Asia/Riyadh',
+    ...(includeTime
+      ? { hour: '2-digit', minute: '2-digit' }
+      : {}),
+  }).format(new Date(value))
+}
 
 function initialTheme() {
   try {
     const saved = localStorage.getItem('ethijahath-dashboard-theme')
-    if (saved === 'light' || saved === 'dark') return saved
+
+    if (saved === 'light' || saved === 'dark') {
+      return saved
+    }
   } catch {
-    // Storage may be unavailable in private or restricted environments.
+    // The theme still works without browser storage.
   }
 
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light'
+  return 'light'
 }
 
-function Badge({ status }) {
-  const variant =
-    status === 'Operational' || status === 'Paid'
-      ? 'success'
-      : status === 'Attention needed' || status === 'Partial payment'
-        ? 'warning'
-        : 'neutral'
-
-  return <span className={`ed-badge ed-badge--${variant}`}>{status}</span>
-}
-
-function PanelHeading({ title, subtitle, children }) {
+function Status({ children, tone = 'neutral' }) {
   return (
-    <div className="ed-panel-heading">
+    <span className={`ed-status ed-status--${tone}`}>
+      {children}
+    </span>
+  )
+}
+
+function SectionHeading({ title, description, children }) {
+  return (
+    <div className="ed-section-heading">
       <div>
         <h2>{title}</h2>
-        {subtitle && <p>{subtitle}</p>}
+        {description && <p>{description}</p>}
       </div>
+
       {children}
     </div>
   )
 }
 
-function ChartTooltip({ active, payload, label }) {
+function EmptyState({ children }) {
+  return <p className="ed-empty">{children}</p>
+}
+
+function ServiceTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null
 
   return (
-    <div className="ed-tooltip">
-      <strong>{label || payload[0].name}</strong>
-      <span>{payload[0].value} services completed</span>
+    <div className="ed-chart-tooltip">
+      <span>{label}</span>
+      <strong>{payload[0].value} completed services</strong>
     </div>
   )
 }
 
-function DetailsDialog({ item, onClose }) {
-  const dialogRef = useRef(null)
+// A callback opens the real workflow. This component never
+// pretends that an approval or reschedule has been saved.
+function ActionButton({ children, onAction, item }) {
+  const [busy, setBusy] = useState(false)
+  const [failed, setFailed] = useState(false)
 
-  useEffect(() => {
-    const dialog = dialogRef.current
-    const previousFocus = document.activeElement
-    dialog.showModal()
+  async function handleClick() {
+    if (!onAction || busy) return
 
-    return () => {
-      dialog.close()
-      previousFocus?.focus()
+    setBusy(true)
+    setFailed(false)
+
+    try {
+      await onAction(item)
+    } catch {
+      setFailed(true)
+    } finally {
+      setBusy(false)
     }
-  }, [])
+  }
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="ed-dialog"
-      aria-labelledby="ed-detail-title"
-      onCancel={onClose}
-      onClick={event => {
-        if (event.target === event.currentTarget) onClose()
-      }}
-    >
-      <div className="ed-dialog-content">
-        <div className="ed-row">
-          <span className="ed-muted">{item.id} / {item.job}</span>
-          <button
-            className="ed-icon-button"
-            onClick={onClose}
-            aria-label="Close equipment details"
-            autoFocus
-          >
-            <XIcon size={20} />
-          </button>
-        </div>
+    <div className="ed-action">
+      <button
+        type="button"
+        className="ed-button"
+        disabled={!onAction || busy}
+        onClick={handleClick}
+        title={
+          !onAction
+            ? 'Available when this workflow is connected.'
+            : undefined
+        }
+      >
+        {busy ? 'Opening…' : children}
+        <ArrowUpRightIcon size={16} aria-hidden="true" />
+      </button>
 
-        <h2 id="ed-detail-title">{item.name}</h2>
-        <p className="ed-muted">{item.model} · {item.site}</p>
-        <Badge status={item.status} />
-
-        <p className="ed-detail-description">{item.description}</p>
-
-        <h3>Latest service activity</h3>
-        <ol className="ed-timeline">
-          {item.steps.map(step => (
-            <li key={step}>
-              <CheckCircleIcon size={19} aria-hidden="true" />
-              <span>{step}</span>
-            </li>
-          ))}
-        </ol>
-
-        <div className="ed-detail-footer">
-          <CalendarBlankIcon size={21} aria-hidden="true" />
-          <div>
-            <span className="ed-muted">Next scheduled visit</span>
-            <strong>{item.next}</strong>
-          </div>
-        </div>
-
-        <a
-          className="ed-button ed-button--primary"
-          href={`mailto:info@alethijahath.com?subject=${encodeURIComponent(
-            `Reschedule request: ${item.id}`
-          )}&body=${encodeURIComponent(
-            `Hello, I would like to request a new service date for ${item.name} (${item.id}).\n\nPreferred date:\nReason:\n`
-          )}`}
-        >
-          Request reschedule by email
-          <ArrowUpRightIcon size={18} />
-        </a>
-      </div>
-    </dialog>
+      {failed && (
+        <p className="ed-action-error" role="alert">
+          Could not open this action. Please try again.
+        </p>
+      )}
+    </div>
   )
 }
 
-export default function DashboardPage() {
+// =========================================================
+// DASHBOARD PAGE
+//
+// API integration:
+// - Pass complete customer-scoped collections.
+// - activeJobs contains only active jobs.
+// - appointments contains only upcoming appointments.
+// - quotations contains only quotations awaiting approval.
+// - Financial totals must include the same invoice collection.
+// - For paginated APIs, provide server-calculated summary data
+//   instead of calculating account totals from one page.
+// =========================================================
+
+export default function DashboardPage({
+  data = DEMO_DATA,
+  loading = false,
+  error = '',
+  onReviewQuotation,
+  onReschedule,
+  onOpenEquipment,
+  onSignOut,
+  enabledPages,
+}) {
   const [theme, setTheme] = useState(initialTheme)
-  const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState('All equipment')
   const [period, setPeriod] = useState('6')
-  const [selected, setSelected] = useState(null)
-  const [notifications, setNotifications] = useState(initialNotifications)
-  const [showNotifications, setShowNotifications] = useState(false)
-  const notificationRef = useRef(null)
-  const bellRef = useRef(null)
+  const [query, setQuery] = useState('')
+  const [reducedMotion, setReducedMotion] = useState(true)
 
   useEffect(() => {
     try {
       localStorage.setItem('ethijahath-dashboard-theme', theme)
     } catch {
-      // Theme still works when persistence is unavailable.
+      // Storage is optional.
     }
   }, [theme])
 
   useEffect(() => {
-    if (!showNotifications) return
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setReducedMotion(media.matches)
 
-    function dismiss(event) {
-      if (!notificationRef.current?.contains(event.target)) {
-        setShowNotifications(false)
-      }
-    }
+    update()
+    media.addEventListener('change', update)
 
-    function escape(event) {
-      if (event.key === 'Escape') {
-        setShowNotifications(false)
-        bellRef.current?.focus()
-      }
-    }
+    return () => media.removeEventListener('change', update)
+  }, [])
 
-    document.addEventListener('pointerdown', dismiss)
-    document.addEventListener('keydown', escape)
+  const ready = !loading && !error && Boolean(data)
+  const demo = data === DEMO_DATA
 
-    return () => {
-      document.removeEventListener('pointerdown', dismiss)
-      document.removeEventListener('keydown', escape)
-    }
-  }, [showNotifications])
+  const equipment = ready ? data.equipment : []
+  const jobs = ready ? data.activeJobs : []
+  const appointments = ready ? data.appointments : []
+  const quotations = ready ? data.quotations : []
+  const invoices = ready ? data.invoices : []
+  const documents = ready ? data.documents : []
+  const notifications = ready ? data.notifications : []
 
   const unread = notifications.filter(item => !item.read).length
+  const covered = equipment.filter(item => item.coverage === 'AMC').length
   const outstanding = invoices.reduce(
-    (total, invoice) => total + invoice.total - invoice.paid,
+    (sum, invoice) => sum + invoice.balanceMinor,
     0
   )
-  const covered = equipment.filter(item => item.coverage === 'AMC').length
-  const chartData = history.slice(-Number(period))
-  const completed = chartData.reduce((total, item) => total + item.completed, 0)
+  const paid = invoices.reduce(
+    (sum, invoice) => sum + invoice.paidMinor,
+    0
+  )
+  const overdueCount = invoices.filter(
+    invoice => invoice.overdue && invoice.balanceMinor > 0
+  ).length
 
-  const visibleEquipment = equipment.filter(item => {
-    const matchesSearch = `${item.name} ${item.id} ${item.site}`
+  const chartData = ready
+    ? data.serviceActivity.slice(-Number(period))
+    : []
+
+  const completed = chartData.reduce(
+    (sum, item) => sum + item.completed,
+    0
+  )
+
+  const paymentChart = [
+    { name: 'Paid', value: paid, fill: 'var(--ed-chart-paid)' },
+    {
+      name: 'Outstanding',
+      value: outstanding,
+      fill: 'var(--ed-chart-unpaid)',
+    },
+  ]
+
+  const visibleEquipment = equipment.filter(item =>
+    `${item.id} ${item.name} ${item.site}`
       .toLowerCase()
       .includes(query.trim().toLowerCase())
+  )
 
-    return (
-      matchesSearch &&
-      (filter === 'All equipment' || item.status === filter)
-    )
-  })
-
-    function navigate(target) {
-    document.getElementById(target)?.scrollIntoView({ block: 'start' })
-    }
+  const metrics = [
+    {
+      label: 'Your equipment',
+      value: equipment.length,
+      detail: `${covered} covered by AMC`,
+      icon: TruckIcon,
+      href: '#equipment',
+    },
+    {
+      label: 'Active service jobs',
+      value: jobs.length,
+      detail: 'Inspection and repair updates',
+      icon: WrenchIcon,
+      href: '#active-jobs',
+    },
+    {
+      label: 'Upcoming visits',
+      value: appointments.length,
+      detail: 'Scheduled maintenance',
+      icon: CalendarBlankIcon,
+      href: '#maintenance',
+    },
+    {
+      label: 'Outstanding balance',
+      value: money(outstanding),
+      detail: `${overdueCount} overdue invoices`,
+      icon: ReceiptIcon,
+      href: '#invoices',
+    },
+  ]
 
   return (
     <div className="ed-dashboard" data-theme={theme}>
-      <a className="ed-skip-link" href="#overview">Skip to dashboard</a>
+      <a className="ed-skip-link" href="#overview">
+        Skip to dashboard
+      </a>
 
-      <CustomerNavbar theme={theme} />
+      <CustomerNavbar
+        theme={theme}
+        companyName={ready ? data.companyName : undefined}
+        unreadCount={unread}
+        enabledPages={enabledPages}
+        onSignOut={onSignOut}
+      />
 
       <div className="ed-main">
+        {/* DASHBOARD TOPBAR */}
         <header className="ed-topbar">
           <div className="ed-breadcrumb">
-            Client portal <span>/</span> <strong>Dashboard</strong>
+            Customer portal <span>/</span> <strong>Overview</strong>
           </div>
 
           <div className="ed-top-actions">
@@ -327,336 +490,634 @@ export default function DashboardPage() {
               rel="noopener noreferrer"
             >
               <LightningIcon size={17} weight="fill" aria-hidden="true" />
-              <span>Emergency dispatch</span>
-              <ArrowUpRightIcon size={15} aria-hidden="true" />
+              Emergency dispatch
+              <span className="ed-sr-only"> (opens in a new tab)</span>
+            </a>
+
+            <a
+              className="ed-icon-button"
+              href="#notifications"
+              aria-label={`Notifications, ${unread} unread`}
+            >
+              <BellIcon size={21} aria-hidden="true" />
+              {unread > 0 && (
+                <span className="ed-notification-count">{unread}</span>
+              )}
             </a>
 
             <button
+              type="button"
               className="ed-icon-button"
-              onClick={() => setTheme(old => old === 'light' ? 'dark' : 'light')}
               aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              onClick={() =>
+                setTheme(current => current === 'light' ? 'dark' : 'light')
+              }
             >
-              {theme === 'light' ? <MoonIcon size={21} /> : <SunIcon size={21} />}
-            </button>
-
-            <div className="ed-notification-wrap" ref={notificationRef}>
-              <button
-                ref={bellRef}
-                className="ed-icon-button"
-                onClick={() => setShowNotifications(old => !old)}
-                aria-label={`Notifications, ${unread} unread`}
-                aria-expanded={showNotifications}
-                aria-controls="ed-notifications"
-              >
-                <BellIcon size={21} />
-                {unread > 0 && <span className="ed-notification-dot" />}
-              </button>
-
-              {showNotifications && (
-                <section
-                  className="ed-notifications"
-                  id="ed-notifications"
-                  aria-label="Notifications"
-                >
-                  <div className="ed-row">
-                    <strong>Notifications</strong>
-                    <button
-                      className="ed-text-button"
-                      disabled={!unread}
-                      onClick={() => setNotifications(old =>
-                        old.map(item => ({ ...item, read: true }))
-                      )}
-                    >
-                      Mark all read
-                    </button>
-                  </div>
-                  {notifications.map(item => (
-                    <article key={item.id} className={item.read ? '' : 'is-unread'}>
-                      <strong>{item.title}</strong>
-                      <p>{item.text}</p>
-                    </article>
-                  ))}
-                </section>
+              {theme === 'light' ? (
+                <MoonIcon size={21} aria-hidden="true" />
+              ) : (
+                <SunIcon size={21} aria-hidden="true" />
               )}
-            </div>
+            </button>
           </div>
         </header>
 
-        <main className="ed-content" id="overview">
+        <main
+          className="ed-content"
+          id="overview"
+          tabIndex={-1}
+          aria-busy={loading}
+        >
           <div className="ed-page-heading">
             <div>
-              <div className="ed-eyebrow">YOUR OPERATIONS, AT A GLANCE</div>
-              <h1>Everything in good hands.</h1>
-              <p>Equipment, service updates and payments. All in one place.</p>
+              <h1>Your operations, at a glance.</h1>
+              <p>
+                Equipment, service updates and payments.
+                Everything you need to keep moving.
+              </p>
             </div>
-            <span className="ed-demo-label">Demo data · Nov 2026</span>
-          </div>
 
-          <section className="ed-metrics" aria-label="Account summary">
-            {[
-              { label: 'Total equipment', value: equipment.length, note: 'Across 3 sites', icon: TruckIcon, target: 'equipment' },
-              { label: 'Active service', value: '1', note: 'Inspection in progress', icon: WrenchIcon, target: 'services' },
-              { label: 'Scheduled visits', value: '4', note: 'Next: 10 November', icon: CalendarBlankIcon, target: 'services' },
-              { label: 'Outstanding balance', value: money(outstanding), note: '2 partially paid invoices', icon: ReceiptIcon, target: 'invoices' },
-            ].map(({ label, value, note, icon: Icon, target }, index) => (
-              <button
-                className="ed-metric"
-                key={label}
-                style={{ '--ed-order': index }}
-                onClick={() => navigate(target)}
-              >
-                <span className="ed-metric-label">
-                  {label}<Icon size={20} aria-hidden="true" />
-                </span>
-                <strong>{value}</strong>
-                <span className="ed-metric-note">
-                  {note}<ArrowUpRightIcon size={16} aria-hidden="true" />
-                </span>
-              </button>
-            ))}
-          </section>
-
-          <div className="ed-chart-grid">
-            <section className="ed-panel">
-              <PanelHeading
-                title="Service activity"
-                subtitle="Completed maintenance and repair visits"
-              >
-                <select
-                  aria-label="Service activity period"
-                  value={period}
-                  onChange={event => setPeriod(event.target.value)}
-                >
-                  <option value="6">Last 6 months</option>
-                  <option value="3">Last 3 months</option>
-                </select>
-              </PanelHeading>
-
-              <div className="ed-chart-summary">
-                <strong>{completed}</strong>
-                <span>completed services</span>
-              </div>
-
-              <div
-                className="ed-area-chart"
-                role="img"
-                aria-label={chartData.map(item =>
-                  `${item.month}: ${item.completed} completed services`
-                ).join(', ')}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={chartData} margin={{ top: 12, right: 12, left: -24, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="ed-service-fill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="var(--ed-accent)" stopOpacity={0.2} />
-                        <stop offset="100%" stopColor="var(--ed-accent)" stopOpacity={0.01} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid vertical={false} stroke="var(--ed-line)" strokeDasharray="4 5" />
-                    <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: 'var(--ed-muted)', fontSize: 12 }} dy={10} />
-                    <YAxis allowDecimals={false} axisLine={false} tickLine={false} tick={{ fill: 'var(--ed-muted)', fontSize: 12 }} />
-                    <Tooltip content={<ChartTooltip />} />
-                    <Area
-                      type="monotone"
-                      dataKey="completed"
-                      stroke="var(--ed-accent)"
-                      strokeWidth={2.5}
-                      fill="url(#ed-service-fill)"
-                      animationDuration={1100}
-                      activeDot={{ r: 6, strokeWidth: 3, stroke: 'var(--ed-surface)' }}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </section>
-
-            <section className="ed-panel">
-              <PanelHeading title="AMC coverage" subtitle="Your equipment protection" />
-
-              <div
-                className="ed-donut"
-                role="img"
-                aria-label={`${covered} of ${equipment.length} equipment covered by AMC`}
-              >
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={[
-                        { name: 'AMC covered', value: covered },
-                        { name: 'Non-AMC', value: equipment.length - covered },
-                      ]}
-                      dataKey="value"
-                      innerRadius={68}
-                      outerRadius={86}
-                      startAngle={90}
-                      endAngle={-270}
-                      paddingAngle={4}
-                      stroke="none"
-                      animationDuration={1000}
-                    >
-                      <Cell fill="var(--ed-accent)" />
-                      <Cell fill="var(--ed-track)" />
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
-                <div className="ed-donut-label">
-                  <strong>{Math.round(covered / equipment.length * 100)}%</strong>
-                  <span>covered</span>
-                </div>
-              </div>
-
-              <div className="ed-coverage-legend">
-                <span><i /> AMC covered <strong>{covered}</strong></span>
-                <span><i /> Non-AMC <strong>{equipment.length - covered}</strong></span>
-              </div>
-
-              <a className="ed-inline-link" href="mailto:info@alethijahath.com?subject=AMC%20coverage%20enquiry">
-                Discuss your coverage <ArrowRightIcon size={17} />
+            {ready && (
+              <a className="ed-heading-link" href="#active-jobs">
+                View service updates
+                <ArrowDownIcon size={17} aria-hidden="true" />
               </a>
-            </section>
+            )}
           </div>
 
-          <section className="ed-panel ed-equipment-panel" id="equipment">
-            <PanelHeading title="Your equipment" subtitle="A clear view of every machine and its next service">
-              <span className="ed-count">{equipment.length} equipment</span>
-            </PanelHeading>
+          {demo && ready && (
+            <p className="ed-demo-notice">
+              <strong>Demo preview · November 2026</strong>
+              <span>
+                Sample records. Approval, rescheduling and history
+                actions will activate when connected.
+              </span>
+            </p>
+          )}
 
-            <div className="ed-table-toolbar">
-              <label className="ed-search">
-                <MagnifyingGlassIcon size={19} aria-hidden="true" />
-                <input
-                  type="search"
-                  placeholder="Search equipment, ID or site..."
-                  aria-label="Search equipment"
-                  value={query}
-                  onChange={event => setQuery(event.target.value)}
-                />
-              </label>
-              <select
-                aria-label="Filter equipment by status"
-                value={filter}
-                onChange={event => setFilter(event.target.value)}
-              >
-                <option>All equipment</option>
-                <option>Operational</option>
-                <option>In service</option>
-                <option>Attention needed</option>
-              </select>
+          {loading && (
+            <div className="ed-state" role="status">
+              Loading your dashboard…
             </div>
+          )}
 
-            <div className="ed-table-scroll" tabIndex={0} aria-label="Equipment table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Equipment</th>
-                    <th>Location</th>
-                    <th>Status</th>
-                    <th>Coverage</th>
-                    <th>Next service</th>
-                    <th><span className="ed-sr-only">Details</span></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {visibleEquipment.map(item => (
-                    <tr key={item.id}>
-                      <td>
-                        <div className="ed-equipment-name">
-                          <span className="ed-equipment-icon"><TruckIcon size={21} /></span>
-                          <div><strong>{item.name}</strong><small>{item.id} · {item.model}</small></div>
-                        </div>
-                      </td>
-                      <td>{item.site}</td>
-                      <td><Badge status={item.status} /></td>
-                      <td><span className="ed-coverage">{item.coverage}</span></td>
-                      <td>{item.next}</td>
-                      <td>
-                        <button
-                          className="ed-icon-button"
-                          aria-label={`View ${item.name} details`}
-                          onClick={() => setSelected(item)}
-                        >
-                          <ArrowUpRightIcon size={19} />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          {error && (
+            <div className="ed-state" role="alert">
+              Could not load your dashboard. Please refresh and try again.
             </div>
+          )}
 
-            {!visibleEquipment.length && (
-              <div className="ed-empty" role="status">
-                <MagnifyingGlassIcon size={28} />
-                <strong>No matching equipment</strong>
-                <p>Try another name, site or status.</p>
-                <button className="ed-text-button" onClick={() => {
-                  setQuery('')
-                  setFilter('All equipment')
-                }}>
-                  Clear filters
-                </button>
-              </div>
-            )}
-          </section>
+          {!loading && !error && !data && (
+            <div className="ed-state">
+              Your dashboard data is not available yet.
+            </div>
+          )}
 
-          <div className="ed-bottom-grid">
-            <section className="ed-panel" id="services">
-              <PanelHeading title="Upcoming visits" subtitle="Plan ahead with your service schedule" />
-
-              {[...equipment]
-                .sort((a, b) => parseInt(a.next) - parseInt(b.next))
-                .slice(0, 3)
-                .map(item => (
-                  <button className="ed-visit" key={item.id} onClick={() => setSelected(item)}>
-                    <span className="ed-date">
-                      <small>NOV</small>
-                      <strong>{item.next.split(' ')[0]}</strong>
-                    </span>
-                    <span className="ed-visit-copy">
-                      <strong>{item.name}</strong>
-                      <span>{item.site}</span>
-                    </span>
-                    <ArrowRightIcon size={19} aria-hidden="true" />
-                  </button>
-                ))}
-            </section>
-
-            <section className="ed-panel" id="invoices">
-              <PanelHeading title="Recent invoices" subtitle="Payments and remaining balances" />
-
-              {invoices.map(invoice => {
-                const remaining = invoice.total - invoice.paid
-
-                return (
-                  <article className="ed-invoice" key={invoice.id}>
-                    <div className="ed-row">
-                      <strong>{invoice.id}</strong>
-                      <strong>{money(invoice.total)}</strong>
-                    </div>
-                    <p>{invoice.item}</p>
-                    <div className="ed-row">
-                      <Badge status={remaining ? 'Partial payment' : 'Paid'} />
-                      <span className="ed-invoice-balance">
-                        {remaining ? `${money(remaining)} remaining` : 'Fully settled'}
+          {ready && (
+            <>
+              {/* SUMMARY CARDS */}
+              <section className="ed-metrics" aria-label="Account summary">
+                {metrics.map(({ label, value, detail, icon: Icon, href }) => (
+                  <a className="ed-metric" href={href} key={label}>
+                    <div className="ed-metric-top">
+                      <span>{label}</span>
+                      <span className="ed-metric-icon">
+                        <Icon size={21} aria-hidden="true" />
                       </span>
                     </div>
-                  </article>
-                )
-              })}
-            </section>
-          </div>
+
+                    <strong className="ed-metric-value">{value}</strong>
+
+                    <div className="ed-metric-bottom">
+                      <span>{detail}</span>
+                      <ArrowUpRightIcon size={17} aria-hidden="true" />
+                    </div>
+                  </a>
+                ))}
+              </section>
+
+              {/* SERVICE AND PAYMENT CHARTS */}
+              <div className="ed-chart-grid">
+                <section className="ed-panel ed-activity-panel">
+                  <SectionHeading
+                    title="Service activity"
+                    description="Completed service jobs by month"
+                  >
+                    <select
+                      className="ed-select"
+                      aria-label="Service activity period"
+                      value={period}
+                      onChange={event => setPeriod(event.target.value)}
+                    >
+                      <option value="6">Last 6 months</option>
+                      <option value="3">Last 3 months</option>
+                    </select>
+                  </SectionHeading>
+
+                  <div className="ed-chart-summary">
+                    <strong>{completed}</strong>
+                    <span>completed services in this period</span>
+                  </div>
+
+                  {chartData.length ? (
+                    <div
+                      className="ed-area-chart"
+                      role="img"
+                      aria-label={chartData.map(item =>
+                        `${item.month}: ${item.completed} completed services`
+                      ).join('; ')}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart
+                          data={chartData}
+                          margin={{ top: 12, right: 12, left: -20, bottom: 0 }}
+                        >
+                          <defs>
+                            <linearGradient
+                              id="ed-service-gradient"
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor="var(--ed-accent)"
+                                stopOpacity={0.24}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor="var(--ed-accent)"
+                                stopOpacity={0.015}
+                              />
+                            </linearGradient>
+                          </defs>
+
+                          <CartesianGrid
+                            vertical={false}
+                            stroke="var(--ed-line)"
+                            strokeDasharray="4 5"
+                          />
+
+                          <XAxis
+                            dataKey="month"
+                            axisLine={false}
+                            tickLine={false}
+                            dy={8}
+                            tick={{ fill: 'var(--ed-muted)', fontSize: 12 }}
+                          />
+
+                          <YAxis
+                            allowDecimals={false}
+                            axisLine={false}
+                            tickLine={false}
+                            tick={{ fill: 'var(--ed-muted)', fontSize: 12 }}
+                          />
+
+                          <Tooltip content={<ServiceTooltip />} />
+
+                          <Area
+                            type="monotone"
+                            dataKey="completed"
+                            stroke="var(--ed-accent)"
+                            strokeWidth={3}
+                            fill="url(#ed-service-gradient)"
+                            isAnimationActive={!reducedMotion}
+                            animationDuration={700}
+                            activeDot={{
+                              r: 5,
+                              strokeWidth: 3,
+                              stroke: 'var(--ed-surface)',
+                            }}
+                          />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  ) : (
+                    <EmptyState>No service activity recorded yet.</EmptyState>
+                  )}
+                </section>
+
+                <section className="ed-panel ed-payment-panel">
+                  <SectionHeading
+                    title="Payment overview"
+                    description="Recorded payments against issued invoices"
+                  />
+
+                  {paid + outstanding > 0 ? (
+                    <div
+                      className="ed-payment-chart"
+                      role="img"
+                      aria-label={`${money(paid)} paid; ${money(outstanding)} outstanding`}
+                    >
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={paymentChart}
+                            dataKey="value"
+                            innerRadius="72%"
+                            outerRadius="93%"
+                            startAngle={90}
+                            endAngle={-270}
+                            paddingAngle={paid && outstanding ? 4 : 0}
+                            stroke="none"
+                            isAnimationActive={!reducedMotion}
+                            animationDuration={700}
+                          >
+                            {paymentChart.map(item => (
+                              <Cell key={item.name} fill={item.fill} />
+                            ))}
+                          </Pie>
+                        </PieChart>
+                      </ResponsiveContainer>
+
+                      <div className="ed-payment-center">
+                        <strong>
+                          {Math.round(paid / (paid + outstanding) * 100)}%
+                        </strong>
+                        <span>paid</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <EmptyState>No invoice balances to display.</EmptyState>
+                  )}
+
+                  <dl className="ed-payment-legend">
+                    <div>
+                      <dt><i className="ed-dot--paid" />Paid</dt>
+                      <dd>{money(paid)}</dd>
+                    </div>
+                    <div>
+                      <dt><i className="ed-dot--unpaid" />Outstanding</dt>
+                      <dd>{money(outstanding)}</dd>
+                    </div>
+                  </dl>
+
+                  <a className="ed-inline-link" href="#invoices">
+                    View invoice breakdown
+                    <ArrowUpRightIcon size={16} aria-hidden="true" />
+                  </a>
+                </section>
+              </div>
+
+              {/* ACTIVE JOBS AND QUOTATIONS */}
+              <div className="ed-work-grid">
+                <section className="ed-panel" id="active-jobs">
+                  <SectionHeading
+                    title="Active service jobs"
+                    description="What is happening with your equipment"
+                  >
+                    <span className="ed-count">{jobs.length} active</span>
+                  </SectionHeading>
+
+                  {!jobs.length ? (
+                    <EmptyState>No active service jobs.</EmptyState>
+                  ) : jobs.map(job => (
+                    <article className="ed-job" key={job.id}>
+                      <div className="ed-record-heading">
+                        <div>
+                          <h3>{job.equipment}</h3>
+                          <p className="ed-muted">{job.id} · {job.site}</p>
+                        </div>
+
+                        <Status
+                          tone={job.status === 'Awaiting approval'
+                            ? 'warning'
+                            : 'neutral'}
+                        >
+                          {job.status}
+                        </Status>
+                      </div>
+
+                      <dl className="ed-job-details">
+                        <div>
+                          <dt>Reported damage</dt>
+                          <dd>{job.damage || 'Not recorded yet'}</dd>
+                        </div>
+                        <div>
+                          <dt>Latest work update</dt>
+                          <dd>{job.work || 'Awaiting an update'}</dd>
+                        </div>
+                      </dl>
+
+                      <p className="ed-update-time">
+                        Updated {formatDate(job.updatedAt, true)} · Saudi time
+                      </p>
+                    </article>
+                  ))}
+                </section>
+
+                <section className="ed-panel ed-quotation-panel">
+                  <SectionHeading
+                    title="Awaiting your approval"
+                    description="Quotations ready for your review"
+                  >
+                    <FileTextIcon size={24} aria-hidden="true" />
+                  </SectionHeading>
+
+                  {!quotations.length ? (
+                    <EmptyState>No quotations awaiting approval.</EmptyState>
+                  ) : quotations.map(item => (
+                    <article className="ed-quotation" key={item.id}>
+                      <Status tone="warning">Action required</Status>
+                      <h3>{item.title}</h3>
+                      <p className="ed-muted">
+                        {item.equipment} · {item.job}
+                      </p>
+
+                      <strong className="ed-quotation-price">
+                        {money(item.totalMinor)}
+                      </strong>
+
+                      <p className="ed-muted">{item.id}</p>
+
+                      <ActionButton
+                        onAction={onReviewQuotation}
+                        item={item}
+                      >
+                        Review quotation
+                      </ActionButton>
+                    </article>
+                  ))}
+                </section>
+              </div>
+
+              {/* MAINTENANCE AND NOTIFICATIONS */}
+              <div className="ed-two-column">
+                <section className="ed-panel" id="maintenance">
+                  <SectionHeading
+                    title="Upcoming maintenance"
+                    description="Saudi time · Date changes require confirmation"
+                  />
+
+                  {!appointments.length ? (
+                    <EmptyState>No upcoming visits scheduled.</EmptyState>
+                  ) : [...appointments]
+                    .sort((a, b) => new Date(a.startsAt) - new Date(b.startsAt))
+                    .map(item => (
+                      <article className="ed-appointment" key={item.id}>
+                        <div className="ed-date-tile" aria-hidden="true">
+                          <span>
+                            {new Intl.DateTimeFormat('en-GB', {
+                              month: 'short',
+                              timeZone: 'Asia/Riyadh',
+                            }).format(new Date(item.startsAt))}
+                          </span>
+                          <strong>
+                            {new Intl.DateTimeFormat('en-GB', {
+                              day: '2-digit',
+                              timeZone: 'Asia/Riyadh',
+                            }).format(new Date(item.startsAt))}
+                          </strong>
+                        </div>
+
+                        <div className="ed-appointment-body">
+                          <h3>{item.equipment}</h3>
+                          <p>{formatDate(item.startsAt, true)}</p>
+                          <p className="ed-muted">{item.site}</p>
+
+                          {item.reschedulePending ? (
+                            <Status tone="warning">
+                              Reschedule awaiting confirmation
+                            </Status>
+                          ) : (
+                            <ActionButton
+                              onAction={onReschedule}
+                              item={item}
+                            >
+                              Request reschedule
+                            </ActionButton>
+                          )}
+                        </div>
+                      </article>
+                    ))}
+                </section>
+
+                <section className="ed-panel" id="notifications">
+                  <SectionHeading
+                    title="Recent notifications"
+                    description="Service, quotation and payment updates"
+                  >
+                    <span className="ed-count">{unread} unread</span>
+                  </SectionHeading>
+
+                  {!notifications.length ? (
+                    <EmptyState>No notifications yet.</EmptyState>
+                  ) : notifications.slice(0, 5).map(item => (
+                    <article
+                      className={`ed-notification ${!item.read ? 'is-unread' : ''}`}
+                      key={item.id}
+                    >
+                      <span className={`ed-event-icon ed-event-icon--${item.tone}`}>
+                        {item.tone === 'success' ? (
+                          <CheckCircleIcon size={20} aria-hidden="true" />
+                        ) : (
+                          <BellIcon size={20} aria-hidden="true" />
+                        )}
+                      </span>
+
+                      <div>
+                        <h3>{item.title}</h3>
+                        <p className="ed-muted">{item.message}</p>
+                        {!item.read && <span className="ed-unread-label">Unread</span>}
+                      </div>
+                    </article>
+                  ))}
+                </section>
+              </div>
+
+              {/* INVOICES AND PARTIAL PAYMENTS */}
+              <section className="ed-panel ed-table-panel" id="invoices">
+                <SectionHeading
+                  title="Invoices & payments"
+                  description="Your invoice totals, confirmed payments and remaining balances"
+                >
+                  <span className="ed-balance-label">
+                    {money(outstanding)} remaining
+                  </span>
+                </SectionHeading>
+
+                {!invoices.length ? (
+                  <EmptyState>No invoices issued yet.</EmptyState>
+                ) : (
+                  <div
+                    className="ed-table-scroll"
+                    role="region"
+                    aria-label="Invoices and payments"
+                    tabIndex={0}
+                  >
+                    <table>
+                      <thead>
+                        <tr>
+                          {['Invoice', 'Due date', 'Total', 'Paid', 'Remaining', 'Status']
+                            .map(label => (
+                              <th key={label} scope="col">{label}</th>
+                            ))}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {invoices.map(item => (
+                          <tr key={item.id}>
+                            <th scope="row">
+                              {item.id}
+                              <small>{item.description}</small>
+                            </th>
+                            <td>{formatDate(item.dueDate)}</td>
+                            <td>{money(item.totalMinor)}</td>
+                            <td>{money(item.paidMinor)}</td>
+                            <td className="ed-amount">
+                              {money(item.balanceMinor)}
+                            </td>
+                            <td>
+                              <Status
+                                tone={item.balanceMinor === 0 ? 'success' : 'warning'}
+                              >
+                                {item.balanceMinor === 0
+                                  ? 'Paid'
+                                  : item.paidMinor > 0
+                                    ? 'Partially paid'
+                                    : 'Unpaid'}
+                              </Status>
+
+                              {item.overdue && item.balanceMinor > 0 && (
+                                <small className="ed-overdue">Overdue</small>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+
+              {/* EQUIPMENT AND SERVICE HISTORY */}
+              <section className="ed-panel ed-table-panel" id="equipment">
+                <SectionHeading
+                  title="Your equipment"
+                  description="AMC coverage, equipment status and service history"
+                >
+                  <label className="ed-search">
+                    <span className="ed-sr-only">Search equipment</span>
+                    <input
+                      type="search"
+                      placeholder="Search equipment or site"
+                      value={query}
+                      onChange={event => setQuery(event.target.value)}
+                    />
+                  </label>
+                </SectionHeading>
+
+                {!visibleEquipment.length ? (
+                  <EmptyState>
+                    {equipment.length
+                      ? 'No equipment matches your search.'
+                      : 'No equipment has been added to your account.'}
+                  </EmptyState>
+                ) : (
+                  <div
+                    className="ed-table-scroll"
+                    role="region"
+                    aria-label="Customer equipment"
+                    tabIndex={0}
+                  >
+                    <table>
+                      <thead>
+                        <tr>
+                          {['Equipment', 'Site', 'Coverage', 'Status', 'Last service', 'History']
+                            .map(label => (
+                              <th key={label} scope="col">{label}</th>
+                            ))}
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {visibleEquipment.map(item => (
+                          <tr key={item.id}>
+                            <th scope="row">
+                              {item.name}
+                              <small>{item.id} · {item.model}</small>
+                            </th>
+                            <td>{item.site}</td>
+                            <td>
+                              <Status tone={item.coverage === 'AMC' ? 'success' : 'neutral'}>
+                                {item.coverage}
+                              </Status>
+                            </td>
+                            <td>{item.status}</td>
+                            <td>{formatDate(item.lastService)}</td>
+                            <td>
+                              <ActionButton
+                                onAction={onOpenEquipment}
+                                item={item}
+                              >
+                                Service history
+                              </ActionButton>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </section>
+
+              {/* REPORTS AND COMPLETION CARDS */}
+              <section className="ed-panel" id="documents">
+                <SectionHeading
+                  title="Latest reports & completion cards"
+                  description="Inspection reports and completed-job documents"
+                />
+
+                {!documents.length ? (
+                  <EmptyState>No documents have been issued yet.</EmptyState>
+                ) : (
+                  <div className="ed-document-grid">
+                    {documents.slice(0, 4).map(item => (
+                      <article className="ed-document" key={item.id}>
+                        <span className="ed-document-icon">
+                          <FilePdfIcon size={29} aria-hidden="true" />
+                        </span>
+
+                        <div>
+                          <h3>{item.title}</h3>
+                          <p className="ed-muted">{item.type} · {item.job}</p>
+                          <p className="ed-muted">{formatDate(item.issuedOn)}</p>
+
+                          {item.url && /^(https?:\/\/|\/(?!\/))/.test(item.url) ? (
+                            <a
+                              className="ed-inline-link"
+                              href={item.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              Open PDF
+                              <ArrowUpRightIcon size={16} aria-hidden="true" />
+                              <span className="ed-sr-only">
+                                : {item.title} (opens in a new tab)
+                              </span>
+                            </a>
+                          ) : (
+                            <span className="ed-file-unavailable">
+                              PDF not available in preview
+                            </span>
+                          )}
+                        </div>
+                      </article>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </>
+          )}
 
           <footer className="ed-footer">
             <span>© {new Date().getFullYear()} Al Ethijahath</span>
-            <a href="mailto:info@alethijahath.com">Need assistance? Contact support</a>
+            <a href="mailto:info@alethijahath.com">Contact support</a>
           </footer>
         </main>
       </div>
-
-      {selected && (
-        <DetailsDialog item={selected} onClose={() => setSelected(null)} />
-      )}
     </div>
   )
 }
