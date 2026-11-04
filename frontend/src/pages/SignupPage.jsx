@@ -3,6 +3,11 @@ import {
   EyeIcon,
   EyeSlashIcon,
   HeadsetIcon,
+  LightningIcon,
+  LinkedinLogoIcon,
+  EnvelopeSimpleIcon,
+  GlobeIcon,
+  WhatsappLogoIcon,
 } from '@phosphor-icons/react'
 import './SignupPage.css'
 
@@ -262,10 +267,25 @@ export default function SignupPage({ onRegister, onLogin }) {
           />
         </a>
 
-        <nav aria-label="Help">
+        <nav className="header-actions" aria-label="Help">
+          <a
+            className="dispatch-link"
+            href="https://www.alethijahath.com/#dispatch-form"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <LightningIcon
+              size={19}
+              weight="fill"
+              aria-hidden="true"
+            />
+
+            <span>Emergency Dispatch</span>
+          </a>
+
           <a
             className="support-link"
-            href="https://www.alethijahath.com/#dispatch-form"
+            href="mailto:info@alethijahath.com"
           >
             <HeadsetIcon
               size={20}
@@ -506,7 +526,61 @@ export default function SignupPage({ onRegister, onLogin }) {
           reserved.
         </span>
 
-        <span>Client portal</span>
+        <nav className="footer-links" aria-label="Contact links">
+          <a
+            href="https://www.linkedin.com/company/al-ethijahath/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Al Ethijahath on LinkedIn"
+            title="LinkedIn"
+          >
+            <LinkedinLogoIcon
+              size={25}
+              weight="regular"
+              aria-hidden="true"
+            />
+          </a>
+
+          <a
+            href="mailto:info@alethijahath.com"
+            aria-label="Email info@alethijahath.com"
+            title="Email"
+          >
+            <EnvelopeSimpleIcon
+              size={25}
+              weight="regular"
+              aria-hidden="true"
+            />
+          </a>
+
+          <a
+            href="https://www.alethijahath.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Visit Al Ethijahath website"
+            title="Website"
+          >
+            <GlobeIcon
+              size={25}
+              weight="regular"
+              aria-hidden="true"
+            />
+          </a>
+
+          <a
+            href="https://wa.me/966509374109"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Contact Al Ethijahath on WhatsApp"
+            title="WhatsApp"
+          >
+            <WhatsappLogoIcon
+              size={25}
+              weight="regular"
+              aria-hidden="true"
+            />
+          </a>
+        </nav>
       </footer>
     </div>
   )

@@ -785,7 +785,126 @@
 }
 
 
+/* Navbar actions */
 
+.portal-header .header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.portal-header .dispatch-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  min-height: 44px;
+  padding: 10px 16px;
+
+  border-radius: 6px;
+  background: var(--button);
+  color: #ffffff;
+
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+
+  transition:
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.portal-header .dispatch-link:hover {
+  background: var(--primary);
+  color: #ffffff;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(143, 0, 13, 0.16);
+}
+
+.portal-header .support-link {
+  text-decoration: none;
+}
+
+/* Footer contact icons */
+
+.portal-footer {
+  align-items: center;
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+}
+
+.portal-footer .footer-links a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+
+  background: transparent;
+  color: var(--body);
+  text-decoration: none;
+
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.portal-footer .footer-links a:hover,
+.portal-footer .footer-links a:focus-visible {
+  background: var(--primary);
+  color: #ffffff;
+}
+
+.header-actions svg,
+.footer-links svg {
+  flex-shrink: 0;
+}
+
+/* Keep every action accessible on narrow screens */
+
+@media (max-width: 640px) {
+  .portal-header {
+    height: auto;
+    min-height: 72px;
+    padding-block: 10px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .portal-header .header-actions {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .portal-header .dispatch-link {
+    padding-inline: 12px;
+    font-size: 12px;
+  }
+
+  .portal-header .support-link {
+    padding-inline: 8px;
+  }
+
+  .footer-links {
+    gap: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portal-header .dispatch-link,
+  .portal-footer .footer-links a {
+    transition: none;
+  }
+}
 
 
 
