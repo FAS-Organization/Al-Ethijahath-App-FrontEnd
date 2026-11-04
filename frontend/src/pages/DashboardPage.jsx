@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   ArrowDownIcon,
   ArrowUpRightIcon,
@@ -238,6 +238,193 @@ function formatDate(value, includeTime = false) {
   }).format(new Date(value))
 }
 
+// =========================================================
+// DASHBOARD MOTION
+// =========================================================
+
+function useDashboardMotion(rootRef, ready, reducedMotion) {
+  useEffect(() => {
+    const root = rootRef.current
+
+    if (!root || !ready || reducedMotion) return
+    if (!('IntersectionObserver' in window)) return
+
+    const animations = new Set()
+
+    const observer = new IntersectionObserver(
+      entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return
+
+          const element = entry.target
+
+          observer.unobserve(element)
+
+          // Keyboard navigation should never wait for a reveal.
+          if (element.contains(document.activeElement)) return
+          if (typeof element.animate !== 'function') return
+
+          const isMetric = element.classList.contains('ed-metric')
+          const index = isMetric
+            ? Array.from(element.parentElement.children).indexOf(element)
+            : 0
+
+          const animation = element.animate(
+            [
+              {
+                opacity: 0.25,
+                translate: '0 18px',
+              },
+              {
+                opacity: 1,
+                translate: '0 0',
+              },
+            ],
+            {
+              duration: isMetric ? 560 : 460,
+              delay: isMetric ? Math.min(index * 65, 195) : 0,
+              easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+              fill: 'backwards',
+            }
+          )
+
+          animations.add(animation)
+
+          animation.onfinish = () => {
+            animations.delete(animation)
+          }
+        })
+      },
+      {
+        threshold: 0.08,
+        rootMargin: '0px 0px -24px 0px',
+      }
+    )
+
+    root
+      .querySelectorAll('.ed-page-heading, .ed-metric, .ed-panel')
+      .forEach(element => observer.observe(element))
+
+    function finishOnFocus() {
+      animations.forEach(animation => animation.finish())
+      animations.clear()
+    }
+
+    root.addEventListener('focusin', finishOnFocus)
+
+    return () => {
+      observer.disconnect()
+      root.removeEventListener('focusin', finishOnFocus)
+
+      animations.forEach(animation => animation.cancel())
+      animations.clear()
+    }
+  }, [rootRef, ready, reducedMotion])
+}
+
+function AnimatedValue({
+  value,
+  currency = false,
+  suffix = '',
+  reducedMotion = false,
+}) {
+  const elementRef = useRef(null)
+  const currentValueRef = useRef(0)
+
+  const target = Number.isFinite(value) ? value : 0
+
+  const format = number =>
+    currency
+      ? money(Math.round(number))
+      : `${Math.round(number).toLocaleString('en-SA')}${suffix}`
+
+  const finalLabel = format(target)
+
+  useEffect(() => {
+    const element = elementRef.current
+
+    if (!element) return
+
+    let frameId = 0
+    let started = false
+
+    const formatFrame = number =>
+      currency
+        ? money(Math.round(number))
+        : `${Math.round(number).toLocaleString('en-SA')}${suffix}`
+
+    function showFinal() {
+      element.textContent = formatFrame(target)
+      currentValueRef.current = target
+    }
+
+    if (reducedMotion || !('IntersectionObserver' in window)) {
+      showFinal()
+      return
+    }
+
+    function start() {
+      if (started) return
+      started = true
+
+      const from = currentValueRef.current
+      const difference = target - from
+      const duration = 850
+      let startTime = null
+
+      if (difference === 0) {
+        showFinal()
+        return
+      }
+
+      function tick(time) {
+        if (startTime === null) startTime = time
+
+        const progress = Math.min((time - startTime) / duration, 1)
+        const eased = 1 - Math.pow(1 - progress, 4)
+        const next = from + difference * eased
+
+        currentValueRef.current = next
+        element.textContent = formatFrame(next)
+
+        if (progress < 1) {
+          frameId = requestAnimationFrame(tick)
+        } else {
+          showFinal()
+        }
+      }
+
+      frameId = requestAnimationFrame(tick)
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (!entries.some(entry => entry.isIntersecting)) return
+
+        observer.disconnect()
+        start()
+      },
+      { threshold: 0.5 }
+    )
+
+    observer.observe(element)
+
+    return () => {
+      observer.disconnect()
+      cancelAnimationFrame(frameId)
+    }
+  }, [target, currency, suffix, reducedMotion])
+
+  return (
+    <span className="ed-animated-value">
+      <span className="ed-sr-only">{finalLabel}</span>
+      <span ref={elementRef} aria-hidden="true">
+        {finalLabel}
+      </span>
+    </span>
+  )
+}
+
 function initialTheme() {
   try {
     const saved = localStorage.getItem('ethijahath-dashboard-theme')
@@ -358,10 +545,11 @@ export default function DashboardPage({
   onSignOut,
   enabledPages,
 }) {
+  const dashboardRef = useRef(null)
   const [theme, setTheme] = useState(initialTheme)
   const [period, setPeriod] = useState('6')
   const [query, setQuery] = useState('')
-  const [reducedMotion, setReducedMotion] = useState(true)
+  const reducedMotion = false
 
   useEffect(() => {
     try {
@@ -371,17 +559,9 @@ export default function DashboardPage({
     }
   }, [theme])
 
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const update = () => setReducedMotion(media.matches)
-
-    update()
-    media.addEventListener('change', update)
-
-    return () => media.removeEventListener('change', update)
-  }, [])
 
   const ready = !loading && !error && Boolean(data)
+  useDashboardMotion(dashboardRef, ready, reducedMotion)
   const demo = data === DEMO_DATA
 
   const equipment = ready ? data.equipment : []
@@ -454,15 +634,22 @@ export default function DashboardPage({
     },
     {
       label: 'Outstanding balance',
-      value: money(outstanding),
-      detail: `${overdueCount} overdue invoices`,
+      value: outstanding,
+      currency: true,
+      detail: `${overdueCount} overdue ${
+        overdueCount === 1 ? 'invoice' : 'invoices'
+      }`,
       icon: ReceiptIcon,
       href: '#invoices',
     },
   ]
 
   return (
-    <div className="ed-dashboard" data-theme={theme}>
+    <div
+      ref={dashboardRef}
+      className="ed-dashboard"
+      data-theme={theme}
+    >
       <a className="ed-skip-link" href="#overview">
         Skip to dashboard
       </a>
@@ -575,25 +762,52 @@ export default function DashboardPage({
 
           {ready && (
             <>
-              {/* SUMMARY CARDS */}
-              <section className="ed-metrics" aria-label="Account summary">
-                {metrics.map(({ label, value, detail, icon: Icon, href }) => (
-                  <a className="ed-metric" href={href} key={label}>
-                    <div className="ed-metric-top">
-                      <span>{label}</span>
-                      <span className="ed-metric-icon">
-                        <Icon size={21} aria-hidden="true" />
-                      </span>
-                    </div>
 
-                    <strong className="ed-metric-value">{value}</strong>
+            {/* SUMMARY CARDS */}
+              <section
+                className="ed-metrics"
+                aria-label="Account summary"
+              >
+                {metrics.map(
+                  ({
+                    label,
+                    value,
+                    detail,
+                    icon: Icon,
+                    href,
+                    currency = false,
+                  }) => (
+                    <a
+                      className="ed-metric"
+                      href={href}
+                      key={label}
+                    >
+                      <div className="ed-metric-top">
+                        <span>{label}</span>
 
-                    <div className="ed-metric-bottom">
-                      <span>{detail}</span>
-                      <ArrowUpRightIcon size={17} aria-hidden="true" />
-                    </div>
-                  </a>
-                ))}
+                        <span className="ed-metric-icon">
+                          <Icon size={21} aria-hidden="true" />
+                        </span>
+                      </div>
+
+                      <strong className="ed-metric-value">
+                        <AnimatedValue
+                          value={value}
+                          currency={currency}
+                          reducedMotion={reducedMotion}
+                        />
+                      </strong>
+
+                      <div className="ed-metric-bottom">
+                        <span>{detail}</span>
+                        <ArrowUpRightIcon
+                          size={17}
+                          aria-hidden="true"
+                        />
+                      </div>
+                    </a>
+                  )
+                )}
               </section>
 
               {/* SERVICE AND PAYMENT CHARTS */}
@@ -615,7 +829,12 @@ export default function DashboardPage({
                   </SectionHeading>
 
                   <div className="ed-chart-summary">
-                    <strong>{completed}</strong>
+                    <strong>
+                      <AnimatedValue
+                        value={completed}
+                        reducedMotion={reducedMotion}
+                      />
+                    </strong>
                     <span>completed services in this period</span>
                   </div>
 
@@ -733,7 +952,17 @@ export default function DashboardPage({
 
                       <div className="ed-payment-center">
                         <strong>
-                          {Math.round(paid / (paid + outstanding) * 100)}%
+                          <AnimatedValue
+                            value={
+                              paid + outstanding > 0
+                                ? Math.round(
+                                    paid / (paid + outstanding) * 100
+                                  )
+                                : 0
+                            }
+                            suffix="%"
+                            reducedMotion={reducedMotion}
+                          />
                         </strong>
                         <span>paid</span>
                       </div>
@@ -1032,7 +1261,10 @@ export default function DashboardPage({
                         </tr>
                       </thead>
 
-                      <tbody>
+                      <tbody
+                        className="ed-equipment-results"
+                        key={query.trim().toLowerCase()}
+                      >
                         {visibleEquipment.map(item => (
                           <tr key={item.id}>
                             <th scope="row">

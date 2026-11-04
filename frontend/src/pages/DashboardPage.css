@@ -1325,20 +1325,6 @@ body:has(.ed-dashboard) {
    ACCESSIBILITY
    ========================================================= */
 
-@media (prefers-reduced-motion: reduce) {
-  .ed-main *,
-  .ed-main *::before,
-  .ed-main *::after {
-    transition: none !important;
-    animation: none !important;
-    scroll-behavior: auto !important;
-  }
-
-  .ed-metric:hover,
-  .ed-button:hover:not(:disabled) {
-    transform: none;
-  }
-}
 
 @media (forced-colors: active) {
   .ed-metric,
@@ -1423,15 +1409,7 @@ body:has(.ed-dashboard) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ed-metric::before {
-    transition: none;
-  }
 
-  .ed-metric:hover::before {
-    transform: none;
-  }
-}
 
 .ed-metric-icon {
   position: relative;
@@ -1488,17 +1466,6 @@ body:has(.ed-dashboard) {
   opacity: 1;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ed-metric-icon,
-  .ed-metric-icon::before,
-  .ed-metric-icon::after {
-    transition: none;
-  }
-
-  .ed-metric:is(:hover, :focus-visible) .ed-metric-icon {
-    transform: none;
-  }
-}
 
 /* ACTIVE JOBS — DISTINCT JOB CONTAINERS */
 
@@ -1591,11 +1558,7 @@ body:has(.ed-dashboard) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #active-jobs .ed-job {
-    transition: none;
-  }
-}
+
 
 /* RECENT NOTIFICATIONS */
 
@@ -1707,11 +1670,6 @@ body:has(.ed-dashboard) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #notifications .ed-notification {
-    transition: none;
-  }
-}
 
 
 /* =========================================================
@@ -1847,11 +1805,6 @@ body:has(.ed-dashboard) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #invoices .ed-table-scroll tbody tr {
-    transition: none;
-  }
-}
 
 /* =========================================================
    EQUIPMENT TABLE — VISUAL REFINEMENT
@@ -1983,10 +1936,305 @@ body:has(.ed-dashboard) {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  #equipment .ed-search input,
-  #equipment .ed-table-scroll tbody tr,
-  #equipment .ed-button {
-    transition: none;
+
+/* =========================================================
+   DASHBOARD MOTION SYSTEM
+   ========================================================= */
+
+.ed-dashboard {
+  --ed-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ed-motion-fast: 180ms;
+  --ed-motion-medium: 320ms;
+}
+
+/* Smooth navigation between dashboard sections. */
+html:has(.ed-dashboard) {
+  scroll-behavior: smooth;
+}
+
+/* Stable numeric alignment while values change. */
+.ed-animated-value {
+  font-variant-numeric: tabular-nums;
+}
+
+.ed-animated-value > [aria-hidden='true'] {
+  display: inline-block;
+}
+
+/* =========================================================
+   SUMMARY CARD FEEDBACK
+   Existing corner decorations are preserved.
+   ========================================================= */
+
+.ed-dashboard .ed-metric {
+  transition:
+    transform 320ms var(--ed-ease-out),
+    box-shadow 320ms ease,
+    background-color 240ms ease;
+}
+
+.ed-dashboard .ed-metric-bottom > svg {
+  transition:
+    transform 280ms var(--ed-ease-out),
+    color 240ms ease;
+}
+
+.ed-dashboard .ed-metric-icon {
+  transition:
+    color 350ms ease,
+    box-shadow 350ms ease,
+    transform 350ms var(--ed-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ed-dashboard .ed-metric:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--ed-shadow-hover);
+  }
+
+  .ed-dashboard .ed-metric:hover .ed-metric-bottom > svg {
+    transform: translate(3px, -3px);
+    color: var(--ed-accent);
+  }
+
+  .ed-dashboard .ed-metric:hover .ed-metric-icon {
+    transform: translateY(-2px) rotate(-5deg);
   }
 }
+
+.ed-dashboard .ed-metric:focus-visible {
+  box-shadow: var(--ed-shadow-hover);
+}
+
+.ed-dashboard .ed-metric:active {
+  transform: translateY(-1px) scale(0.99);
+}
+
+/* =========================================================
+   PANEL AND RECORD FEEDBACK
+   ========================================================= */
+
+.ed-dashboard .ed-panel {
+  transition:
+    border-color 260ms ease,
+    box-shadow 320ms ease;
+}
+
+.ed-dashboard .ed-panel:focus-within {
+  border-color: var(--ed-accent);
+}
+
+#active-jobs .ed-job,
+#notifications .ed-notification {
+  transition:
+    border-color 260ms ease,
+    box-shadow 320ms ease,
+    background-color 260ms ease,
+    transform 320ms var(--ed-ease-out);
+}
+
+.ed-dashboard .ed-date-tile,
+.ed-dashboard .ed-document-icon,
+#notifications .ed-event-icon {
+  transition:
+    transform 320ms var(--ed-ease-out),
+    box-shadow 320ms ease,
+    background-color 260ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ed-dashboard .ed-panel:hover {
+    box-shadow: 0 10px 30px rgb(70 35 25 / 5%);
+  }
+
+  #active-jobs .ed-job:hover {
+    transform: translateY(-2px);
+  }
+
+  #notifications .ed-notification:hover {
+    transform: translateX(3px);
+  }
+
+  #notifications .ed-notification:hover .ed-event-icon {
+    transform: rotate(-6deg);
+  }
+
+  .ed-dashboard .ed-appointment:hover .ed-date-tile {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 14px rgb(70 35 25 / 8%);
+  }
+
+  .ed-dashboard .ed-document:hover .ed-document-icon {
+    transform: translateY(-3px) rotate(-4deg);
+  }
+}
+
+/* Keyboard users receive the same local emphasis. */
+.ed-dashboard .ed-appointment:focus-within .ed-date-tile,
+.ed-dashboard .ed-document:focus-within .ed-document-icon {
+  box-shadow: 0 5px 14px rgb(70 35 25 / 10%);
+}
+
+/* =========================================================
+   BUTTONS AND LINK ICONS
+   ========================================================= */
+
+.ed-dashboard .ed-button,
+.ed-dashboard .ed-dispatch,
+.ed-dashboard .ed-icon-button {
+  transition:
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease,
+    box-shadow 260ms ease,
+    transform 260ms var(--ed-ease-out);
+}
+
+.ed-dashboard .ed-button > svg,
+.ed-dashboard .ed-inline-link > svg,
+.ed-dashboard .ed-heading-link > svg,
+.ed-dashboard .ed-icon-button > svg {
+  transition: transform 280ms var(--ed-ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .ed-dashboard .ed-button:not(:disabled):hover > svg,
+  .ed-dashboard .ed-inline-link:hover > svg {
+    transform: translate(2px, -2px);
+  }
+
+  .ed-dashboard .ed-heading-link:hover > svg {
+    transform: translateY(3px);
+  }
+
+  .ed-dashboard .ed-dispatch:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 18px rgb(178 34 34 / 18%);
+  }
+
+  .ed-dashboard .ed-icon-button:hover > svg {
+    transform: rotate(-8deg);
+  }
+}
+
+.ed-dashboard .ed-button:not(:disabled):active,
+.ed-dashboard .ed-dispatch:active,
+.ed-dashboard .ed-icon-button:active {
+  transform: scale(0.97);
+}
+
+.ed-dashboard .ed-button:disabled {
+  transform: none;
+  box-shadow: none;
+}
+
+.ed-dashboard .ed-button:disabled > svg {
+  transform: none;
+}
+
+/* =========================================================
+   SEARCH AND TABLE FEEDBACK
+   ========================================================= */
+
+#equipment .ed-search input {
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 260ms ease;
+}
+
+#equipment .ed-search input:focus {
+  box-shadow: 0 4px 14px rgb(143 0 13 / 8%);
+}
+
+#equipment .ed-table-scroll tbody tr,
+#invoices .ed-table-scroll tbody tr {
+  transition: background-color 240ms ease;
+}
+
+#equipment .ed-equipment-results {
+  animation: ed-results-enter 220ms ease-out;
+}
+
+@keyframes ed-results-enter {
+  from {
+    opacity: 0.55;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* =========================================================
+   ANCHOR DESTINATION FEEDBACK
+   Briefly identify the section a summary card opens.
+   ========================================================= */
+
+.ed-content section[id]:target {
+  animation: ed-destination-highlight 1100ms ease-out;
+}
+
+@keyframes ed-destination-highlight {
+  0%,
+  25% {
+    border-color: var(--ed-accent);
+  }
+
+  100% {
+    border-color: var(--ed-line);
+  }
+}
+
+/* =========================================================
+   LOADING AND ERROR FEEDBACK
+   ========================================================= */
+
+.ed-content[aria-busy='true'] .ed-state {
+  position: relative;
+  overflow: hidden;
+}
+
+.ed-content[aria-busy='true'] .ed-state::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+
+  background: linear-gradient(
+    100deg,
+    transparent 20%,
+    var(--ed-accent-soft) 50%,
+    transparent 80%
+  );
+
+  opacity: 0.5;
+  transform: translateX(-100%);
+  animation: ed-loading-sweep 1400ms ease-in-out 3;
+}
+
+@keyframes ed-loading-sweep {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+.ed-action-error {
+  animation: ed-feedback-enter 200ms ease-out;
+}
+
+@keyframes ed-feedback-enter {
+  from {
+    opacity: 0.4;
+    translate: 0 -3px;
+  }
+
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
