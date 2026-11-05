@@ -21,7 +21,7 @@ export const CUSTOMER_NAV_ITEMS = [
   { id: 'account', label: 'My account', to: '/account', icon: UserCircleIcon },
 ]
 
-const INITIAL_PAGES = ['overview']
+const INITIAL_PAGES = ['overview', 'equipment']
 
 /** Render once within BrowserRouter, outside individual page contents.
  * onSignOut must await your real logout request and clear authenticated state.
