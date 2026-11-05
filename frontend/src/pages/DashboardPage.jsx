@@ -655,11 +655,10 @@ export default function DashboardPage({
       </a>
 
       <CustomerNavbar
+        companyName="Demo Customer Company"
+        customerName="Customer account"
+        unreadCount={2}
         theme={theme}
-        companyName={ready ? data.companyName : undefined}
-        unreadCount={unread}
-        enabledPages={enabledPages}
-        onSignOut={onSignOut}
       />
 
       <div className="ed-main">

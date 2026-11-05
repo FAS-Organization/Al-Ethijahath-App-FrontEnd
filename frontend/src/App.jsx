@@ -8,6 +8,7 @@ import SignupPage from './pages/SignupPage'
 import CustomerNavbar from './components/CustomerNavbar'
 import DashboardPage from './pages/DashboardPage'
 import EquipmentPage from './pages/EquipmentPage'
+import QuotationsPage from './pages/QuotationsPage'
 
 // Fictional preview records using the EquipmentPage data structure.
 // Replace this data with the customer-scoped API response later.
@@ -270,6 +271,7 @@ export default function App() {
           path="/equipment"
           element={<EquipmentPage data={EQUIPMENT_PREVIEW_DATA} />}
         />
+        <Route path="/quotations" element={<QuotationsPage />} />
         <Route path="/navbar" element={<CustomerNavbar />} />
       </Routes>
     </BrowserRouter>

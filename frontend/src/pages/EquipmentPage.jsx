@@ -839,10 +839,10 @@ export default function EquipmentPage({
       </a>
 
       <CustomerNavbar
+        companyName="Demo Customer Company"
+        customerName="Customer account"
+        unreadCount={2}
         theme={theme}
-        companyName={ready ? data.company_name : undefined}
-        enabledPages={['overview', 'equipment']}
-        onSignOut={onSignOut}
       />
 
       <div className="eq-main">
