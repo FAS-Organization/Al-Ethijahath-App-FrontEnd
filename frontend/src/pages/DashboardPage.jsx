@@ -543,7 +543,6 @@ export default function DashboardPage({
   onReschedule,
   onOpenEquipment,
   onSignOut,
-  enabledPages,
 }) {
   const dashboardRef = useRef(null)
   const [theme, setTheme] = useState(initialTheme)

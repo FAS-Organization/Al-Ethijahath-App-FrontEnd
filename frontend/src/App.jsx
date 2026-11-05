@@ -5,10 +5,10 @@ import {
 } from 'react-router-dom'
 
 import SignupPage from './pages/SignupPage'
-import CustomerNavbar from './components/CustomerNavbar'
 import DashboardPage from './pages/DashboardPage'
 import EquipmentPage from './pages/EquipmentPage'
 import QuotationsPage from './pages/QuotationsPage'
+import AmcSchedulePage from './pages/AmcSchedulePage'
 
 // Fictional preview records using the EquipmentPage data structure.
 // Replace this data with the customer-scoped API response later.
@@ -272,7 +272,7 @@ export default function App() {
           element={<EquipmentPage data={EQUIPMENT_PREVIEW_DATA} />}
         />
         <Route path="/quotations" element={<QuotationsPage />} />
-        <Route path="/navbar" element={<CustomerNavbar />} />
+        <Route path="/maintenance" element={<AmcSchedulePage />} />
       </Routes>
     </BrowserRouter>
   )
