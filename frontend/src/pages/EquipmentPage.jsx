@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import {
   ArrowRightIcon,
   BuildingsIcon,
@@ -9,6 +9,7 @@ import {
   SunIcon,
   TruckIcon,
   WrenchIcon,
+  XIcon,
 } from '@phosphor-icons/react'
 
 import CustomerNavbar from '../components/CustomerNavbar'
@@ -146,32 +147,75 @@ function Specification({ label, value }) {
   )
 }
 
-function ServiceRecord({ record }) {
+function ActionButton({ children, available, onClick }) {
+  return (
+    <button
+      className="eq-action"
+      type="button"
+      disabled={!available}
+      title={!available ? 'This destination is not connected yet.' : undefined}
+      onClick={onClick}
+    >
+      {children}
+      <ArrowRightIcon size={16} aria-hidden="true" />
+    </button>
+  )
+}
+
+function ServiceRecord({
+  record,
+  onOpenService,
+  onOpenDocument,
+}) {
   const completed = record.status === 'completed'
+  const snapshot = record.equipment_snapshot || {}
+
+  const historicalName = [
+    snapshot.brand,
+    snapshot.equipment_type,
+  ].filter(Boolean).join(' ')
+
+  const reference = record.job?.id != null && record.suffix
+    ? `${record.job.id}${record.suffix}`
+    : record.job?.id != null
+      ? `Job ${record.job.id}`
+      : 'Reference not recorded'
+
+  const jobTypes = {
+    amc: 'AMC',
+    service: 'Service',
+    general: 'General',
+  }
+
+  // Proposed customer serializer field, not a new database field.
+  // The API must return only customer-authorized, published documents.
+  const documents = record.customer_documents || []
 
   return (
     <article className="eq-service-record">
       <div className="eq-service-heading">
-        <strong>Service job #{record.job.id}</strong>
+        <div>
+          <strong>{reference}</strong>
+          <p className="eq-muted">
+            {jobTypes[record.job?.job_type] || 'Job type not recorded'}
+          </p>
+        </div>
 
         <span className={`eq-badge ${completed ? 'eq-badge--green' : ''}`}>
           {SERVICE_STATUSES[record.status] || 'Status unavailable'}
         </span>
       </div>
 
-      <dl className="eq-specifications">
-        <Specification
-          label="Reported issue"
-          value={record.reported_issue}
-        />
-        <Specification
-          label="Planned work"
-          value={record.planned_work}
-        />
+      <p className="eq-history-description">
+        {record.reported_issue || 'No reported issue recorded.'}
+      </p>
+
+      <dl className="eq-specifications eq-history-facts">
         <Specification
           label="Started"
           value={formatDate(record.started_at)}
         />
+
         <Specification
           label={completed ? 'Completed' : 'Estimated completion'}
           value={formatDate(
@@ -180,19 +224,72 @@ function ServiceRecord({ record }) {
               : record.estimated_completion
           )}
         />
+
+        <Specification
+          label="Site/address at service"
+          value={record.job?.site_address_snapshot}
+        />
+
+        <Specification
+          label="Equipment recorded at service"
+          value={historicalName}
+        />
       </dl>
+
+      <div className="eq-record-actions">
+        <ActionButton
+          available={Boolean(onOpenService)}
+          onClick={() => onOpenService?.(record)}
+        >
+          View service
+        </ActionButton>
+
+        {documents.map(document => (
+          <ActionButton
+            key={document.id}
+            available={
+              document.status === 'ready' &&
+              Boolean(onOpenDocument)
+            }
+            onClick={() => onOpenDocument?.(document)}
+          >
+            {document.document_type === 'inspection'
+              ? 'Inspection PDF'
+              : document.document_type === 'completion'
+                ? 'Completion PDF'
+                : document.document_number || 'View document'}
+          </ActionButton>
+        ))}
+      </div>
+
+      {!documents.length && (
+        <p className="eq-record-note">
+          No published inspection or completion PDFs supplied.
+        </p>
+      )}
     </article>
   )
 }
 
 // =========================================================
-// EQUIPMENT CARD
+// EQUIPMENT CARD AND DETAILS DIALOG
 // =========================================================
 
-function EquipmentCard({ item }) {
-  const coverage = item.current_amc_coverages
-  const records = item.service_records
+function EquipmentCard({
+  item,
+  onOpenService,
+  onOpenCoverage,
+  onOpenAppointment,
+  onOpenDocument,
+  onRequestService,
+}) {
+  const dialogRef = useRef(null)
+  const triggerRef = useRef(null)
+  const titleId = useId()
+  const [open, setOpen] = useState(false)
 
+  const coverage = item.current_amc_coverages || []
+  const records = item.service_records || []
   const active = records.filter(isActiveService)
 
   const completed = records
@@ -212,6 +309,91 @@ function EquipmentCard({ item }) {
     .filter(Boolean)
     .sort()
 
+  const appointments = records
+    .flatMap(record =>
+      (record.appointments || []).map(appointment => ({
+        ...appointment,
+        serviceRecord: record,
+      }))
+    )
+    .filter(appointment =>
+      ['planned', 'confirmed'].includes(appointment.status)
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.scheduled_start) -
+        new Date(b.scheduled_start)
+    )
+
+  useEffect(() => {
+    if (!open) return undefined
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+    }
+  }, [open])
+
+  function openDetails() {
+    const dialog = dialogRef.current
+
+    if (!dialog || dialog.open) return
+
+    dialog.showModal()
+    setOpen(true)
+  }
+
+  function closeDetails() {
+    dialogRef.current?.close()
+  }
+
+  function finishClosing() {
+    setOpen(false)
+    triggerRef.current?.focus()
+  }
+
+  function closeFromBackdrop(event) {
+    if (event.target !== event.currentTarget) return
+
+    const bounds = event.currentTarget.getBoundingClientRect()
+
+    const outside =
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom
+
+    if (outside) closeDetails()
+  }
+
+  function followAction(callback, value) {
+    if (!callback) return
+
+    closeDetails()
+    callback(value)
+  }
+
+  function renderRecord(record) {
+    return (
+      <ServiceRecord
+        key={record.id}
+        record={record}
+        onOpenService={
+          onOpenService
+            ? value => followAction(onOpenService, value)
+            : undefined
+        }
+        onOpenDocument={
+          onOpenDocument
+            ? value => followAction(onOpenDocument, value)
+            : undefined
+        }
+      />
+    )
+  }
+
   return (
     <article className="eq-card">
       <div className="eq-card-header">
@@ -221,6 +403,7 @@ function EquipmentCard({ item }) {
 
         <div className="eq-card-title">
           <h2>{equipmentTitle(item)}</h2>
+
           <p>
             {item.customer_asset_number
               ? `Asset ${item.customer_asset_number}`
@@ -228,17 +411,14 @@ function EquipmentCard({ item }) {
           </p>
         </div>
 
-        <span
-          className={`eq-badge ${
-            item.is_retired ? 'eq-badge--muted' : 'eq-badge--green'
-          }`}
-        >
-          {item.is_retired ? 'Retired' : 'In your equipment list'}
+        <span className="eq-badge eq-badge--muted">
+          {item.is_retired ? 'Retired' : 'Current record'}
         </span>
       </div>
 
       <div className="eq-location">
         <BuildingsIcon size={18} aria-hidden="true" />
+
         <span>
           {item.current_site.name}
           <small>{item.current_site.region.name}</small>
@@ -259,37 +439,125 @@ function EquipmentCard({ item }) {
           {coverage.length ? 'AMC covered' : 'No current AMC'}
         </span>
 
-        <span className="eq-service-count">
+        <span
+          className={`eq-service-count ${
+            active.length ? 'eq-service-count--active' : ''
+          }`}
+        >
           <WrenchIcon size={16} aria-hidden="true" />
           {active.length} active {active.length === 1 ? 'service' : 'services'}
         </span>
       </div>
 
-      <div className="eq-next-service">
-        <CalendarBlankIcon size={19} aria-hidden="true" />
+      <div className="eq-card-dates">
+        <div>
+          <span>Last completed service</span>
+          <strong>
+            {completed.length
+              ? formatDate(completed[0].completed_at)
+              : 'No recorded completion'}
+          </strong>
+        </div>
+
         <div>
           <span>Next AMC service due</span>
           <strong>
             {dueDates.length
               ? formatDate(dueDates[0])
               : coverage.length
-                ? 'Not scheduled'
-                : 'No current AMC coverage'}
+                ? 'Due date not recorded'
+                : 'No current AMC'}
           </strong>
         </div>
       </div>
 
-      <details className="eq-details">
-        <summary>
-          <span>Details & service history</span>
-          <ArrowRightIcon size={18} aria-hidden="true" />
-        </summary>
+      <button
+        ref={triggerRef}
+        className="eq-details-trigger"
+        type="button"
+        aria-haspopup="dialog"
+        onClick={openDetails}
+      >
+        <span>Details & service history</span>
+        <ArrowRightIcon size={18} aria-hidden="true" />
+      </button>
 
-        <div className="eq-details-body">
-          <section>
-            <h3>Equipment specifications</h3>
+      <dialog
+        ref={dialogRef}
+        className="eq-dialog"
+        aria-labelledby={titleId}
+        onClose={finishClosing}
+        onClick={closeFromBackdrop}
+      >
+        <header className="eq-dialog-header">
+          <div>
+            <h2 id={titleId}>{equipmentTitle(item)}</h2>
+            <p>
+              {item.customer_asset_number || `Equipment #${item.id}`}
+              {' · '}
+              {item.current_site.name}
+            </p>
+          </div>
 
-            <dl className="eq-specifications">
+          <button
+            className="eq-close"
+            type="button"
+            aria-label="Close equipment details"
+            onClick={closeDetails}
+          >
+            <XIcon size={22} aria-hidden="true" />
+          </button>
+        </header>
+
+        <div className="eq-dialog-scroll">
+          <section className="eq-dialog-overview">
+            <div className="eq-photo">
+              <TruckIcon size={48} aria-hidden="true" />
+
+              {item.photo ? (
+                <img
+                  src={item.photo}
+                  alt={equipmentTitle(item)}
+                  loading="lazy"
+                  onError={event => {
+                    event.currentTarget.style.display = 'none'
+                  }}
+                />
+              ) : (
+                <span>No equipment photo recorded</span>
+              )}
+            </div>
+
+            <div>
+              <div className="eq-dialog-badges">
+                <span className="eq-badge eq-badge--muted">
+                  {item.is_retired ? 'Retired equipment' : 'Current equipment record'}
+                </span>
+
+                <span
+                  className={`eq-badge ${
+                    coverage.length ? 'eq-badge--green' : 'eq-badge--muted'
+                  }`}
+                >
+                  {coverage.length ? 'Current AMC coverage' : 'No current AMC'}
+                </span>
+              </div>
+
+              <dl className="eq-specifications">
+                <Specification label="Current site" value={item.current_site.name} />
+                <Specification label="Region" value={item.current_site.region.name} />
+                <Specification label="Current address" value={item.current_site.address} />
+                <Specification label="Active services" value={active.length} />
+              </dl>
+            </div>
+          </section>
+
+          <section className="eq-dialog-section">
+            <div className="eq-section-title">
+              <h3>Equipment specifications</h3>
+            </div>
+
+            <dl className="eq-specifications eq-specifications--three">
               <Specification label="Type" value={item.equipment_type} />
               <Specification label="Brand" value={item.brand} />
               <Specification label="Model" value={item.model_name} />
@@ -304,71 +572,153 @@ function EquipmentCard({ item }) {
                 label="Manufacture year"
                 value={item.manufacture_year}
               />
-              <Specification
-                label="Site address"
-                value={item.current_site.address}
-              />
             </dl>
           </section>
 
-          <section>
-            <h3>Current AMC coverage</h3>
+          <section className="eq-dialog-section">
+            <div className="eq-section-title">
+              <h3>Current AMC coverage</h3>
+              <span className="eq-section-count">{coverage.length}</span>
+            </div>
 
             {!coverage.length ? (
               <p className="eq-muted">
                 No currently effective AMC coverage is recorded.
               </p>
-            ) : coverage.map(record => (
-              <div className="eq-contract" key={record.id}>
-                <strong>{record.contract.contract_number}</strong>
-                <p>
-                  {formatDate(record.start_date)}
-                  {' – '}
-                  {formatDate(record.end_date)}
-                </p>
-                <p>
-                  Next service due: {record.next_service_due_date
-                    ? formatDate(record.next_service_due_date)
-                    : 'Not scheduled'}
-                </p>
+            ) : coverage.map(record => {
+              const interval =
+                record.interval_months_override ??
+                record.contract?.service_interval_months
+
+              return (
+                <div className="eq-contract" key={record.id}>
+                  <strong>{record.contract?.contract_number}</strong>
+
+                  <dl className="eq-specifications">
+                    <Specification
+                      label="Coverage dates"
+                      value={`${formatDate(record.start_date)} – ${formatDate(record.end_date)}`}
+                    />
+
+                    <Specification
+                      label="Service interval"
+                      value={
+                        interval
+                          ? `Every ${interval} ${interval === 1 ? 'month' : 'months'}`
+                          : null
+                      }
+                    />
+
+                    <Specification
+                      label="Next service due"
+                      value={
+                        record.next_service_due_date
+                          ? formatDate(record.next_service_due_date)
+                          : 'Due date not recorded'
+                      }
+                    />
+                  </dl>
+
+                  <ActionButton
+                    available={Boolean(onOpenCoverage)}
+                    onClick={() => followAction(onOpenCoverage, record)}
+                  >
+                    View contract & coverage
+                  </ActionButton>
+                </div>
+              )
+            })}
+          </section>
+
+          <section className="eq-dialog-section">
+            <div className="eq-section-title">
+              <h3>Scheduled visits</h3>
+              <CalendarBlankIcon size={19} aria-hidden="true" />
+            </div>
+
+            {!appointments.length ? (
+              <p className="eq-muted">
+                No planned or confirmed visits supplied.
+                An AMC due date does not confirm a visit.
+              </p>
+            ) : appointments.map(appointment => (
+              <div className="eq-visit" key={appointment.id}>
+                <div>
+                  <strong>
+                    {appointment.purpose
+                      ? appointment.purpose.charAt(0).toUpperCase() +
+                        appointment.purpose.slice(1)
+                      : 'Service visit'}
+                  </strong>
+
+                  <p>
+                    {formatDate(appointment.scheduled_start)}
+                    {' · '}
+                    {appointment.status}
+                  </p>
+                </div>
+
+                <ActionButton
+                  available={Boolean(onOpenAppointment)}
+                  onClick={() =>
+                    followAction(onOpenAppointment, appointment)
+                  }
+                >
+                  View visit
+                </ActionButton>
               </div>
             ))}
           </section>
 
-          <section>
-            <h3>Active services</h3>
+          <section className="eq-dialog-section">
+            <div className="eq-section-title">
+              <h3>Active services</h3>
+              <span className="eq-section-count">{active.length}</span>
+            </div>
 
             {!active.length ? (
               <p className="eq-muted">
                 No active service records for this equipment.
               </p>
-            ) : active.map(record => (
-              <ServiceRecord key={record.id} record={record} />
-            ))}
+            ) : active.map(renderRecord)}
           </section>
 
-          <section>
-            <h3>Completed service history</h3>
+          <section className="eq-dialog-section">
+            <div className="eq-section-title">
+              <h3>Completed service history</h3>
+              <span className="eq-section-count">{completed.length}</span>
+            </div>
 
             {!completed.length ? (
               <p className="eq-muted">
-                No completed service records yet.
+                No recorded completed service history.
               </p>
-            ) : completed.map(record => (
-              <ServiceRecord key={record.id} record={record} />
-            ))}
+            ) : completed.map(renderRecord)}
           </section>
 
           {cancelled.length > 0 && (
-            <section>
-              <h3>Cancelled services</h3>
-              {cancelled.map(record => (
-                <ServiceRecord key={record.id} record={record} />
-              ))}
+            <section className="eq-dialog-section">
+              <div className="eq-section-title">
+                <h3>Cancelled services</h3>
+                <span className="eq-section-count">{cancelled.length}</span>
+              </div>
+
+              {cancelled.map(renderRecord)}
             </section>
           )}
         </div>
-      </details>
+
+        <footer className="eq-dialog-footer">
+          <p>Service progress and final reports belong to each service record.</p>
+
+          <ActionButton
+            available={Boolean(onRequestService) && !item.is_retired}
+            onClick={() => followAction(onRequestService, item)}
+          >
+            Request service
+          </ActionButton>
+        </footer>
+      </dialog>
     </article>
   )
 }
@@ -382,12 +732,19 @@ export default function EquipmentPage({
   loading = false,
   error = '',
   onSignOut,
+  onOpenService,
+  onOpenCoverage,
+  onOpenAppointment,
+  onOpenDocument,
+  onRequestService,
 }) {
+
   const [theme, setTheme] = useState(initialTheme)
   const [query, setQuery] = useState('')
   const [site, setSite] = useState('all')
   const [coverageFilter, setCoverageFilter] = useState('all')
   const [recordFilter, setRecordFilter] = useState('current')
+  const [activityFilter, setActivityFilter] = useState('all')
 
   useEffect(() => {
     try {
@@ -408,6 +765,8 @@ export default function EquipmentPage({
       ])
     ).values()
   ).sort((a, b) => a.name.localeCompare(b.name))
+
+
 
   const current = equipment.filter(item => !item.is_retired)
 
@@ -447,11 +806,21 @@ export default function EquipmentPage({
       (recordFilter === 'current' && !item.is_retired) ||
       (recordFilter === 'retired' && item.is_retired)
 
+
+
+    const hasActiveService = item.service_records.some(isActiveService)
+
+    const matchesActivity =
+      activityFilter === 'all' ||
+      (activityFilter === 'active' && hasActiveService) ||
+      (activityFilter === 'none' && !hasActiveService)
+
     return (
       matchesQuery &&
       matchesSite &&
       matchesCoverage &&
-      matchesRecord
+      matchesRecord &&
+      matchesActivity
     )
   })
 
@@ -459,7 +828,8 @@ export default function EquipmentPage({
     setQuery('')
     setSite('all')
     setCoverageFilter('all')
-    setRecordFilter('all')
+    setRecordFilter('current')
+    setActivityFilter('all')
   }
 
   return (
@@ -534,6 +904,12 @@ export default function EquipmentPage({
 
           {ready && (
             <>
+              {data.is_demo && (
+                <p className="eq-demo-notice">
+                  Preview mode · Fictional equipment records.
+                  No live backend connection.
+                </p>
+              )}
               <section className="eq-summary" aria-label="Equipment summary">
                 {[
                   {
@@ -577,6 +953,19 @@ export default function EquipmentPage({
                 </label>
 
                 <div className="eq-filters">
+
+
+                  <label>
+                    <span>Service activity</span>
+                    <select
+                      value={activityFilter}
+                      onChange={event => setActivityFilter(event.target.value)}
+                    >
+                      <option value="all">All service activity</option>
+                      <option value="active">With active services</option>
+                      <option value="none">Without active services</option>
+                    </select>
+                  </label>
                   <label>
                     <span>Site</span>
                     <select
@@ -643,7 +1032,15 @@ export default function EquipmentPage({
               ) : (
                 <div className="eq-grid">
                   {visible.map(item => (
-                    <EquipmentCard key={item.id} item={item} />
+                    <EquipmentCard
+                      key={item.id}
+                      item={item}
+                      onOpenService={onOpenService}
+                      onOpenCoverage={onOpenCoverage}
+                      onOpenAppointment={onOpenAppointment}
+                      onOpenDocument={onOpenDocument}
+                      onRequestService={onRequestService}
+                    />
                   ))}
                 </div>
               )}

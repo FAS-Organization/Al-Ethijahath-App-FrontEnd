@@ -12,15 +12,14 @@ import './CustomerNavbar.css'
 export const CUSTOMER_NAV_ITEMS = [
   { id: 'overview', label: 'Overview', to: '/dashboard', icon: SquaresFourIcon, end: true },
   { id: 'equipment', label: 'My equipment', to: '/equipment', icon: TruckIcon },
-  { id: 'services', label: 'Services', to: '/services', icon: WrenchIcon },
-  { id: 'maintenance', label: 'AMC & maintenance', to: '/maintenance', icon: CalendarBlankIcon },
+  { id: 'services', label: 'Service jobs', to: '/services', icon: WrenchIcon },
+  { id: 'maintenance', label: 'AMC & service schedule', to: '/maintenance', icon: CalendarBlankIcon },
   { id: 'quotations', label: 'Quotations', to: '/quotations', icon: FileTextIcon },
   { id: 'billing', label: 'Invoices & payments', to: '/billing', icon: ReceiptIcon },
   { id: 'documents', label: 'Reports & documents', to: '/documents', icon: FolderOpenIcon },
   { id: 'notifications', label: 'Notifications', to: '/notifications', icon: BellIcon },
   { id: 'account', label: 'My account', to: '/account', icon: UserCircleIcon },
 ]
-
 const INITIAL_PAGES = ['overview', 'equipment']
 
 /** Render once within BrowserRouter, outside individual page contents.

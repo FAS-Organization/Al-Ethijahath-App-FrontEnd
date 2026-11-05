@@ -12,6 +12,7 @@ import EquipmentPage from './pages/EquipmentPage'
 // Fictional preview records using the EquipmentPage data structure.
 // Replace this data with the customer-scoped API response later.
 const EQUIPMENT_PREVIEW_DATA = {
+  is_demo: true,
   company_name: 'Demo Customer Company',
 
   equipment: [
