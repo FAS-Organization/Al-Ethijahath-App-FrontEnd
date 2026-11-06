@@ -835,9 +835,7 @@ export default function EquipmentPage({
 
   return (
     <div className="eq-page" data-theme={theme}>
-      <a className="eq-skip" href="#equipment-content">
-        Skip to equipment
-      </a>
+
 
       <CustomerNavbar
         companyName="Demo Customer Company"

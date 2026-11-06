@@ -1417,9 +1417,7 @@ export default function AmcSchedulePage({
 
   return (
     <div className="sc-page" data-theme={theme}>
-      <a className="sc-skip" href="#schedule-content">
-        Skip to AMC and service schedule
-      </a>
+
 
       <CustomerNavbar
         companyName="Demo Customer Company"

@@ -860,9 +860,7 @@ export default function InvoicesPage({
 
   return (
     <div className="sv-page" data-theme={theme}>
-      <a className="sv-skip" href="#invoices-content">
-        Skip to invoices
-      </a>
+
 
       <CustomerNavbar
         companyName="Demo Customer Company"

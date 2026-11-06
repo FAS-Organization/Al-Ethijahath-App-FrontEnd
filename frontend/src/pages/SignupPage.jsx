@@ -250,9 +250,6 @@ export default function SignupPage({ onRegister, onLogin }) {
 
   return (
     <div className="signup-shell">
-      <a className="skip-link" href="#signup">
-        Skip to form
-      </a>
 
       <header className="portal-header">
         <a

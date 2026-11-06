@@ -475,9 +475,7 @@ export default function DashboardPage({
       className="ed-dashboard"
       data-theme={theme}
     >
-      <a className="ed-skip-link" href="#overview">
-        Skip to dashboard
-      </a>
+
 
       <CustomerNavbar
         companyName="Demo Customer Company"

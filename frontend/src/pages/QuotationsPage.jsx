@@ -752,9 +752,7 @@ export default function QuotationsPage({
 
   return (
     <div className="qt-page" data-theme={theme}>
-      <a className="qt-skip-link" href="#qt-main">
-        Skip to quotations
-      </a>
+
 
       <CustomerNavbar
         companyName="Demo Customer Company"

@@ -994,9 +994,7 @@ export default function ServicesPage({
 
   return (
     <div className="sv-page" data-theme={theme}>
-      <a className="sv-skip" href="#services-content">
-        Skip to service jobs
-      </a>
+
 
       <CustomerNavbar
         companyName="Demo Customer Company"
