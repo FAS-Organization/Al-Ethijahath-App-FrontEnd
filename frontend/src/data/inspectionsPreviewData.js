@@ -1,0 +1,136 @@
+import { PREVIEW_SITES } from './customerPreviewData'
+
+// Each row represents one customer-visible inspection report version.
+// IDs are fictional. Django will supply the actual record IDs later.
+export const INSPECTIONS_PREVIEW_DATA = [
+  {
+    id: 'inspection-1031A-v1',
+    number: 'INS-1031A',
+    version: 1,
+    serviceReference: '1031A',
+    equipment: 'Perkins generator · 1104A',
+    site: PREVIEW_SITES.main.name,
+    status: 'pending_approval',
+    remarks: 'Scheduled AMC inspection of the filters and cooling system.',
+    findings: [
+      {
+        component: 'Air filter',
+        condition: 'worn',
+        proposed_action: 'replace',
+        description: 'Filter element shows wear at the sealing edge.',
+      },
+    ],
+  },
+  {
+    id: 'inspection-1042A-v1',
+    number: 'INS-1042A',
+    version: 1,
+    serviceReference: '1042A',
+    equipment: 'Toyota forklift · 8FG25',
+    site: PREVIEW_SITES.main.name,
+    status: 'approved',
+    remarks: 'Hydraulic leak inspected at the lifting assembly.',
+    findings: [
+      {
+        component: 'Hydraulic hose',
+        condition: 'damaged',
+        proposed_action: 'replace',
+        description: 'The hose leaks at the lift-cylinder connection.',
+      },
+    ],
+  },
+  {
+    id: 'inspection-1038A-v1',
+    number: 'INS-1038A',
+    version: 1,
+    serviceReference: '1038A',
+    equipment: 'Perkins generator · 1104A',
+    site: PREVIEW_SITES.depot.name,
+    status: 'approved',
+    remarks: 'Starting system inspected following a failure to start.',
+    findings: [
+      {
+        component: 'Starter motor',
+        condition: 'defective',
+        proposed_action: 'replace',
+        description: 'Starter motor failed the operating test.',
+      },
+    ],
+  },
+  {
+    id: 'inspection-1026A-v1',
+    number: 'INS-1026A',
+    version: 1,
+    serviceReference: '1026A',
+    equipment: 'Hyster forklift · H3.0FT',
+    site: PREVIEW_SITES.depot.name,
+    status: 'approved',
+    remarks: 'Routine preventive maintenance inspection completed.',
+    findings: [],
+  },
+  {
+    id: 'inspection-1048A-v1',
+    number: 'IR-DEMO-1048A',
+    version: 1,
+    serviceReference: '1048A',
+    equipment: 'Hyster forklift · H3.0FT',
+    site: PREVIEW_SITES.depot.name,
+    status: 'approved',
+    remarks: 'Brake wear assessed before issuing the repair quotation.',
+    findings: [
+      {
+        component: 'Brake components',
+        condition: 'worn',
+        proposed_action: 'replace',
+        description: 'Wear identified during the braking inspection.',
+      },
+    ],
+  },
+  {
+    id: 'inspection-1036A-v1',
+    number: 'IR-DEMO-1036A',
+    version: 1,
+    serviceReference: '1036A',
+    equipment: 'Perkins generator · 1104A',
+    site: PREVIEW_SITES.main.name,
+    status: 'approved',
+    remarks: 'Cooling system inspected before the quoted generator service.',
+    findings: [],
+  },
+  {
+    id: 'inspection-1050A-v1',
+    number: 'IR-DEMO-1050A',
+    version: 1,
+    serviceReference: '1050A',
+    equipment: 'Electric shutter · Industrial roller door',
+    site: PREVIEW_SITES.north.name,
+    status: 'approved',
+    remarks: 'Shutter safety response checked.',
+    findings: [
+      {
+        component: 'Safety sensor',
+        condition: 'defective',
+        proposed_action: 'replace',
+        description: 'Sensor response was intermittent during testing.',
+      },
+    ],
+  },
+  {
+    id: 'inspection-1052A-v1',
+    number: 'IR-DEMO-1052A',
+    version: 1,
+    serviceReference: '1052A',
+    equipment: 'Toyota forklift · 8FG25',
+    site: PREVIEW_SITES.main.name,
+    status: 'approved',
+    remarks: 'Mast movement and roller alignment inspected.',
+    findings: [
+      {
+        component: 'Mast roller',
+        condition: 'damaged',
+        proposed_action: 'replace',
+        description: 'Damage found on the roller during inspection.',
+      },
+    ],
+  },
+]

@@ -2238,3 +2238,84 @@ html:has(.ed-dashboard) {
 /* =========================================================
    REDUCED MOTION
    ========================================================= */
+/* Pending service charges, immediately above the summary cards */
+.ed-charge-strip {
+  margin: 0 0 16px;
+  overflow: hidden;
+  border: 1px solid var(--ed-line);
+  border-radius: 10px;
+  background: linear-gradient(
+    105deg,
+    var(--ed-warning-bg),
+    var(--ed-soft-surface)
+  );
+}
+
+.ed-charge-strip > summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 8px 16px;
+  color: var(--ed-warning);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  list-style: none;
+  cursor: pointer;
+}
+
+.ed-charge-strip > summary::-webkit-details-marker {
+  display: none;
+}
+
+.ed-charge-strip > summary > strong {
+  color: var(--ed-heading);
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.ed-charge-strip > summary:focus-visible {
+  outline: 2px solid var(--ed-accent);
+  outline-offset: -3px;
+}
+
+.ed-charge-chevron {
+  transition: transform 180ms ease;
+}
+
+.ed-charge-strip[open] .ed-charge-chevron {
+  transform: rotate(180deg);
+}
+
+.ed-charge-strip > ul {
+  margin: 0;
+  padding: 0 16px;
+  border-top: 1px solid var(--ed-line);
+  background: var(--ed-surface);
+  list-style: none;
+}
+
+.ed-charge-strip li {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  padding: 10px 0;
+  color: var(--ed-text);
+  font-size: 13px;
+}
+
+.ed-charge-strip li + li {
+  border-top: 1px solid var(--ed-line);
+}
+
+.ed-charge-strip li small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ed-muted);
+  font-size: 12px;
+}

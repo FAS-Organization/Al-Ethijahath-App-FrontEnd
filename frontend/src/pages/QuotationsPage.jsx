@@ -14,6 +14,7 @@ import {
 } from '@phosphor-icons/react'
 import CustomerNavbar from '../components/CustomerNavbar'
 import { createDemoQuotations } from '../data/quotationsPreviewData'
+import { INSPECTIONS_PREVIEW_DATA } from '../data/inspectionsPreviewData'
 import './QuotationsPage.css'
 
 const THEME_KEY = 'ethijahath-dashboard-theme'
@@ -831,6 +832,9 @@ function QuotationDialog({
   )
 }
 
+
+
+
 export default function QuotationsPage({
   onOpenService,
   onOpenInspection,
@@ -1017,7 +1021,7 @@ export default function QuotationsPage({
           <div className="qt-breadcrumb">
             <span>Customer portal</span>
             <span aria-hidden="true">/</span>
-            <strong>Quotations</strong>
+            <strong>Inspections &amp; quotations</strong>
           </div>
 
           <div className="qt-topbar-actions">
@@ -1048,9 +1052,9 @@ export default function QuotationsPage({
         <div className="qt-content">
           <div className="qt-page-heading">
             <div>
-              <h1>Quotations</h1>
+              <h1>Inspections &amp; quotations</h1>
               <p>
-                Review proposed work, check the price and record your decision.
+                Review your equipment inspections and decide on quotations for the proposed work.
               </p>
             </div>
 
@@ -1112,6 +1116,113 @@ export default function QuotationsPage({
                 <small>This is not an outstanding invoice balance.</small>
               </div>
             ) : null}
+          </section>
+
+          <section
+            className="qt-panel qt-inspections"
+            aria-labelledby="qt-inspections-title"
+          >
+            <div className="qt-panel-heading">
+              <div>
+                <h2 id="qt-inspections-title">Inspection reports</h2>
+                <p>Review the technician’s findings and any related quotation.</p>
+              </div>
+            </div>
+
+            <div className="qt-inspection-list">
+              {INSPECTIONS_PREVIEW_DATA.map(report => {
+                const relatedQuote = currentQuotations.find(
+                  quote => quote.inspection_report_id === report.id,
+                )
+
+                const statusLabel = {
+                  pending_approval: 'Awaiting signature',
+                  approved: 'Approved',
+                  superseded: 'Previous version',
+                }[report.status]
+
+                return (
+                  <details
+                    className="qt-inspection"
+                    id={report.id}
+                    key={report.id}
+                  >
+                    <summary>
+                      <FileTextIcon size={22} aria-hidden="true" />
+
+                      <span className="qt-inspection-title">
+                        <strong>{report.equipment}</strong>
+                        <small>
+                          {report.number} · Version {report.version} · Service{' '}
+                          {report.serviceReference}
+                        </small>
+                      </span>
+
+                      <span
+                        className={`qt-status qt-status--${
+                          report.status === 'pending_approval'
+                            ? 'sent'
+                            : report.status
+                        }`}
+                      >
+                        {statusLabel}
+                      </span>
+
+                      <span className="qt-inspection-toggle" aria-hidden="true" />
+                    </summary>
+
+                    <div className="qt-inspection-body">
+                      <dl className="qt-detail-grid">
+                        <DetailField label="Service site">
+                          {report.site}
+                        </DetailField>
+
+                        <DetailField label="Technician remarks">
+                          {report.remarks}
+                        </DetailField>
+                      </dl>
+
+                      <h3>Inspection findings</h3>
+
+                      {report.findings.length > 0 ? (
+                        <ul>
+                          {report.findings.map(finding => (
+                            <li key={finding.component}>
+                              <strong>{finding.component}</strong>
+                              {' · '}{finding.condition}
+                              {' · Proposed action: '}{finding.proposed_action}
+                              <p>{finding.description}</p>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="qt-helper">
+                          No individual findings recorded in this preview.
+                        </p>
+                      )}
+
+                      {report.status === 'pending_approval' && (
+                        <p className="qt-notice">
+                          This report is awaiting the customer’s signature.
+                          Signature capture is pending backend integration.
+                        </p>
+                      )}
+
+                      {relatedQuote && (
+                        <button
+                          type="button"
+                          className="qt-text-button"
+                          onClick={() => setSelectedId(relatedQuote.id)}
+                        >
+                          View quotation {relatedQuote.number}
+                          <ArrowUpRightIcon size={16} aria-hidden="true" />
+                        </button>
+                      )}
+                    </div>
+                  </details>
+                )
+              })}
+            </div>
           </section>
 
           <section className="qt-panel" aria-labelledby="qt-list-title">
@@ -1348,7 +1459,28 @@ export default function QuotationsPage({
             onSelectVersion={setSelectedId}
             onDecision={decideQuotation}
             onOpenService={onOpenService}
-            onOpenInspection={onOpenInspection}
+            onOpenInspection={
+              onOpenInspection ||
+              (INSPECTIONS_PREVIEW_DATA.some(
+                report => report.id === selectedQuotation.inspection_report_id,
+              )
+                ? quote => {
+                    requestAnimationFrame(() => {
+                      const details = document.getElementById(
+                        quote.inspection_report_id,
+                      )
+
+                      if (!details) return
+
+                      details.open = true
+                      details.querySelector('summary')?.focus({
+                        preventScroll: true,
+                      })
+                      details.scrollIntoView({ block: 'center' })
+                    })
+                  }
+                : undefined)
+            }
           />
         ) : null}
       </main>

@@ -14,7 +14,7 @@ export const CUSTOMER_NAV_ITEMS = [
   { id: 'equipment', label: 'My equipment', to: '/equipment', icon: TruckIcon },
   { id: 'services', label: 'Service jobs', to: '/services', icon: WrenchIcon },
   { id: 'maintenance', label: 'AMC & service', to: '/maintenance', icon: CalendarBlankIcon },
-  { id: 'quotations', label: 'Quotations', to: '/quotations', icon: FileTextIcon },
+  { id: 'quotations', label: 'Inspections & quotations', to: '/quotations', icon: FileTextIcon },
   { id: 'billing', label: 'Invoices & payments', to: '/billing', icon: ReceiptIcon },
   { id: 'documents', label: 'Reports & documents', to: '/documents', icon: FolderOpenIcon },
   { id: 'notifications', label: 'Notifications', to: '/notifications', icon: BellIcon },

@@ -50,7 +50,8 @@ export function createDemoQuotations() {
       sentDays: -2,
       total: '1200.00',
       job_equipment: toyotaService,
-      inspection_reference: 'IR-DEMO-1042A · Version 1',
+      inspection_report_id: 'inspection-1042A-v1',
+      inspection_reference: 'INS-1042A · Version 1',
       customer_summary:
         'Replace the leaking hydraulic hose, check the associated ' +
         'connections and carry out a hydraulic leak and operating test.',
@@ -66,7 +67,8 @@ export function createDemoQuotations() {
       sentDays: -4,
       total: '1350.00',
       job_equipment: toyotaService,
-      inspection_reference: 'IR-DEMO-1042A · Version 1',
+      inspection_report_id: 'inspection-1042A-v1',
+      inspection_reference: 'INS-1042A · Version 1',
       customer_summary:
         'Replace the leaking hydraulic hose and associated fittings, ' +
         'then carry out a hydraulic operating test.',
@@ -89,6 +91,7 @@ export function createDemoQuotations() {
         asset_number: 'EQ-004',
         site_name: PREVIEW_SITES.depot.name,
       },
+      inspection_report_id: 'inspection-1048A-v1',
       inspection_reference: 'IR-DEMO-1048A · Version 1',
       customer_summary:
         'Replace worn brake components, adjust the braking system ' +
@@ -112,6 +115,7 @@ export function createDemoQuotations() {
         asset_number: 'EQ-002',
         site_name: PREVIEW_SITES.main.name,
       },
+      inspection_report_id: 'inspection-1036A-v1',
       inspection_reference: 'IR-DEMO-1036A · Version 1',
       customer_summary:
         'Service the cooling system, replace the identified worn ' +
@@ -137,6 +141,7 @@ export function createDemoQuotations() {
         asset_number: 'EQ-003',
         site_name: PREVIEW_SITES.north.name,
       },
+      inspection_report_id: 'inspection-1050A-v1',
       inspection_reference: 'IR-DEMO-1050A · Version 1',
       customer_summary:
         'Replace the faulty safety sensor, adjust its alignment ' +
@@ -159,6 +164,7 @@ export function createDemoQuotations() {
         asset_number: 'EQ-001',
         site_name: PREVIEW_SITES.main.name,
       },
+      inspection_report_id: 'inspection-1052A-v1',
       inspection_reference: 'IR-DEMO-1052A · Version 1',
       customer_summary:
         'Replace the damaged mast roller and check mast movement ' +

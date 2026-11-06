@@ -586,7 +586,46 @@ export default function DashboardPage({
           {ready && (
             <>
 
-            {/* SUMMARY CARDS */}
+              {pendingServiceCharges.length > 0 && (
+                <details className="ed-charge-strip" id="pending-service-charges">
+                  <summary>
+                    <ReceiptIcon size={19} aria-hidden="true" />
+
+                    <span>Service charges pending invoice</span>
+
+                    <strong>
+                      {money(
+                        pendingServiceCharges.reduce(
+                          (sum, charge) => sum + charge.balanceMinor,
+                          0
+                        )
+                      )}
+                    </strong>
+
+                    <ArrowDownIcon
+                      className="ed-charge-chevron"
+                      size={16}
+                      aria-hidden="true"
+                    />
+                  </summary>
+
+                  <ul>
+                    {pendingServiceCharges.map(charge => (
+                      <li key={charge.id}>
+                        <div>
+                          <strong>{charge.description}</strong>
+                          <small>
+                            {charge.jobReference} · {charge.equipment} · {charge.site}
+                          </small>
+                        </div>
+                        <strong>{money(charge.balanceMinor)} left to pay</strong>
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              )}
+
+              {/* SUMMARY CARDS */}
               <section
                 className="ed-metrics"
                 aria-label="Account summary"
@@ -978,31 +1017,7 @@ export default function DashboardPage({
                 </section>
               </div>
 
-              {pendingServiceCharges.length > 0 && (
-                <section className="ed-panel" id="pending-service-charges">
-                  <SectionHeading
-                    title="Service charges pending invoice"
-                    description="Confirmed charges for completed work awaiting an invoice."
-                  />
-
-                  {pendingServiceCharges.map(charge => (
-                    <article className="ed-job" key={charge.id}>
-                      <div className="ed-record-heading">
-                        <div>
-                          <h3>{charge.description}</h3>
-                          <p className="ed-muted">
-                            {charge.jobReference} · {charge.equipment} · {charge.site}
-                          </p>
-                        </div>
-
-                        <Status tone="warning">
-                          {money(charge.balanceMinor)} left to pay
-                        </Status>
-                      </div>
-                    </article>
-                  ))}
-                </section>
-              )}
+              
 
               {/* INVOICES AND PARTIAL PAYMENTS */}
               <section className="ed-panel ed-table-panel" id="invoices">
