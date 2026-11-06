@@ -1,5 +1,5 @@
-// Fictional dashboard records.
-// Monetary amounts are integer halalas: 100 halalas = SAR 1.
+import { PREVIEW_SITES } from './customerPreviewData'
+
 export const DASHBOARD_PREVIEW_DATA = {
   companyName: 'Demo company',
 
@@ -8,7 +8,7 @@ export const DASHBOARD_PREVIEW_DATA = {
       id: 'EQ-001',
       name: 'Toyota forklift',
       model: '8FG25',
-      site: 'Riyadh warehouse',
+      site: PREVIEW_SITES.main.name,
       coverage: 'AMC',
       status: 'In service',
       lastService: '2026-10-12',
@@ -17,7 +17,7 @@ export const DASHBOARD_PREVIEW_DATA = {
       id: 'EQ-002',
       name: 'Perkins generator',
       model: '1104A',
-      site: 'Riyadh warehouse',
+      site: PREVIEW_SITES.main.name,
       coverage: 'AMC',
       status: 'Operational',
       lastService: '2026-10-16',
@@ -26,7 +26,7 @@ export const DASHBOARD_PREVIEW_DATA = {
       id: 'EQ-003',
       name: 'Electric shutter',
       model: 'Industrial roller door',
-      site: 'Jeddah facility',
+      site: PREVIEW_SITES.north.name,
       coverage: 'Non-AMC',
       status: 'Inspection scheduled',
       lastService: null,
@@ -35,7 +35,7 @@ export const DASHBOARD_PREVIEW_DATA = {
       id: 'EQ-004',
       name: 'Hyster forklift',
       model: 'H3.0FT',
-      site: 'Dammam depot',
+      site: PREVIEW_SITES.depot.name,
       coverage: 'AMC',
       status: 'Operational',
       lastService: '2026-10-21',
@@ -46,7 +46,7 @@ export const DASHBOARD_PREVIEW_DATA = {
     {
       id: 'JOB-1042',
       equipment: 'Toyota forklift',
-      site: 'Riyadh warehouse',
+      site: PREVIEW_SITES.main.name,
       status: 'Awaiting approval',
       damage: 'Hydraulic hose leak detected during inspection.',
       work: 'Inspection completed. Replacement quotation issued.',
@@ -55,7 +55,7 @@ export const DASHBOARD_PREVIEW_DATA = {
     {
       id: 'JOB-1045',
       equipment: 'Electric shutter',
-      site: 'Jeddah facility',
+      site: PREVIEW_SITES.north.name,
       status: 'Inspection scheduled',
       damage: 'Intermittent opening reported by the customer.',
       work: 'Controller and safety-sensor inspection scheduled.',
@@ -67,7 +67,7 @@ export const DASHBOARD_PREVIEW_DATA = {
     {
       id: 'APT-1045',
       equipment: 'Electric shutter',
-      site: 'Jeddah facility',
+      site: PREVIEW_SITES.north.name,
       startsAt: '2026-11-10T09:00:00+03:00',
       status: 'Confirmed',
       reschedulePending: false,
@@ -75,7 +75,7 @@ export const DASHBOARD_PREVIEW_DATA = {
     {
       id: 'APT-1046',
       equipment: 'Perkins generator',
-      site: 'Riyadh warehouse',
+      site: PREVIEW_SITES.main.name,
       startsAt: '2026-11-16T10:00:00+03:00',
       status: 'Reschedule requested',
       reschedulePending: true,

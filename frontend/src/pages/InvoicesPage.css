@@ -1,0 +1,530 @@
+/* =========================================================
+   INVOICES & PAYMENTS
+   Shell, summary cards, tabs, search, buttons, badges and the dialog
+   frame come from ServicesPage.css (sv- classes). Only invoice parts
+   are styled here.
+   ========================================================= */
+
+.sv-main :where(h4, ul, pre, figure, figcaption) {
+  margin: 0;
+}
+
+/* Summary values: one big amount, or a short stack when the customer
+   has invoices in more than one currency. */
+.iv-values strong {
+  display: block;
+  margin-top: 4px;
+}
+
+.sv-page .iv-values--multi strong {
+  margin-top: 2px;
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+.sv-page .iv-values:not(.iv-values--multi) strong {
+  font-size: 26px;
+}
+
+/* Invoice card */
+.iv-card--overdue {
+  border-color: var(--sv-accent);
+}
+
+.iv-amounts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 24px;
+  margin-top: 20px;
+  padding: 18px 20px;
+  border-radius: 10px;
+  background: var(--sv-soft);
+}
+
+.iv-amounts dt {
+  margin-bottom: 4px;
+  color: var(--sv-muted);
+  font-size: 12px;
+}
+
+.iv-amounts dd {
+  font-size: 15px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.iv-amounts-remaining dd {
+  color: var(--sv-heading);
+  font-size: 17px;
+}
+
+.sv-page .iv-late {
+  color: var(--sv-accent);
+}
+
+.iv-meter-block {
+  margin: 16px 0 20px;
+}
+
+.iv-meter {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--sv-line);
+}
+
+.iv-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--sv-green);
+  transition: width 600ms var(--sv-ease);
+}
+
+.iv-meter-block p {
+  margin-top: 8px;
+  color: var(--sv-muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.iv-card .sv-note {
+  margin-bottom: 16px;
+}
+
+.iv-card .sv-record-actions .sv-action svg:first-child {
+  flex-shrink: 0;
+}
+
+.iv-gap {
+  margin-top: 24px;
+}
+
+.iv-footnote {
+  margin-top: 28px !important;
+  color: var(--sv-muted);
+  font-size: 12px;
+}
+
+/* Small helpers */
+.iv-copy,
+.iv-link {
+  border: 0;
+  background: transparent;
+  color: var(--sv-accent);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.iv-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--sv-line);
+  border-radius: 7px;
+  background: var(--sv-surface);
+  font-size: 12px;
+}
+
+.iv-link {
+  padding: 8px 0;
+  min-height: 44px;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Tables (payment history and invoice lines) */
+.iv-table-scroll {
+  overflow-x: auto;
+  border: 1px solid var(--sv-line);
+  border-radius: 10px;
+  background: var(--sv-surface);
+}
+
+.iv-table {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.iv-table th,
+.iv-table td {
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--sv-line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.iv-table thead th {
+  background: var(--sv-soft);
+  color: var(--sv-muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.iv-table tbody th {
+  font-weight: 600;
+}
+
+.iv-table tbody th small {
+  display: block;
+  margin-top: 2px;
+  color: var(--sv-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.iv-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.iv-table .iv-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.iv-table tbody tr > :first-child {
+  transition: box-shadow 260ms ease;
+}
+
+.iv-ledger-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 24px 0 16px;
+}
+
+.iv-ledger-head h2 {
+  color: var(--sv-heading);
+  font-size: 20px;
+}
+
+.iv-ledger-head p {
+  margin-top: 6px;
+  max-width: 60ch;
+  color: var(--sv-muted);
+  font-size: 12px;
+}
+
+.iv-ledger-head strong {
+  color: var(--sv-text);
+}
+
+/* Invoice dialog */
+.sv-dialog.iv-dialog {
+  width: min(860px, calc(100% - 40px));
+}
+
+.iv-dialog-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.iv-dialog h3 {
+  margin-bottom: 14px;
+  color: var(--sv-heading);
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.iv-dialog .sv-dialog-scroll {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+}
+
+.iv-meta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 24px;
+}
+
+.iv-meta dt {
+  margin-bottom: 4px;
+  color: var(--sv-muted);
+  font-size: 12px;
+}
+
+.iv-meta dd {
+  font-size: 13px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.iv-meta dd small {
+  display: block;
+  margin-top: 2px;
+  color: var(--sv-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.iv-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--sv-line);
+  border-left: 3px solid var(--sv-accent);
+  border-radius: 8px;
+  background: var(--sv-soft);
+  font-size: 13px;
+}
+
+.iv-callout--green {
+  border-left-color: var(--sv-green);
+  background: var(--sv-green-bg);
+  color: var(--sv-green);
+  font-weight: 600;
+}
+
+.iv-callout > svg {
+  flex-shrink: 0;
+}
+
+.iv-totals {
+  display: grid;
+  gap: 0;
+  width: min(100%, 380px);
+  margin: 16px 0 0 auto;
+}
+
+.iv-totals > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 8px 0;
+  font-size: 13px;
+}
+
+.iv-totals dt {
+  color: var(--sv-muted);
+}
+
+.iv-totals dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.iv-totals-strong {
+  border-top: 1px solid var(--sv-line);
+  font-weight: 700;
+}
+
+.iv-totals-strong dt {
+  color: var(--sv-text);
+}
+
+.iv-totals-remaining {
+  margin-top: 4px;
+  padding: 12px 14px !important;
+  border: 1px solid var(--sv-accent);
+  border-radius: 8px;
+  background: var(--sv-accent-soft);
+}
+
+.iv-totals-remaining dt,
+.iv-totals-remaining dd {
+  color: var(--sv-accent);
+  font-size: 15px;
+}
+
+.iv-list {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--sv-line);
+  border-radius: 10px;
+}
+
+.iv-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--sv-line);
+  font-size: 13px;
+}
+
+.iv-list li:last-child {
+  border-bottom: 0;
+}
+
+.iv-list li > div {
+  min-width: 0;
+}
+
+.iv-list strong,
+.iv-list span {
+  display: block;
+}
+
+.iv-list span {
+  margin-top: 2px;
+  color: var(--sv-muted);
+  font-size: 12px;
+}
+
+.iv-list b {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* How to pay */
+.iv-pay {
+  padding: 20px;
+  border: 1px solid var(--sv-line);
+  border-radius: 12px;
+  background: var(--sv-soft);
+  scroll-margin-top: 8px;
+}
+
+.iv-pay > p {
+  margin-bottom: 16px;
+}
+
+.iv-pay-grid {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.iv-pay-grid:not(:has(figure)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.iv-pay figure {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--sv-line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.iv-pay figure img {
+  display: block;
+  width: 150px;
+  height: 150px;
+}
+
+.iv-pay figcaption {
+  color: #5b514c;
+  font-size: 11px;
+}
+
+.iv-pay h4 {
+  margin-bottom: 8px;
+  color: var(--sv-text);
+  font-size: 13px;
+}
+
+.iv-pay pre {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  overflow-x: auto;
+  border: 1px solid var(--sv-line);
+  border-radius: 8px;
+  background: var(--sv-surface);
+  font: 13px/1.7 Arial, Helvetica, sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.iv-copy-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.iv-steps-list {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--sv-muted);
+  font-size: 12px;
+}
+
+/* Interaction */
+@media (hover: hover) and (pointer: fine) {
+  .iv-copy:hover {
+    border-color: var(--sv-button);
+    background: var(--sv-accent-soft);
+  }
+
+  .iv-link:hover {
+    color: var(--sv-heading);
+  }
+
+  .iv-table tbody tr:hover > :first-child {
+    box-shadow: inset 3px 0 0 var(--sv-accent);
+  }
+
+  .iv-table tbody tr:hover {
+    background: var(--sv-soft);
+  }
+}
+
+@media (max-width: 1023px) {
+  .iv-amounts,
+  .iv-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .iv-amounts {
+    padding: 16px;
+  }
+
+  .iv-pay {
+    padding: 16px;
+  }
+
+  .iv-pay-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .iv-pay figure {
+    justify-self: start;
+  }
+
+  .iv-totals {
+    width: 100%;
+  }
+
+  .iv-list li {
+    align-items: flex-start;
+  }
+
+  .iv-ledger-head .sv-action {
+    width: 100%;
+  }
+
+  .iv-copy {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iv-meter span {
+    transition: none;
+  }
+}

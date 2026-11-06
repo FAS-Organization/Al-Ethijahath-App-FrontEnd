@@ -1,3 +1,9 @@
+import {
+  PREVIEW_REGION,
+  PREVIEW_SITES,
+} from './customerPreviewData'
+
+
 const DAY = 24 * 60 * 60 * 1000
 
 export function createDemoQuotations() {
@@ -11,7 +17,7 @@ export function createDemoQuotations() {
     ...quotation
   }) => ({
     currency: 'SAR',
-    region_name: 'Riyadh',
+    region_name: PREVIEW_REGION.name,
     company_name: 'Demo Customer Company',
     rejection_reason: '',
     previous_version: null,
@@ -31,7 +37,7 @@ export function createDemoQuotations() {
     equipment_name: 'Toyota forklift',
     model_name: '8FG25',
     asset_number: 'EQ-001',
-    site_name: 'Riyadh main warehouse',
+    site_name: PREVIEW_SITES.main.name,
   }
 
   return [
@@ -81,7 +87,7 @@ export function createDemoQuotations() {
         equipment_name: 'Hyster forklift',
         model_name: 'H3.0FT',
         asset_number: 'EQ-004',
-        site_name: 'Riyadh north warehouse',
+        site_name: PREVIEW_SITES.depot.name,
       },
       inspection_reference: 'IR-DEMO-1048A · Version 1',
       customer_summary:
@@ -104,7 +110,7 @@ export function createDemoQuotations() {
         equipment_name: 'Perkins generator',
         model_name: '1104A',
         asset_number: 'EQ-002',
-        site_name: 'Riyadh main warehouse',
+        site_name: PREVIEW_SITES.main.name,
       },
       inspection_reference: 'IR-DEMO-1036A · Version 1',
       customer_summary:
@@ -129,7 +135,7 @@ export function createDemoQuotations() {
         equipment_name: 'Electric shutter',
         model_name: 'Industrial roller door',
         asset_number: 'EQ-003',
-        site_name: 'Riyadh north warehouse',
+        site_name: PREVIEW_SITES.north.name,
       },
       inspection_reference: 'IR-DEMO-1050A · Version 1',
       customer_summary:
@@ -151,7 +157,7 @@ export function createDemoQuotations() {
         equipment_name: 'Toyota forklift',
         model_name: '8FG25',
         asset_number: 'EQ-001',
-        site_name: 'Riyadh main warehouse',
+        site_name: PREVIEW_SITES.main.name,
       },
       inspection_reference: 'IR-DEMO-1052A · Version 1',
       customer_summary:

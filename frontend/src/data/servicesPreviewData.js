@@ -1,32 +1,6 @@
-// Fictional preview records for the Service jobs page.
-// Same shape the customer API will return later, so replacing this
-// file with the real response needs no change inside ServicesPage.jsx.
-//
-// Django mapping:
-//   job                    -> ServiceJob
-//   job.machines[]         -> JobEquipment (reference = job id + suffix)
-//   machine.updates[]      -> ServiceUpdate, customer-visible ones only
-//   machine.next_appointment -> next ServiceAppointment (+ open RescheduleRequest)
-//   machine.pending_actions  -> derived: things the customer must decide
-//   machine.documents      -> published customer documents only
+import { PREVIEW_SITES as SITES } from './customerPreviewData'
 
-const SITES = {
-  riyadh: {
-    id: 1,
-    name: 'Riyadh warehouse',
-    region: { id: 1, name: 'Riyadh' },
-  },
-  jeddah: {
-    id: 2,
-    name: 'Jeddah facility',
-    region: { id: 2, name: 'Jeddah' },
-  },
-  dammam: {
-    id: 3,
-    name: 'Dammam depot',
-    region: { id: 3, name: 'Dammam' },
-  },
-}
+
 
 export const SERVICES_PREVIEW_DATA = {
   is_demo: true,
@@ -34,7 +8,7 @@ export const SERVICES_PREVIEW_DATA = {
 
   // Options for the "Request a service" form: sites and current equipment.
   request_options: {
-    sites: [SITES.riyadh, SITES.jeddah, SITES.dammam],
+    sites: [SITES.main, SITES.north, SITES.depot],
     equipment: [
       { id: 1, site_id: 1, label: 'Toyota Forklift 8FG25', asset: 'EQ-001' },
       { id: 2, site_id: 1, label: 'Perkins Generator 1104A', asset: 'EQ-002' },
@@ -51,8 +25,8 @@ export const SERVICES_PREVIEW_DATA = {
       description:
         'Hydraulic oil leaking near the lifting assembly on the Toyota forklift. Mast also drifts down under load.',
       requested_date: '2026-11-02',
-      site: SITES.riyadh,
-      site_address_snapshot: 'Demo warehouse address, Riyadh',
+      site: SITES.main,
+      site_address_snapshot: SITES.main.address,
       machines: [
         {
           id: 201,
@@ -164,8 +138,8 @@ export const SERVICES_PREVIEW_DATA = {
       description:
         'Electric roller shutter occasionally stops while opening. Safety sensor suspected.',
       requested_date: '2026-10-30',
-      site: SITES.jeddah,
-      site_address_snapshot: 'Demo facility address, Jeddah',
+      site: SITES.north,
+      site_address_snapshot: SITES.north.address,
       machines: [
         {
           id: 203,
@@ -227,8 +201,8 @@ export const SERVICES_PREVIEW_DATA = {
       status: 'in_progress',
       description: 'Generator fails to start after a long idle period.',
       requested_date: '2026-10-24',
-      site: SITES.dammam,
-      site_address_snapshot: 'Demo depot address, Dammam',
+      site: SITES.depot,
+      site_address_snapshot: SITES.depot.address,
       machines: [
         {
           id: 204,
@@ -299,8 +273,8 @@ export const SERVICES_PREVIEW_DATA = {
       status: 'open',
       description: 'Scheduled AMC service for the Perkins generator.',
       requested_date: '2026-10-28',
-      site: SITES.riyadh,
-      site_address_snapshot: 'Demo warehouse address, Riyadh',
+      site: SITES.main,
+      site_address_snapshot: SITES.main.address,
       machines: [
         {
           id: 205,
@@ -358,8 +332,8 @@ export const SERVICES_PREVIEW_DATA = {
       status: 'completed',
       description: 'Routine preventive maintenance under the AMC contract.',
       requested_date: '2026-10-19',
-      site: SITES.dammam,
-      site_address_snapshot: 'Demo depot address, Dammam',
+      site: SITES.depot,
+      site_address_snapshot: SITES.depot.address,
       machines: [
         {
           id: 206,
@@ -421,8 +395,8 @@ export const SERVICES_PREVIEW_DATA = {
       status: 'closed',
       description: 'Routine maintenance under the AMC contract.',
       requested_date: '2026-10-09',
-      site: SITES.riyadh,
-      site_address_snapshot: 'Demo warehouse address, Riyadh',
+      site: SITES.main,
+      site_address_snapshot: SITES.main.address,
       machines: [
         {
           id: 207,
@@ -472,8 +446,8 @@ export const SERVICES_PREVIEW_DATA = {
       status: 'cancelled',
       description: 'Generator does not start.',
       requested_date: '2026-09-18',
-      site: SITES.dammam,
-      site_address_snapshot: 'Demo depot address, Dammam',
+      site: SITES.depot,
+      site_address_snapshot: SITES.depot.address,
       machines: [
         {
           id: 208,

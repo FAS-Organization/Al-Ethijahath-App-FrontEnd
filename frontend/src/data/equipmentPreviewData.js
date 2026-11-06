@@ -1,5 +1,4 @@
-// Fictional preview records using the EquipmentPage data structure.
-// Replace this data with the customer-scoped API response later.
+import { PREVIEW_SITES } from './customerPreviewData'
 export const EQUIPMENT_PREVIEW_DATA = {
   is_demo: true,
   company_name: 'Demo Customer Company',
@@ -17,15 +16,7 @@ export const EQUIPMENT_PREVIEW_DATA = {
       manufacture_year: 2022,
       is_retired: false,
 
-      current_site: {
-        id: 1,
-        name: 'Riyadh warehouse',
-        address: 'Demo warehouse address, Riyadh',
-        region: {
-          id: 1,
-          name: 'Riyadh',
-        },
-      },
+      current_site: PREVIEW_SITES.main,
 
       current_amc_coverages: [
         {
@@ -79,15 +70,7 @@ export const EQUIPMENT_PREVIEW_DATA = {
       manufacture_year: 2021,
       is_retired: false,
 
-      current_site: {
-        id: 1,
-        name: 'Riyadh warehouse',
-        address: 'Demo warehouse address, Riyadh',
-        region: {
-          id: 1,
-          name: 'Riyadh',
-        },
-      },
+      current_site: PREVIEW_SITES.main,
 
       current_amc_coverages: [
         {
@@ -129,15 +112,7 @@ export const EQUIPMENT_PREVIEW_DATA = {
       manufacture_year: null,
       is_retired: false,
 
-      current_site: {
-        id: 2,
-        name: 'Jeddah facility',
-        address: 'Demo facility address, Jeddah',
-        region: {
-          id: 2,
-          name: 'Jeddah',
-        },
-      },
+      current_site: PREVIEW_SITES.north,
 
       current_amc_coverages: [],
 
@@ -169,15 +144,7 @@ export const EQUIPMENT_PREVIEW_DATA = {
       manufacture_year: 2023,
       is_retired: false,
 
-      current_site: {
-        id: 3,
-        name: 'Dammam depot',
-        address: 'Demo depot address, Dammam',
-        region: {
-          id: 3,
-          name: 'Dammam',
-        },
-      },
+      current_site: PREVIEW_SITES.depot,
 
       current_amc_coverages: [
         {
@@ -219,15 +186,7 @@ export const EQUIPMENT_PREVIEW_DATA = {
       manufacture_year: 2015,
       is_retired: true,
 
-      current_site: {
-        id: 3,
-        name: 'Dammam depot',
-        address: 'Demo depot address, Dammam',
-        region: {
-          id: 3,
-          name: 'Dammam',
-        },
-      },
+      current_site: PREVIEW_SITES.depot,
 
       current_amc_coverages: [],
 
