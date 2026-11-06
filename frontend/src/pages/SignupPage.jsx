@@ -303,6 +303,7 @@ export default function SignupPage({ onRegister, onLogin }) {
           id="signup"
           className="registration-layout"
           ref={layoutRef}
+          tabIndex={-1}
         >
           <section
             className="welcome"

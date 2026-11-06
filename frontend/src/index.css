@@ -1,1 +1,99 @@
-body{margin:0}button,input{font:inherit}
+body {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+/* Shared keyboard skip links across customer and account pages. */
+#root a:is(
+  .ed-skip-link,
+  .eq-skip,
+  .sv-skip,
+  .sc-skip,
+  .qt-skip-link,
+  .skip-link
+) {
+  position: fixed;
+  z-index: 100;
+  top: auto;
+  right: auto;
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  left: 50%;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: max-content;
+  max-width: calc(100% - 40px);
+  min-height: 44px;
+  margin: 0;
+  padding: 12px 20px;
+
+  border: 1px solid #8f000d;
+  border-radius: 8px;
+  background: #b22222;
+  color: #ffffff;
+  box-shadow: 0 6px 20px rgb(40 35 33 / 18%);
+
+  font: 600 14px/1.5 Arial, Helvetica, sans-serif;
+  text-align: center;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  touch-action: manipulation;
+
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, calc(100% + 40px));
+}
+
+#root a:is(
+  .ed-skip-link,
+  .eq-skip,
+  .sv-skip,
+  .sc-skip,
+  .qt-skip-link,
+  .skip-link
+):focus {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translate(-50%, 0);
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+  box-shadow:
+    0 0 0 5px #8f000d,
+    0 6px 20px rgb(40 35 33 / 18%);
+}
+
+#root a:is(
+  .ed-skip-link,
+  .eq-skip,
+  .sv-skip,
+  .sc-skip,
+  .qt-skip-link,
+  .skip-link
+):hover {
+  background: #8f000d;
+}
+
+@media (forced-colors: active) {
+  #root a:is(
+    .ed-skip-link,
+    .eq-skip,
+    .sv-skip,
+    .sc-skip,
+    .qt-skip-link,
+    .skip-link
+  ):focus {
+    border-color: ButtonText;
+    background: ButtonFace;
+    color: ButtonText;
+    outline: 3px solid Highlight;
+    outline-offset: 3px;
+    box-shadow: none;
+  }
+}
