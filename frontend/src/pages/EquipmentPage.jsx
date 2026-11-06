@@ -13,6 +13,7 @@ import {
 } from '@phosphor-icons/react'
 
 import CustomerNavbar from '../components/CustomerNavbar'
+import { EQUIPMENT_PREVIEW_DATA } from '../data/equipmentPreviewData'
 import './EquipmentPage.css'
 
 // =========================================================
@@ -728,7 +729,7 @@ function EquipmentCard({
 // =========================================================
 
 export default function EquipmentPage({
-  data = null,
+  data = EQUIPMENT_PREVIEW_DATA,
   loading = false,
   error = '',
   onSignOut,

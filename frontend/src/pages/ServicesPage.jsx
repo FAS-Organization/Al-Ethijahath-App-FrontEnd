@@ -20,6 +20,7 @@ import {
 } from '@phosphor-icons/react'
 
 import CustomerNavbar from '../components/CustomerNavbar'
+import { SERVICES_PREVIEW_DATA } from '../data/servicesPreviewData'
 import './ServicesPage.css'
 
 // =========================================================
@@ -904,7 +905,7 @@ function RequestDialog({ options, isDemo, onSubmit, onClose }) {
   )
 }
 export default function ServicesPage({
-  data = null,
+  data = SERVICES_PREVIEW_DATA,
   loading = false,
   error = '',
   onRequestService,
