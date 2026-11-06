@@ -16,6 +16,7 @@ import {
 } from '@phosphor-icons/react'
 
 import CustomerNavbar from '../components/CustomerNavbar'
+import { INVOICES_PREVIEW_DATA } from '../data/invoicesPreviewData'
 // Shared page shell, summary cards, tabs, search, dialog and button styles.
 import './ServicesPage.css'
 import './InvoicesPage.css'
@@ -758,7 +759,7 @@ function InvoiceDialog({ invoice, focusPay, onDownloadInvoice, onClose }) {
 }
 
 export default function InvoicesPage({
-  data = null,
+  data = INVOICES_PREVIEW_DATA,
   loading = false,
   error = '',
   onDownloadInvoice,
@@ -768,7 +769,6 @@ export default function InvoicesPage({
   const [tab, setTab] = useState('open')
   const [query, setQuery] = useState('')
   const [site, setSite] = useState('all')
-  const [currency, setCurrency] = useState('all')
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
@@ -793,9 +793,7 @@ export default function InvoicesPage({
     ).values()
   ).sort((a, b) => a.name.localeCompare(b.name))
 
-  const currencies = Array.from(
-    new Set(invoices.map(invoice => invoice.currency))
-  ).sort()
+
 
   const counts = {
     open: openInvoices.length,
@@ -825,8 +823,7 @@ export default function InvoicesPage({
 
     return (
       searchText.includes(query.trim().toLowerCase()) &&
-      (site === 'all' || String(invoice.job.site.id) === site) &&
-      (currency === 'all' || invoice.currency === currency)
+      (site === 'all' || String(invoice.job.site.id) === site)
     )
   })
 
@@ -854,7 +851,6 @@ export default function InvoicesPage({
   function clearFilters() {
     setQuery('')
     setSite('all')
-    setCurrency('all')
     setTab('open')
   }
 
@@ -1049,21 +1045,6 @@ export default function InvoicesPage({
                     </select>
                   </label>
 
-                  <label>
-                    <span>Currency</span>
-                    <select
-                      value={currency}
-                      disabled={currencies.length < 2}
-                      onChange={event => setCurrency(event.target.value)}
-                    >
-                      <option value="all">All currencies</option>
-                      {currencies.map(item => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
                 </div>
               </div>
 
@@ -1092,12 +1073,12 @@ export default function InvoicesPage({
                   {!visible.length ? (
                     <div className="sv-message">
                       <h2>
-                        {tab === 'open' && !query && site === 'all' && currency === 'all'
+                        {tab === 'open' && !query && site === 'all'
                           ? 'No open invoices'
                           : 'No matching invoices'}
                       </h2>
                       <p>
-                        {tab === 'open' && !query && site === 'all' && currency === 'all'
+                        {tab === 'open' && !query && site === 'all'
                           ? 'You are all paid up. Thank you.'
                           : 'Try a different search or change your filters.'}
                       </p>
@@ -1123,9 +1104,9 @@ export default function InvoicesPage({
               )}
 
               <p className="iv-footnote">
-                Amounts are shown in each region&apos;s currency. Payments
-                are recorded by our team after confirmation, and paid
-                invoices are final.
+                Amounts for this Riyadh demo account are shown in SAR.
+                Payments appear after our team confirms and records them.
+                Preview bank details are fictional.
               </p>
             </>
           )}

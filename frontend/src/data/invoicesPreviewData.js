@@ -1,7 +1,7 @@
-// Fictional preview records for the Invoices & payments page.
-// Same shape the customer API will return later (see the contract at
-// the top of InvoicesPage.jsx). The builder below only exists so the
-// demo numbers always add up; the real API returns finished values.
+import {
+  PREVIEW_REGION,
+  PREVIEW_SITES as SITES,
+} from './customerPreviewData'
 
 const toMinor = value => Math.round(Number(value) * 100)
 const fromMinor = minor => (minor / 100).toFixed(2)
@@ -19,42 +19,18 @@ function isoTime(offset, hour = 10) {
   return `${isoDay(offset)}T${String(hour).padStart(2, '0')}:00:00+03:00`
 }
 
-const REGIONS = {
-  riyadh: {
-    id: 1,
-    name: 'Riyadh',
-    currency: 'SAR',
-    bank_details:
-      'Bank: Demo National Bank\nAccount name: Al Ethijahath (demo)\nIBAN: SA00 0000 0000 0000 0000 0000\nSWIFT: DEMOSARI',
-    payment_qr_url: null,
-  },
-  dammam: {
-    id: 3,
-    name: 'Dammam',
-    currency: 'SAR',
-    bank_details:
-      'Bank: Demo National Bank\nAccount name: Al Ethijahath (demo)\nIBAN: SA00 1111 1111 1111 1111 1111\nSWIFT: DEMOSARI',
-    // Demo placeholder only. The API returns the region's real QR image URL.
-    payment_qr_url:
-      'data:image/svg+xml;utf8,' +
-      encodeURIComponent(
-        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="#fff"/><g fill="#282321"><rect x="10" y="10" width="30" height="30"/><rect x="80" y="10" width="30" height="30"/><rect x="10" y="80" width="30" height="30"/><rect x="50" y="50" width="10" height="10"/><rect x="70" y="60" width="10" height="10"/><rect x="90" y="80" width="20" height="10"/><rect x="60" y="90" width="10" height="20"/></g><g fill="#fff"><rect x="18" y="18" width="14" height="14"/><rect x="88" y="18" width="14" height="14"/><rect x="18" y="88" width="14" height="14"/></g><text x="60" y="68" font-size="9" text-anchor="middle" fill="#8f000d" font-family="Arial">DEMO</text></svg>'
-      ),
-  },
-  qatar: {
-    id: 4,
-    name: 'Qatar',
-    currency: 'QAR',
-    bank_details:
-      'Bank: Demo Qatar Bank\nAccount name: Al Ethijahath Qatar (demo)\nIBAN: QA00 0000 0000 0000 0000 0000 0000 0',
-    payment_qr_url: null,
-  },
-}
-
-const SITES = {
-  riyadh: { id: 1, name: 'Riyadh warehouse', region: { id: 1, name: 'Riyadh' } },
-  dammam: { id: 3, name: 'Dammam depot', region: { id: 3, name: 'Dammam' } },
-  doha: { id: 5, name: 'Doha workshop', region: { id: 4, name: 'Qatar' } },
+// All invoices in this demo belong to the same Riyadh account.
+// Payment details are fictional and must not be used for transfers.
+const BILLING_REGION = {
+  ...PREVIEW_REGION,
+  currency: 'SAR',
+  bank_details:
+    'DEMO ONLY — DO NOT TRANSFER MONEY\n' +
+    'Bank: Demo National Bank\n' +
+    'Account name: Al Ethijahath (demo)\n' +
+    'IBAN: SA00 0000 0000 0000 0000 0000\n' +
+    'SWIFT: DEMOSARI',
+  payment_qr_url: null,
 }
 
 const BILL_TO = {
@@ -160,8 +136,8 @@ export const INVOICES_PREVIEW_DATA = {
     // Unpaid and overdue.
     invoice({
       number: 'RYD-2399',
-      region: REGIONS.riyadh,
-      site: SITES.riyadh,
+      region: BILLING_REGION,
+      site: SITES.main,
       jobId: 1020,
       jobType: 'service',
       description: 'Brake system repair, Toyota Forklift 8FG25',
@@ -179,8 +155,8 @@ export const INVOICES_PREVIEW_DATA = {
     // Partly paid, not yet due.
     invoice({
       number: 'RYD-2401',
-      region: REGIONS.riyadh,
-      site: SITES.riyadh,
+      region: BILLING_REGION,
+      site: SITES.main,
       jobId: 1015,
       jobType: 'service',
       description: 'Generator service, Perkins Generator 1104A',
@@ -198,8 +174,8 @@ export const INVOICES_PREVIEW_DATA = {
     // Partial invoice: bills 1 of 2 machines of the same job.
     invoice({
       number: 'RYD-2403',
-      region: REGIONS.riyadh,
-      site: SITES.riyadh,
+      region: BILLING_REGION,
+      site: SITES.main,
       jobId: 1021,
       jobType: 'amc',
       description: 'Preventive maintenance, Hyster Forklift H3.0FT',
@@ -215,9 +191,9 @@ export const INVOICES_PREVIEW_DATA = {
 
     // Partly paid, overdue, with a discount and a credit note.
     invoice({
-      number: 'DMM-1181',
-      region: REGIONS.dammam,
-      site: SITES.dammam,
+      number: 'RYD-1181',
+      region: BILLING_REGION,
+      site: SITES.depot,
       jobId: 1004,
       jobType: 'service',
       description: 'Hydraulic pump replacement, Hyster Forklift H3.0FT',
@@ -233,7 +209,7 @@ export const INVOICES_PREVIEW_DATA = {
       creditNotes: [
         {
           id: nextId++,
-          number: 'DMM-CN-0007',
+          number: 'RYD-CN-0007',
           issued_at: isoTime(-12),
           amount: '300.00',
           reason: 'Price adjustment on labor hours.',
@@ -241,11 +217,11 @@ export const INVOICES_PREVIEW_DATA = {
       ],
     }),
 
-    // Paid in full by QR.
+    // Historical payment recorded as paid by QR.
     invoice({
-      number: 'DMM-1187',
-      region: REGIONS.dammam,
-      site: SITES.dammam,
+      number: 'RYD-1187',
+      region: BILLING_REGION,
+      site: SITES.depot,
       jobId: 1026,
       jobType: 'amc',
       description: 'AMC visit, Hyster Forklift H3.0FT',
@@ -259,8 +235,8 @@ export const INVOICES_PREVIEW_DATA = {
     // Paid in full in two payments.
     invoice({
       number: 'RYD-2394',
-      region: REGIONS.riyadh,
-      site: SITES.riyadh,
+      region: BILLING_REGION,
+      site: SITES.main,
       jobId: 1008,
       jobType: 'amc',
       description: 'AMC visit, Toyota Forklift 8FG25',
@@ -274,11 +250,11 @@ export const INVOICES_PREVIEW_DATA = {
       ],
     }),
 
-    // Another region, another currency. Never mixed into SAR totals.
+    // Another site within the customer's Riyadh region.
     invoice({
-      number: 'DOH-0412',
-      region: REGIONS.qatar,
-      site: SITES.doha,
+      number: 'RYD-0412',
+      region: BILLING_REGION,
+      site: SITES.north,
       jobId: 1030,
       jobType: 'service',
       description: 'Shutter motor replacement, industrial roller door',
@@ -293,8 +269,8 @@ export const INVOICES_PREVIEW_DATA = {
     // Void invoice (issued in error).
     invoice({
       number: 'RYD-2380',
-      region: REGIONS.riyadh,
-      site: SITES.riyadh,
+      region: BILLING_REGION,
+      site: SITES.main,
       jobId: 1011,
       jobType: 'service',
       description: 'Conveyor belt repair',
