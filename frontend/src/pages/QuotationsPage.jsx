@@ -129,6 +129,74 @@ function DetailField({ label, children }) {
   )
 }
 
+async function downloadQuotationEmailDraft({ quotation, subject, body }) {
+  // Django should return an authorized URL for this exact quotation version.
+  const response = await fetch(quotation.pdf_url)
+
+  if (!response.ok) {
+    throw new Error('Could not download the quotation PDF. Please try again.')
+  }
+
+  const pdf = await response.blob()
+
+  // Catch login pages or API error responses returned with HTTP 200.
+  const signature = await pdf.slice(0, 5).text()
+
+  if (signature !== '%PDF-') {
+    throw new Error('The quotation PDF could not be opened. Please try again.')
+  }
+
+  const encodeBase64 = bytes => {
+    let binary = ''
+
+    for (let offset = 0; offset < bytes.length; offset += 8192) {
+      binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192))
+    }
+
+    return btoa(binary)
+  }
+
+  const wrapLines = value => value.match(/.{1,76}/g)?.join('\r\n') || ''
+  const encodeText = value => encodeBase64(new TextEncoder().encode(value))
+  const pdfBase64 = encodeBase64(new Uint8Array(await pdf.arrayBuffer()))
+  const boundary = `quotation-${crypto.randomUUID()}`
+  const safeNumber = String(quotation.number).replace(/[^a-zA-Z0-9_-]/g, '-')
+  const filename = `${safeNumber}-v${quotation.version}.pdf`
+
+  const email = [
+    'X-Unsent: 1',
+    'To: info@alethijahath.com',
+    `Subject: =?UTF-8?B?${encodeText(subject)}?=`,
+    'MIME-Version: 1.0',
+    `Content-Type: multipart/mixed; boundary="${boundary}"`,
+    '',
+    `--${boundary}`,
+    'Content-Type: text/plain; charset=UTF-8',
+    'Content-Transfer-Encoding: base64',
+    '',
+    wrapLines(encodeText(body)),
+    '',
+    `--${boundary}`,
+    `Content-Type: application/pdf; name="${filename}"`,
+    'Content-Transfer-Encoding: base64',
+    `Content-Disposition: attachment; filename="${filename}"`,
+    '',
+    wrapLines(pdfBase64),
+    '',
+    `--${boundary}--`,
+    '',
+  ].join('\r\n')
+
+  const url = URL.createObjectURL(new Blob([email], { type: 'message/rfc822' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `${safeNumber}-v${quotation.version}-confirmation.eml`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.setTimeout(() => URL.revokeObjectURL(url), 60000)
+}
+
 function QuotationDialog({
   quotation,
   versions,
@@ -141,6 +209,8 @@ function QuotationDialog({
 }) {
   const dialogRef = useRef(null)
   const [mode, setMode] = useState('review')
+  const [acceptanceMethod, setAcceptanceMethod] = useState('')
+  const [purchaseOrder, setPurchaseOrder] = useState(null)
   const [reason, setReason] = useState('')
   const [feedback, setFeedback] = useState('')
   const [error, setError] = useState('')
@@ -182,17 +252,109 @@ function QuotationDialog({
 
   function beginDecision(nextMode) {
     setMode(nextMode)
+    setAcceptanceMethod('')
+    setPurchaseOrder(null)
     setFeedback('')
     setError('')
   }
 
-  function submitDecision(event) {
+  async function submitDecision(event) {
     event.preventDefault()
+    setError('')
+
+    if (!canDecide || getStatus(quotation, Date.now()) !== 'sent') {
+      setError('This quotation is no longer available for a decision.')
+      return
+    }
+
+    if (mode === 'accept' && !acceptanceMethod) {
+      setError('Choose how you want to confirm this quotation.')
+      return
+    }
+
+    if (mode === 'accept' && acceptanceMethod === 'email') {
+      const subject =
+        `Quotation confirmation | ${quotation.number} | Version ${quotation.version}`
+
+      const body = [
+        'Dear Al Ethijahath team,',
+        '',
+        `On behalf of ${quotation.company_name}, I confirm acceptance of the following quotation:`,
+        '',
+        `Quotation: ${quotation.number}, version ${quotation.version}`,
+        `Service reference: ${quotation.job_equipment.reference}`,
+        `Equipment: ${quotation.job_equipment.equipment_name}`,
+        `Site: ${quotation.job_equipment.site_name}`,
+        `Quoted total: ${formatMoney(quotation.total, quotation.currency)}`,
+        '',
+        'Purchase order reference, if applicable: [enter reference]',
+        'Name and role of the person confirming: [enter name and role]',
+        '',
+        'Before sending:',
+        '1. Send this message from the official company email address registered in the customer portal.',
+        '2. Add the relevant purchasing contact or authorized company approver in CC.',
+        '3. Attach your purchase order if one has been issued. If your company does not issue a PO, state that explicitly.',
+        quotation.pdf_url
+          ? '4. Keep the attached quotation PDF with this email when sending.'
+          : '4. This preview has no quotation PDF attached.',
+      ].join('\r\n')
+
+            if (quotation.pdf_url) {
+        try {
+          await downloadQuotationEmailDraft({ quotation, subject, body })
+
+          setFeedback(
+            'Email draft downloaded with the quotation PDF attached. ' +
+            'Open the .eml file in your mail app, select your registered ' +
+            'company email account, add the required CC and send it. ' +
+            'The quotation remains awaiting approval.',
+          )
+        } catch (error) {
+          setError(error.message || 'Could not prepare the email draft.')
+          return
+        }
+      } else if (quotation.id?.toString().startsWith('quote-') && !quotation.pdf_url) {
+        // Current fictional preview records have no generated PDF.
+        const mailUrl =
+          `mailto:info@alethijahath.com?subject=${encodeURIComponent(subject)}` +
+          `&body=${encodeURIComponent(body)}`
+
+        window.location.href = mailUrl
+
+        setFeedback(
+          'Preview email opened without an attachment because this demo ' +
+          'quotation has no PDF. The quotation remains awaiting approval.',
+        )
+      } else {
+        setError(
+          'The quotation PDF is not available yet. Please try again once it is ready.',
+        )
+        return
+      }
+
+      setMode('review')
+      return
+    }
+
+    if (mode === 'accept') {
+      if (!purchaseOrder) {
+        setError('Select a purchase order before confirming acceptance.')
+        return
+      }
+
+      const allowedExtension = /\.(pdf|png|jpe?g|webp)$/i
+
+      if (!allowedExtension.test(purchaseOrder.name) || purchaseOrder.size === 0) {
+        setError('Select a non-empty PDF, JPG, PNG or WebP file.')
+        return
+      }
+    }
 
     const result = onDecision(
       quotation.id,
       mode === 'accept' ? 'approved' : 'rejected',
       reason.trim(),
+      mode === 'accept' ? purchaseOrder : null,
     )
 
     if (!result.ok) {
@@ -202,7 +364,7 @@ function QuotationDialog({
 
     setMode('review')
     setReason('')
-    setError('')
+    setPurchaseOrder(null)
     setFeedback(result.message)
   }
 
@@ -369,7 +531,13 @@ function QuotationDialog({
               linked service job for work updates.
             </div>
           ) : null}
-
+          {status === 'approved' && quotation.purchase_order && (
+            <p>
+              <strong>Purchase order:</strong> {quotation.purchase_order.name}
+              <br />
+              <small>Selected in this preview. Refreshing clears the file.</small>
+            </p>
+          )}
           {status === 'rejected' ? (
             <div className="qt-notice">
               <strong>Rejection reason</strong>
@@ -507,7 +675,66 @@ function QuotationDialog({
                   )}. Review the proposed work and terms before confirming.`
                 : `You are rejecting version ${quotation.version}. You may add a reason for the team.`}
             </p>
+            {mode === 'accept' && (
+              <fieldset className="qt-accept-method">
+                <legend>How would you like to confirm?</legend>
 
+                <label>
+                  <input
+                    type="radio"
+                    name="quotation-acceptance-method"
+                    value="po"
+                    checked={acceptanceMethod === 'po'}
+                    onChange={() => {
+                      setAcceptanceMethod('po')
+                      setError('')
+                    }}
+                  />
+                  Upload purchase order
+                </label>
+
+                <label>
+                  <input
+                    type="radio"
+                    name="quotation-acceptance-method"
+                    value="email"
+                    checked={acceptanceMethod === 'email'}
+                    onChange={() => {
+                      setAcceptanceMethod('email')
+                      setPurchaseOrder(null)
+                      setError('')
+                    }}
+                  />
+                  Confirm by email
+                </label>
+
+                {acceptanceMethod === 'po' && (
+                  <label className="qt-po-upload">
+                    <strong>Purchase order file</strong>
+                    <span>Choose a PDF, JPG, PNG or WebP image.</span>
+                    <input
+                      type="file"
+                      accept=".pdf,.jpg,.jpeg,.png,.webp"
+                      required
+                      onChange={event => {
+                        setPurchaseOrder(event.target.files?.[0] ?? null)
+                        setError('')
+                      }}
+                    />
+                  </label>
+                )}
+
+                {acceptanceMethod === 'email' && (
+                  <p className="qt-helper">
+                    Send from your registered company email and CC your purchasing
+                    contact or authorized approver.{' '}
+                    {quotation.pdf_url
+                      ? 'Download the prepared email draft and open it in your mail app. The quotation PDF is attached.'
+                      : 'This preview opens an email draft without a PDF.'}
+                  </p>
+                )}
+              </fieldset>
+            )}
             {mode === 'reject' ? (
               <label className="qt-reason">
                 <span>Reason for rejection (optional)</span>
@@ -527,9 +754,13 @@ function QuotationDialog({
 
             <div className="qt-button-row">
               <button type="submit" className="qt-button">
-                {mode === 'accept'
-                  ? 'Confirm acceptance'
-                  : 'Confirm rejection'}
+                {mode === 'reject' && 'Confirm rejection'}
+                {mode === 'accept' && acceptanceMethod === 'email' && (
+                  quotation.pdf_url
+                    ? 'Download email draft with PDF'
+                    : 'Open email draft'
+                )}
+                {mode === 'accept' && acceptanceMethod !== 'email' && 'Confirm acceptance'}
               </button>
 
               <button
@@ -694,7 +925,7 @@ export default function QuotationsPage({
     clearFilters()
   }
 
-  function decideQuotation(id, decision, rejectionReason) {
+  function decideQuotation(id, decision, rejectionReason, purchaseOrder = null) {
     const decisionTime = Date.now()
     const quotation = quotations.find(item => item.id === id)
 
@@ -726,13 +957,19 @@ export default function QuotationsPage({
         message: 'The decision could not be recorded. Please try again.',
       }
     }
-
+    if (decision === 'approved' && !purchaseOrder) {
+      return {
+        ok: false,
+        message: 'A purchase order is required for this acceptance method.',
+      }
+    }
     setQuotations(items =>
       items.map(item =>
         item.id === id
           ? {
               ...item,
               status: decision,
+              purchase_order: purchaseOrder,
               decided_at: new Date(decisionTime).toISOString(),
               rejection_reason:
                 decision === 'rejected' ? rejectionReason : '',

@@ -1603,3 +1603,55 @@ body:has(.qt-page) {
     background: var(--qt-accent-soft);
   }
 }
+
+.qt-accept-method {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid var(--qt-line);
+  border-radius: 8px;
+  background: var(--qt-soft);
+}
+
+.qt-accept-method legend {
+  padding-inline: 6px;
+  color: var(--qt-heading);
+  font-weight: 600;
+}
+
+.qt-accept-method > label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 40px;
+  color: var(--qt-text);
+  cursor: pointer;
+}
+
+.qt-accept-method input[type='radio'] {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--qt-button);
+}
+
+.qt-accept-method > .qt-po-upload {
+  align-items: flex-start;
+  flex-direction: column;
+  padding: 14px;
+  border: 1px dashed var(--qt-line);
+  border-radius: 8px;
+  background: var(--qt-surface);
+}
+
+.qt-po-upload span {
+  color: var(--qt-muted);
+  font-size: 12px;
+}
+
+.qt-po-upload input {
+  max-width: 100%;
+  color: var(--qt-text);
+}
