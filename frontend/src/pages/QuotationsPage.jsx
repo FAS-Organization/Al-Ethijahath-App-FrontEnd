@@ -241,6 +241,20 @@ function QuotationDialog({
       }
     }
   }, [])
+    const confirmationHeadingRef = useRef(null)
+
+  useEffect(() => {
+    if (mode === 'review') return
+
+    const heading = confirmationHeadingRef.current
+    if (!heading) return
+
+    heading.focus({ preventScroll: true })
+    heading.scrollIntoView({
+      behavior: 'instant',
+      block: 'start',
+    })
+  }, [mode])
 
   function chooseVersion(id) {
     setMode('review')
@@ -322,8 +336,9 @@ function QuotationDialog({
         window.location.href = mailUrl
 
         setFeedback(
-          'Preview email opened without an attachment because this demo ' +
-          'quotation has no PDF. The quotation remains awaiting approval.',
+          'If you sent the confirmation from your registered company email, ' +
+          'you’re done. The quotation will show Approved after Sales verifies it. ' +
+          'If you closed the draft without sending, select Accept quotation to try again.',
         )
       } else {
         setError(
@@ -661,7 +676,7 @@ function QuotationDialog({
 
         {canDecide && mode !== 'review' ? (
           <form className="qt-confirmation" onSubmit={submitDecision}>
-            <h3>
+            <h3 ref={confirmationHeadingRef} tabIndex={-1}>
               {mode === 'accept'
                 ? 'Accept this quotation?'
                 : 'Reject this quotation?'}
