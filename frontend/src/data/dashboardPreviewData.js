@@ -92,6 +92,20 @@ export const DASHBOARD_PREVIEW_DATA = {
     },
   ],
 
+  // Backend requirement for later:
+  // Staff publish a confirmed charge against a completed, billable service.
+  // Remove it from this list when linked to an invoice or settled offline.
+  pendingServiceCharges: [
+    {
+      id: 'DEMO-CHARGE-001',
+      jobReference: 'DEMO-1060A',
+      equipment: 'Toyota forklift',
+      site: PREVIEW_SITES.main.name,
+      description: 'Emergency hydraulic hose replacement',
+      balanceMinor: 120000, // SAR 1,200.00
+    },
+  ],
+
   invoices: [
     {
       id: 'INV-2084',

@@ -394,6 +394,7 @@ export default function DashboardPage({
   const appointments = ready ? data.appointments : []
   const quotations = ready ? data.quotations : []
   const invoices = ready ? data.invoices : []
+  const pendingServiceCharges = ready ? (data.pendingServiceCharges ?? []) : []
   const documents = ready ? data.documents : []
   const notifications = ready ? data.notifications : []
 
@@ -458,7 +459,7 @@ export default function DashboardPage({
       href: '#maintenance',
     },
     {
-      label: 'Outstanding balance',
+      label: 'Outstanding invoice balance',
       value: outstanding,
       currency: true,
       detail: `${overdueCount} overdue ${
@@ -976,6 +977,32 @@ export default function DashboardPage({
                   ))}
                 </section>
               </div>
+
+              {pendingServiceCharges.length > 0 && (
+                <section className="ed-panel" id="pending-service-charges">
+                  <SectionHeading
+                    title="Service charges pending invoice"
+                    description="Confirmed charges for completed work awaiting an invoice."
+                  />
+
+                  {pendingServiceCharges.map(charge => (
+                    <article className="ed-job" key={charge.id}>
+                      <div className="ed-record-heading">
+                        <div>
+                          <h3>{charge.description}</h3>
+                          <p className="ed-muted">
+                            {charge.jobReference} · {charge.equipment} · {charge.site}
+                          </p>
+                        </div>
+
+                        <Status tone="warning">
+                          {money(charge.balanceMinor)} left to pay
+                        </Status>
+                      </div>
+                    </article>
+                  ))}
+                </section>
+              )}
 
               {/* INVOICES AND PARTIAL PAYMENTS */}
               <section className="ed-panel ed-table-panel" id="invoices">
