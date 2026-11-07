@@ -133,75 +133,6 @@ function DetailField({ label, children }) {
   )
 }
 
-async function downloadQuotationEmailDraft({ quotation, subject, body }) {
-  // Django should return an authorized URL for this exact quotation version.
-  const response = await fetch(quotation.pdf_url, {
-    signal: AbortSignal.timeout(30000),
-  })
-
-  if (!response.ok) {
-    throw new Error('Could not download the quotation PDF. Please try again.')
-  }
-
-  const pdf = await response.blob()
-
-  // Catch login pages or API error responses returned with HTTP 200.
-  const signature = await pdf.slice(0, 5).text()
-
-  if (signature !== '%PDF-') {
-    throw new Error('The quotation PDF could not be opened. Please try again.')
-  }
-
-  const encodeBase64 = bytes => {
-    let binary = ''
-
-    for (let offset = 0; offset < bytes.length; offset += 8192) {
-      binary += String.fromCharCode(...bytes.subarray(offset, offset + 8192))
-    }
-
-    return btoa(binary)
-  }
-
-  const wrapLines = value => value.match(/.{1,76}/g)?.join('\r\n') || ''
-  const encodeText = value => encodeBase64(new TextEncoder().encode(value))
-  const pdfBase64 = encodeBase64(new Uint8Array(await pdf.arrayBuffer()))
-  const boundary = `quotation-${crypto.randomUUID()}`
-  const safeNumber = String(quotation.number).replace(/[^a-zA-Z0-9_-]/g, '-')
-  const filename = `${safeNumber}-v${quotation.version}.pdf`
-
-  const email = [
-    'X-Unsent: 1',
-    'To: info@alethijahath.com',
-    `Subject: =?UTF-8?B?${encodeText(subject)}?=`,
-    'MIME-Version: 1.0',
-    `Content-Type: multipart/mixed; boundary="${boundary}"`,
-    '',
-    `--${boundary}`,
-    'Content-Type: text/plain; charset=UTF-8',
-    'Content-Transfer-Encoding: base64',
-    '',
-    wrapLines(encodeText(body)),
-    '',
-    `--${boundary}`,
-    `Content-Type: application/pdf; name="${filename}"`,
-    'Content-Transfer-Encoding: base64',
-    `Content-Disposition: attachment; filename="${filename}"`,
-    '',
-    wrapLines(pdfBase64),
-    '',
-    `--${boundary}--`,
-    '',
-  ].join('\r\n')
-
-  const url = URL.createObjectURL(new Blob([email], { type: 'message/rfc822' }))
-  const link = document.createElement('a')
-  link.href = url
-  link.download = `${safeNumber}-v${quotation.version}-confirmation.eml`
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.setTimeout(() => URL.revokeObjectURL(url), 60000)
-}
 
 function QuotationDialog({
   quotation,
@@ -212,6 +143,7 @@ function QuotationDialog({
   onDecision,
   onOpenService,
   onOpenInspection,
+  onEmailQuotation,
 }) {
   const dialogRef = useRef(null)
   const emailBusyRef = useRef(false)
@@ -226,7 +158,6 @@ function QuotationDialog({
   const [purchaseOrder, setPurchaseOrder] = useState(null)
   const [reason, setReason] = useState('')
   const [feedback, setFeedback] = useState('')
-  const [emailFallback, setEmailFallback] = useState(null)
   const [error, setError] = useState('')
 
   const status = getStatus(quotation, now)
@@ -292,6 +223,7 @@ function QuotationDialog({
     if (emailBusyRef.current) return
 
     setError('')
+    setFeedback('')
 
     if (!canDecide || getStatus(quotation, Date.now()) !== 'sent') {
       setError('This quotation is no longer available for a decision.')
@@ -304,74 +236,62 @@ function QuotationDialog({
     }
 
     if (mode === 'accept' && acceptanceMethod === 'email') {
-      const subject =
-        `Quotation confirmation | ${quotation.number} | Version ${quotation.version}`
+      // Backend integration:
+      // onEmailQuotation receives the exact quotation ID and version.
+      // Django must resolve the registered recipient, validate access
+      // and validity, attach this version's PDF, and queue the email.
+      // Resolve with { status: 'queued' } only after the request is saved.
+      // Reject on failure. Requesting an email never approves a quotation.
 
-      const body = [
-        'Dear Al Ethijahath team,',
-        '',
-        `On behalf of ${quotation.company_name}, I confirm acceptance of the following quotation:`,
-        '',
-        `Quotation: ${quotation.number}, version ${quotation.version}`,
-        `Service reference: ${quotation.job_equipment.reference}`,
-        `Equipment: ${quotation.job_equipment.equipment_name}`,
-        `Site: ${quotation.job_equipment.site_name}`,
-        `Quoted total: ${formatMoney(quotation.total, quotation.currency)}`,
-        '',
-        'Purchase order reference, if applicable: [enter reference]',
-        'Name and role of the person confirming: [enter name and role]',
-        '',
-        'Before sending:',
-        '1. Send this message from the official company email address registered in the customer portal.',
-        '2. Add the relevant purchasing contact or authorized company approver in CC.',
-        '3. Attach your purchase order if one has been issued. If your company does not issue a PO, state that explicitly.',
-        quotation.pdf_url
-          ? '4. Keep the attached quotation PDF with this email when sending.'
-          : '4. This preview has no quotation PDF attached.',
-      ].join('\r\n')
-
-      if (quotation.pdf_url) {
-        emailBusyRef.current = true
-        setPreparingEmail(true)
-
-        try {
-          await downloadQuotationEmailDraft({ quotation, subject, body })
-
-          setFeedback(
-            'Email draft downloaded with the quotation PDF attached. ' +
-            'Open the .eml file in a compatible mail app, select your ' +
-            'registered company email account, add the required CC and send it. ' +
-            'Sales will verify your email before marking the quotation Approved.',
-          )
-        } catch (error) {
-          setError(error.message || 'Could not prepare the email draft.')
-          return
-        } finally {
-          emailBusyRef.current = false
-          setPreparingEmail(false)
-        }
-      } else if (quotation.id?.toString().startsWith('quote-') && !quotation.pdf_url) {
-        // Current fictional preview records have no generated PDF.
-        const mailUrl =
-          `mailto:info@alethijahath.com?subject=${encodeURIComponent(subject)}` +
-          `&body=${encodeURIComponent(body)}`
-
-        setEmailFallback({ quotationId: quotation.id, subject, body })
-        window.location.href = mailUrl
-
+      if (!onEmailQuotation) {
         setFeedback(
-          'If you sent the confirmation from your registered company email, ' +
-          'you’re done. The quotation will show Approved after Sales verifies it. ' +
-          'If you closed the draft without sending, select Accept quotation to try again.',
+          'Preview only — no email was sent. ' +
+          'In the connected application, you will receive this quotation ' +
+          'and its PDF at your registered company email address. ' +
+          'Reply with your acceptance and add your purchasing contact ' +
+          'or authorized approver in CC. Sales will verify your reply. ' +
+          'This quotation remains awaiting approval.',
         )
-      } else {
-        setError(
-          'The quotation PDF is not available yet. Please try again once it is ready.',
-        )
+
+        setMode('review')
         return
       }
 
-      setMode('review')
+      emailBusyRef.current = true
+      setPreparingEmail(true)
+
+      try {
+        const result = await onEmailQuotation({
+          quotationId: quotation.id,
+          version: quotation.version,
+        })
+
+        if (result?.status !== 'queued') {
+          throw new Error(
+            'The email request could not be confirmed. Please try again.',
+          )
+        }
+
+        setFeedback(
+          'Your quotation email has been queued for delivery to your ' +
+          'registered company email address, with the quotation PDF attached. ' +
+          'Once it arrives, reply with your acceptance and add your ' +
+          'purchasing contact or authorized approver in CC. ' +
+          'Sales will verify your reply before marking this quotation Approved.',
+        )
+
+        setMode('review')
+      } catch (error) {
+        setError(
+          error instanceof Error
+            ? error.message
+            : 'Could not request the quotation email. Please try again.',
+        )
+      } finally {
+        emailBusyRef.current = false
+        setPreparingEmail(false)
+      }
+
       return
     }
 
@@ -706,35 +626,7 @@ function QuotationDialog({
             ))}
           </ol>
         </section>
-        {emailFallback?.quotationId === quotation.id && (
-          <details className="qt-notice">
-            <summary>Email app didn’t open?</summary>
-            <p>
-              Copy the details below into a new message and send it from
-              your registered company email.
-            </p>
-            <label className="qt-reason">
-              <span>Email details</span>
-              <textarea
-                readOnly
-                rows={7}
-                value={
-                  `To: info@alethijahath.com\n` +
-                  `Subject: ${emailFallback.subject}\n\n` +
-                  emailFallback.body
-                }
-              />
-            </label>
-            <a
-              className="qt-button qt-button--secondary"
-              href="https://mail.google.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open Gmail in browser
-            </a>
-          </details>
-        )}
+
         <div className="qt-feedback" role="status" aria-live="polite">
           {feedback ? (
             <p className="qt-notice qt-notice--success">{feedback}</p>
@@ -757,10 +649,10 @@ function QuotationDialog({
 
             <p>
               {mode === 'accept'
-                ? `You are accepting version ${quotation.version} for ${formatMoney(
+                ? `Review version ${quotation.version} for ${formatMoney(
                     quotation.total,
                     quotation.currency,
-                  )}. Review the proposed work and terms before confirming.`
+                  )}. Confirm with a purchase order, or request an email copy and reply with your acceptance.`
                 : `You are rejecting version ${quotation.version}. You may add a reason for the team.`}
             </p>
             {mode === 'accept' && (
@@ -813,13 +705,34 @@ function QuotationDialog({
                 )}
 
                 {acceptanceMethod === 'email' && (
-                  <p className="qt-helper">
-                    Send from your registered company email and CC your purchasing
-                    contact or authorized approver.{' '}
-                    {quotation.pdf_url
-                      ? 'Download the prepared email draft and open it in your mail app. The quotation PDF is attached.'
-                      : 'This preview opens an email draft without a PDF.'}
-                  </p>
+                  <div className="qt-notice">
+                    <strong>Receive the quotation in your inbox</strong>
+
+                    <p>
+                      We will email this quotation version and its PDF
+                      to your registered company email address.
+                    </p>
+
+                    <p className="qt-helper">
+                      Open the email and reply with your acceptance.
+                      Add your purchasing contact or authorized approver
+                      in CC. Include your name and role, and attach your
+                      purchase order if one has been issued. If your company
+                      does not issue a purchase order, state that in your reply.
+                    </p>
+
+                    <p className="qt-helper">
+                      The quotation stays awaiting approval until Sales
+                      verifies your reply.
+                    </p>
+
+                    {!onEmailQuotation && (
+                      <p className="qt-helper">
+                        Preview only — this button simulates the request.
+                        No email will be sent.
+                      </p>
+                    )}
+                  </div>
                 )}
               </fieldset>
             )}
@@ -837,18 +750,25 @@ function QuotationDialog({
             ) : null}
 
             <p className="qt-helper">
-              Preview only. This decision changes the demo on this page.
+              {mode === 'accept' && acceptanceMethod === 'email'
+                ? 'Requesting an email does not record your acceptance.'
+                : 'Preview only. This decision changes the demo on this page.'}
             </p>
 
             <div className="qt-button-row">
-              <button type="submit" className="qt-button">
-                {mode === 'reject' && 'Confirm rejection'}
-                {mode === 'accept' && acceptanceMethod === 'email' && (
-                  quotation.pdf_url
-                    ? 'Download email draft with PDF'
-                    : 'Open email draft'
-                )}
-                {mode === 'accept' && acceptanceMethod !== 'email' && 'Confirm acceptance'}
+              <button
+                type="submit"
+                className="qt-button"
+                disabled={preparingEmail}
+                aria-busy={preparingEmail}
+              >
+                {preparingEmail
+                  ? 'Requesting quotation email…'
+                  : mode === 'reject'
+                    ? 'Confirm rejection'
+                    : acceptanceMethod === 'email'
+                      ? 'Email me the quotation'
+                      : 'Confirm acceptance'}
               </button>
 
               <button
@@ -869,7 +789,7 @@ function QuotationDialog({
       <div className="qt-dialog-footer">
         <span role="status" aria-live="polite">
           {preparingEmail
-            ? 'Preparing email draft and attaching the PDF…'
+            ? 'Requesting quotation email…'
             : 'Demo quotation · No payment is collected here'}
         </span>
 
@@ -915,6 +835,7 @@ function QuotationDialog({
 export default function QuotationsPage({
   onOpenService,
   onOpenInspection,
+  onEmailQuotation,
 }) {
   const navigate = useNavigate()
   const [quotations, setQuotations] = useState(createDemoQuotations)
@@ -1551,6 +1472,7 @@ export default function QuotationsPage({
             onClose={() => setSelectedId(null)}
             onSelectVersion={setSelectedId}
             onDecision={decideQuotation}
+            onEmailQuotation={onEmailQuotation}
             onOpenService={
               onOpenService ||
               (() => {
