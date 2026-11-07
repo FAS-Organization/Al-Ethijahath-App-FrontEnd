@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   ArrowCounterClockwiseIcon,
   ArrowUpRightIcon,
@@ -132,7 +133,9 @@ function DetailField({ label, children }) {
 
 async function downloadQuotationEmailDraft({ quotation, subject, body }) {
   // Django should return an authorized URL for this exact quotation version.
-  const response = await fetch(quotation.pdf_url)
+  const response = await fetch(quotation.pdf_url, {
+    signal: AbortSignal.timeout(30000),
+  })
 
   if (!response.ok) {
     throw new Error('Could not download the quotation PDF. Please try again.')
@@ -209,6 +212,13 @@ function QuotationDialog({
   onOpenInspection,
 }) {
   const dialogRef = useRef(null)
+  const emailBusyRef = useRef(false)
+  const [preparingEmail, setPreparingEmail] = useState(false)
+
+  function closeDialog() {
+    if (emailBusyRef.current) return
+    onClose()
+  }
   const [mode, setMode] = useState('review')
   const [acceptanceMethod, setAcceptanceMethod] = useState('')
   const [purchaseOrder, setPurchaseOrder] = useState(null)
@@ -275,6 +285,9 @@ function QuotationDialog({
 
   async function submitDecision(event) {
     event.preventDefault()
+
+    if (emailBusyRef.current) return
+
     setError('')
 
     if (!canDecide || getStatus(quotation, Date.now()) !== 'sent') {
@@ -314,19 +327,25 @@ function QuotationDialog({
           : '4. This preview has no quotation PDF attached.',
       ].join('\r\n')
 
-            if (quotation.pdf_url) {
+      if (quotation.pdf_url) {
+        emailBusyRef.current = true
+        setPreparingEmail(true)
+
         try {
           await downloadQuotationEmailDraft({ quotation, subject, body })
 
           setFeedback(
             'Email draft downloaded with the quotation PDF attached. ' +
-            'Open the .eml file in your mail app, select your registered ' +
-            'company email account, add the required CC and send it. ' +
-            'The quotation remains awaiting approval.',
+            'Open the .eml file in a compatible mail app, select your ' +
+            'registered company email account, add the required CC and send it. ' +
+            'Sales will verify your email before marking the quotation Approved.',
           )
         } catch (error) {
           setError(error.message || 'Could not prepare the email draft.')
           return
+        } finally {
+          emailBusyRef.current = false
+          setPreparingEmail(false)
         }
       } else if (quotation.id?.toString().startsWith('quote-') && !quotation.pdf_url) {
         // Current fictional preview records have no generated PDF.
@@ -334,7 +353,7 @@ function QuotationDialog({
           `mailto:info@alethijahath.com?subject=${encodeURIComponent(subject)}` +
           `&body=${encodeURIComponent(body)}`
 
-        window.location.href = mailUrl
+        window.open(mailUrl, '_blank', 'noopener,noreferrer')
 
         setFeedback(
           'If you sent the confirmation from your registered company email, ' +
@@ -396,7 +415,7 @@ function QuotationDialog({
       aria-labelledby="qt-dialog-title"
       onCancel={event => {
         event.preventDefault()
-        onClose()
+        closeDialog()
       }}
     >
       <div className="qt-dialog-header">
@@ -411,7 +430,8 @@ function QuotationDialog({
         <button
           type="button"
           className="qt-icon-button"
-          onClick={onClose}
+          onClick={closeDialog}
+          disabled={preparingEmail}
           aria-label="Close quotation"
           autoFocus
         >
@@ -419,7 +439,11 @@ function QuotationDialog({
         </button>
       </div>
 
-      <div className="qt-dialog-body">
+      <div
+        className="qt-dialog-body"
+        inert={preparingEmail}
+        aria-busy={preparingEmail}
+      >
         <div className="qt-dialog-status">
           <StatusBadge status={status} />
 
@@ -588,18 +612,34 @@ function QuotationDialog({
 
             <div>
               <strong>Quotation PDF · Version {quotation.version}</strong>
-              <p>No sample PDF is attached to these demo records.</p>
+              <p>
+                {quotation.pdf_url
+                  ? 'Published PDF for this exact quotation version.'
+                  : 'No sample PDF is attached to this preview record.'}
+              </p>
             </div>
 
-            <button
-              type="button"
-              className="qt-button qt-button--secondary"
-              disabled
-              title="A published quotation PDF is required."
-            >
-              <DownloadSimpleIcon size={17} aria-hidden="true" />
-              Download
-            </button>
+            {quotation.pdf_url ? (
+              <a
+                className="qt-button qt-button--secondary"
+                href={quotation.pdf_url}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <DownloadSimpleIcon size={17} aria-hidden="true" />
+                Open PDF
+              </a>
+            ) : (
+              <button
+                type="button"
+                className="qt-button qt-button--secondary"
+                disabled
+                title="A published quotation PDF is required."
+              >
+                <DownloadSimpleIcon size={17} aria-hidden="true" />
+                PDF unavailable
+              </button>
+            )}
           </div>
 
           <div className="qt-document">
@@ -795,7 +835,11 @@ function QuotationDialog({
       </div>
 
       <div className="qt-dialog-footer">
-        <span>Demo quotation · No payment is collected here</span>
+        <span role="status" aria-live="polite">
+          {preparingEmail
+            ? 'Preparing email draft and attaching the PDF…'
+            : 'Demo quotation · No payment is collected here'}
+        </span>
 
         <div className="qt-button-row">
           {canDecide && mode === 'review' ? (
@@ -821,7 +865,8 @@ function QuotationDialog({
             <button
               type="button"
               className="qt-button qt-button--secondary"
-              onClick={onClose}
+              onClick={closeDialog}
+          disabled={preparingEmail}
             >
               Close
             </button>
@@ -839,6 +884,7 @@ export default function QuotationsPage({
   onOpenService,
   onOpenInspection,
 }) {
+  const navigate = useNavigate()
   const [quotations, setQuotations] = useState(createDemoQuotations)
   const [now, setNow] = useState(() => Date.now())
   const [search, setSearch] = useState('')
@@ -1458,7 +1504,16 @@ export default function QuotationsPage({
             onClose={() => setSelectedId(null)}
             onSelectVersion={setSelectedId}
             onDecision={decideQuotation}
-            onOpenService={onOpenService}
+            onOpenService={
+              onOpenService ||
+              (() => {
+                navigate(
+                  `/services?service=${encodeURIComponent(
+                    selectedQuotation.job_equipment.reference,
+                  )}`,
+                )
+              })
+            }
             onOpenInspection={
               onOpenInspection ||
               (INSPECTIONS_PREVIEW_DATA.some(
