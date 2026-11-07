@@ -11,6 +11,7 @@ import QuotationsPage from './pages/QuotationsPage'
 import AmcSchedulePage from './pages/AmcSchedulePage'
 import ServicesPage from './pages/ServicesPage'
 import InvoicesPage from './pages/InvoicesPage'
+import DocumentsPage from './pages/DocumentsPage'
 
 export default function App() {
   return (
@@ -29,6 +30,9 @@ export default function App() {
         <Route path="/maintenance" element={<AmcSchedulePage />} />
 
         <Route path="/billing" element={<InvoicesPage />} />
+
+        <Route path="/documents" element={<DocumentsPage />} />
+
       </Routes>
     </BrowserRouter>
   )
