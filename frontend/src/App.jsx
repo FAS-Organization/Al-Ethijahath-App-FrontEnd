@@ -13,6 +13,9 @@ import ServicesPage from './pages/ServicesPage'
 import InvoicesPage from './pages/InvoicesPage'
 import DocumentsPage from './pages/DocumentsPage'
 import AccountPage from './pages/AccountPage'
+import NotificationsPage from './pages/NotificationsPage'
+
+
 
 export default function App() {
   return (
@@ -34,6 +37,8 @@ export default function App() {
 
         <Route path="/documents" element={<DocumentsPage />} />
         
+        <Route path="/notifications" element={<NotificationsPage />} />
+
         <Route path="/account" element={<AccountPage />} />
 
       </Routes>
