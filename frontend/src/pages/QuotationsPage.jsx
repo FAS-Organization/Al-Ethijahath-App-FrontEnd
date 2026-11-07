@@ -226,6 +226,7 @@ function QuotationDialog({
   const [purchaseOrder, setPurchaseOrder] = useState(null)
   const [reason, setReason] = useState('')
   const [feedback, setFeedback] = useState('')
+  const [emailFallback, setEmailFallback] = useState(null)
   const [error, setError] = useState('')
 
   const status = getStatus(quotation, now)
@@ -355,7 +356,8 @@ function QuotationDialog({
           `mailto:info@alethijahath.com?subject=${encodeURIComponent(subject)}` +
           `&body=${encodeURIComponent(body)}`
 
-        window.open(mailUrl, '_blank', 'noopener,noreferrer')
+        setEmailFallback({ quotationId: quotation.id, subject, body })
+        window.location.href = mailUrl
 
         setFeedback(
           'If you sent the confirmation from your registered company email, ' +
@@ -704,7 +706,35 @@ function QuotationDialog({
             ))}
           </ol>
         </section>
-
+        {emailFallback?.quotationId === quotation.id && (
+          <details className="qt-notice">
+            <summary>Email app didn’t open?</summary>
+            <p>
+              Copy the details below into a new message and send it from
+              your registered company email.
+            </p>
+            <label className="qt-reason">
+              <span>Email details</span>
+              <textarea
+                readOnly
+                rows={7}
+                value={
+                  `To: info@alethijahath.com\n` +
+                  `Subject: ${emailFallback.subject}\n\n` +
+                  emailFallback.body
+                }
+              />
+            </label>
+            <a
+              className="qt-button qt-button--secondary"
+              href="https://mail.google.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open Gmail in browser
+            </a>
+          </details>
+        )}
         <div className="qt-feedback" role="status" aria-live="polite">
           {feedback ? (
             <p className="qt-notice qt-notice--success">{feedback}</p>
