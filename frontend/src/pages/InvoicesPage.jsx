@@ -16,6 +16,8 @@ import {
 } from '@phosphor-icons/react'
 
 import CustomerNavbar from '../components/CustomerNavbar'
+import DateRangeFilter from '../components/DateRangeFilter'
+import { inDateRange } from '../utils/dateRange'
 import { INVOICES_PREVIEW_DATA } from '../data/invoicesPreviewData'
 // Shared page shell, summary cards, tabs, search, dialog and button styles.
 import './ServicesPage.css'
@@ -769,6 +771,8 @@ export default function InvoicesPage({
   const [tab, setTab] = useState('open')
   const [query, setQuery] = useState('')
   const [site, setSite] = useState('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
   const [selected, setSelected] = useState(null)
 
   useEffect(() => {
@@ -823,7 +827,9 @@ export default function InvoicesPage({
 
     return (
       searchText.includes(query.trim().toLowerCase()) &&
-      (site === 'all' || String(invoice.job.site.id) === site)
+            (site === 'all' || String(invoice.job.site.id) === site) &&
+      (tab === 'payments' ||
+        inDateRange(invoice.issue_date, dateFrom, dateTo))
     )
   })
 
@@ -845,12 +851,14 @@ export default function InvoicesPage({
   const ledgerRows = filtered
     .flatMap(invoice =>
       invoice.payments.map(item => ({ ...item, invoice }))
-    )
+    ).filter(row => inDateRange(row.paid_at, dateFrom, dateTo))
     .sort((a, b) => new Date(b.paid_at) - new Date(a.paid_at))
 
   function clearFilters() {
     setQuery('')
     setSite('all')
+    setDateFrom('')
+    setDateTo('')
     setTab('open')
   }
 
@@ -1044,6 +1052,15 @@ export default function InvoicesPage({
                   </label>
 
                 </div>
+                  <DateRangeFilter
+                    label={tab === 'payments' ? 'Payment date' : 'Invoice date'}
+                    from={dateFrom}
+                    to={dateTo}
+                    onChange={(from, to) => {
+                      setDateFrom(from)
+                      setDateTo(to)
+                    }}
+                  />
               </div>
 
               {!invoices.length ? (
@@ -1071,12 +1088,12 @@ export default function InvoicesPage({
                   {!visible.length ? (
                     <div className="sv-message">
                       <h2>
-                        {tab === 'open' && !query && site === 'all'
+                        {tab === 'open' && !query && site === 'all' && !dateFrom && !dateTo
                           ? 'No open invoices'
                           : 'No matching invoices'}
                       </h2>
                       <p>
-                        {tab === 'open' && !query && site === 'all'
+                        {tab === 'open' && !query && site === 'all' && !dateFrom && !dateTo
                           ? 'You are all paid up. Thank you.'
                           : 'Try a different search or change your filters.'}
                       </p>

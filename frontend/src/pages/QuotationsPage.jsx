@@ -13,6 +13,8 @@ import {
   XIcon,
 } from '@phosphor-icons/react'
 import CustomerNavbar from '../components/CustomerNavbar'
+import DateRangeFilter from '../components/DateRangeFilter'
+import { inDateRange } from '../utils/dateRange'
 import { createDemoQuotations } from '../data/quotationsPreviewData'
 import { INSPECTIONS_PREVIEW_DATA } from '../data/inspectionsPreviewData'
 import './QuotationsPage.css'
@@ -844,6 +846,8 @@ export default function QuotationsPage({
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   const [siteFilter, setSiteFilter] = useState('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
   const [selectedId, setSelectedId] = useState(null)
 
   const [theme, setTheme] = useState(() => {
@@ -913,7 +917,8 @@ export default function QuotationsPage({
       (!normalizedSearch || searchableText.includes(normalizedSearch)) &&
       (statusFilter === 'all' ||
         getStatus(quotation, now) === statusFilter) &&
-      (siteFilter === 'all' || equipment.site_name === siteFilter)
+      (siteFilter === 'all' || equipment.site_name === siteFilter) &&
+      inDateRange(quotation.sent_at, dateFrom, dateTo)
     )
   })
 
@@ -935,6 +940,8 @@ export default function QuotationsPage({
     setSearch('')
     setStatusFilter('all')
     setSiteFilter('all')
+    setDateFrom('')
+    setDateTo('')
   }
 
   function resetPreview() {
@@ -1294,14 +1301,24 @@ export default function QuotationsPage({
                 </select>
               </label>
             </div>
-
+              <div className="drf-wrap">
+                <DateRangeFilter
+                  label="Sent date"
+                  from={dateFrom}
+                  to={dateTo}
+                  onChange={(from, to) => {
+                    setDateFrom(from)
+                    setDateTo(to)
+                  }}
+                />
+              </div>
             <div className="qt-results-line" role="status" aria-live="polite">
               <span>
                 Showing {visibleQuotations.length} of{' '}
                 {currentQuotations.length} quotations
               </span>
 
-              {search || statusFilter !== 'all' || siteFilter !== 'all' ? (
+              {search || statusFilter !== 'all' || siteFilter !== 'all' || dateFrom || dateTo ? (
                 <button
                   type="button"
                   className="qt-text-button"

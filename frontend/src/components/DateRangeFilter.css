@@ -1,0 +1,107 @@
+.drf {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.drf legend {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  float: left;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 0;
+  color: var(--sv-muted, var(--qt-muted));
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.drf-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.drf-fields label {
+  display: grid;
+  gap: 4px;
+  color: var(--sv-muted, var(--qt-muted));
+  font-size: 11px;
+}
+
+.drf-fields input {
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--sv-line, var(--qt-line));
+  border-radius: 7px;
+  background: var(--sv-soft, var(--qt-surface));
+  color: var(--sv-text, var(--qt-text));
+  font: inherit;
+  font-size: 13px;
+  color-scheme: light;
+}
+
+[data-theme='dark'] .drf-fields input {
+  color-scheme: dark;
+}
+
+.drf-quick {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.drf-quick button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border: 1px solid var(--sv-line, var(--qt-line));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sv-text, var(--qt-text));
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.drf-quick .drf-clear {
+  border-color: transparent;
+  color: var(--sv-accent, var(--qt-accent));
+}
+
+.drf :focus-visible {
+  outline: 2px solid var(--sv-accent, var(--qt-accent));
+  outline-offset: 2px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drf-quick button:hover {
+    border-color: var(--sv-accent, var(--qt-accent));
+    color: var(--sv-accent, var(--qt-accent));
+  }
+}
+
+@media (max-width: 639px) {
+  .drf-fields,
+  .drf-fields label {
+    width: 100%;
+  }
+
+  .drf-fields input {
+    width: 100%;
+  }
+}
+
+/* Quotations toolbar is a flex row, so the filter gets its own line. */
+.drf-wrap {
+  padding: 0 24px 8px;
+}

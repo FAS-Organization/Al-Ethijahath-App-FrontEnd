@@ -20,6 +20,8 @@ import {
 } from '@phosphor-icons/react'
 
 import CustomerNavbar from '../components/CustomerNavbar'
+import DateRangeFilter from '../components/DateRangeFilter'
+import { inDateRange } from '../utils/dateRange'
 import { SERVICES_PREVIEW_DATA } from '../data/servicesPreviewData'
 import './ServicesPage.css'
 
@@ -918,6 +920,8 @@ export default function ServicesPage({
   const [query, setQuery] = useState('')
   const [site, setSite] = useState('all')
   const [type, setType] = useState('all')
+  const [dateFrom, setDateFrom] = useState('')
+  const [dateTo, setDateTo] = useState('')
   const [requestOpen, setRequestOpen] = useState(false)
 
   useEffect(() => {
@@ -980,7 +984,8 @@ export default function ServicesPage({
         matchesTab &&
         searchText.includes(query.trim().toLowerCase()) &&
         (site === 'all' || String(job.site.id) === site) &&
-        (type === 'all' || job.job_type === type)
+        (type === 'all' || job.job_type === type) &&
+        inDateRange(job.requested_date, dateFrom, dateTo)
       )
     })
     .sort((a, b) => lastActivity(b) - lastActivity(a))
@@ -989,6 +994,8 @@ export default function ServicesPage({
     setQuery('')
     setSite('all')
     setType('all')
+    setDateFrom('')
+    setDateTo('')
     setTab('active')
   }
 
@@ -1194,6 +1201,15 @@ export default function ServicesPage({
                     </select>
                   </label>
                 </div>
+                  <DateRangeFilter
+                  label="Requested date"
+                  from={dateFrom}
+                  to={dateTo}
+                  onChange={(from, to) => {
+                    setDateFrom(from)
+                    setDateTo(to)
+                  }}
+                  />
               </div>
 
               <p className="sv-results" role="status" aria-live="polite">
