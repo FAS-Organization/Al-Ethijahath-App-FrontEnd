@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import {
   ArrowRightIcon,
@@ -915,9 +916,14 @@ export default function ServicesPage({
   onOpenDocument,
   onOpenApproval,
 }) {
+  const [searchParams] = useSearchParams()
+  const initialServiceReference = searchParams.get('service') || ''
+
   const [theme, setTheme] = useState(initialTheme)
-  const [tab, setTab] = useState('active')
-  const [query, setQuery] = useState('')
+  const [tab, setTab] = useState(
+    initialServiceReference ? 'all' : 'active',
+  )
+  const [query, setQuery] = useState(initialServiceReference)
   const [site, setSite] = useState('all')
   const [type, setType] = useState('all')
   const [dateFrom, setDateFrom] = useState('')
