@@ -286,10 +286,10 @@ export default function NotificationsPage() {
   }
 
   const views = [
-    { id: 'all', label: 'All updates', count: items.length },
-    { id: 'unread', label: 'Unread', count: unread },
-    { id: 'attention', label: 'Needs action', count: attention },
-    { id: 'read', label: 'Read', count: items.length - unread },
+    { id: 'all', label: 'All updates', count: items.length, icon: FileTextIcon },
+    { id: 'unread', label: 'Unread', count: unread, icon: BellIcon },
+    { id: 'attention', label: 'Needs action', count: attention, icon: LightningIcon },
+    { id: 'read', label: 'Read', count: items.length - unread, icon: ChecksIcon },
   ]
 
   return (
@@ -376,16 +376,17 @@ export default function NotificationsPage() {
             <h2 id="np-inbox-title" className="np-sr-only">Your updates</h2>
 
             <div className="np-tabs" role="group" aria-label="Read status and actions">
-              {views.map(view => (
+              {views.map(({ id, label, count, icon: Icon }) => (
                 <button
                   type="button"
-                  key={view.id}
-                  className={`np-tab${filters.view === view.id ? ' is-active' : ''}`}
-                  aria-pressed={filters.view === view.id}
-                  onClick={() => changeFilters({ view: view.id })}
+                  key={id}
+                  className="np-tab"
+                  aria-pressed={filters.view === id}
+                  onClick={() => changeFilters({ view: id })}
                 >
-                  {view.label}
-                  <span>{view.count}</span>
+                  <Icon className="np-tab-icon" size={16} aria-hidden="true" />
+                  <span className="np-tab-label">{label}</span>
+                  <span className="np-tab-count">{count}</span>
                 </button>
               ))}
             </div>

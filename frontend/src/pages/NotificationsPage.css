@@ -305,42 +305,85 @@ body:has(.np-page) {
 }
 
 .np-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 10px 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, auto));
+  gap: 4px;
+  width: fit-content;
+  max-width: calc(100% - 28px);
+  margin: 10px 14px;
+  padding: 4px;
+  border: 1px solid var(--np-line);
+  border-radius: 10px;
+  background: var(--np-soft);
 }
 
 .np-tab {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr) auto;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
+  min-width: 0;
   min-height: 36px;
   padding: 5px 9px;
   border: 1px solid transparent;
   border-radius: 7px;
   background: transparent;
-  color: var(--np-muted);
+  color: var(--np-text);
+  text-align: left;
   font-size: 13px;
   font-weight: 600;
+  line-height: 1.25;
   cursor: pointer;
 }
 
-.np-tab:hover,
-.np-tab.is-active {
-  border-color: var(--np-line);
+.np-tab-icon {
+  color: var(--np-muted);
+}
+
+.np-tab-count {
+  min-width: 20px;
+  padding: 2px 4px;
+  border-radius: 5px;
+  background: var(--np-surface);
+  color: var(--np-muted);
+  text-align: center;
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+}
+
+.np-tab:hover:not([aria-pressed='true']) {
+  background: var(--np-rose);
+}
+
+.np-tab[aria-pressed='true'] {
+  border-color: var(--np-accent);
   background: var(--np-rose);
   color: var(--np-accent);
 }
 
-.np-tab > span {
-  min-width: 20px;
-  padding-inline: 4px;
-  border-radius: 4px;
-  background: var(--np-soft);
-  text-align: center;
-  font-size: 11px;
-  font-variant-numeric: tabular-nums;
+.np-tab[aria-pressed='true'] .np-tab-icon,
+.np-tab[aria-pressed='true'] .np-tab-count {
+  color: inherit;
+}
+
+.np-tab[aria-pressed='true'] .np-tab-count {
+  background: var(--np-surface);
+}
+
+@media (max-width: 620px) {
+  .np-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: auto;
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .np-tab,
+  .np-tab-icon,
+  .np-tab-count {
+    transition: background-color 160ms ease, color 160ms ease;
+  }
 }
 
 .np-filters {
@@ -398,6 +441,96 @@ body:has(.np-page) {
   width: 100%;
   padding: 5px 8px;
   font-size: 13px;
+}
+
+/* Category and Sort controls */
+.np-select select:is([name='notification-category'], [name='notification-sort']) {
+  --np-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  appearance: none;
+  padding: 8px 34px 8px 11px;
+  background-image: var(--np-chevron);
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.np-page[data-theme='dark']
+  .np-select select:is([name='notification-category'], [name='notification-sort']) {
+  --np-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23ed9299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.np-select select:is([name='notification-category'], [name='notification-sort']):hover {
+  border-color: var(--np-accent);
+}
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .np-select select:is([name='notification-category'], [name='notification-sort']),
+  .np-select select:is([name='notification-category'], [name='notification-sort'])::picker(select) {
+    appearance: base-select;
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort']) {
+    align-items: center;
+    padding-inline-end: 12px;
+    background-image: none;
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort'])::picker-icon {
+    width: 8px;
+    height: 8px;
+    margin-inline-start: 10px;
+    border-right: 2px solid var(--np-accent);
+    border-bottom: 2px solid var(--np-accent);
+    rotate: 45deg;
+    translate: 0 -2px;
+    content: '';
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort']):open::picker-icon {
+    rotate: 225deg;
+    translate: 0 2px;
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort'])::picker(select) {
+    margin-block: 5px;
+    padding: 5px;
+    border: 1px solid var(--np-line);
+    border-radius: 10px;
+    background: var(--np-surface);
+    color: var(--np-text);
+    box-shadow: 0 8px 24px rgb(40 35 33 / 12%);
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort']) option {
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    white-space: normal;
+    cursor: pointer;
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort']) option:hover,
+  .np-select select:is([name='notification-category'], [name='notification-sort']) option:focus-visible {
+    background: var(--np-soft);
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort']) option:checked {
+    background: var(--np-rose);
+    color: var(--np-accent);
+    font-weight: 700;
+  }
+
+  .np-select select:is([name='notification-category'], [name='notification-sort']) option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--np-accent);
+  }
 }
 
 .np-more-filters {
