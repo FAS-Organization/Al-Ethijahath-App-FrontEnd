@@ -212,13 +212,99 @@ body:has(.eq-page) {
 }
 
 .eq-summary-item {
+  --eq-metric-ink: var(--eq-accent);
+  --eq-metric-tint: var(--eq-accent-soft);
+
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
+  overflow: hidden;
   padding: 22px;
   border: 1px solid var(--eq-line);
   border-radius: 12px;
-  background: var(--eq-surface);
+  background: linear-gradient(
+    135deg,
+    var(--eq-surface) 28%,
+    var(--eq-metric-tint) 100%
+  );
+}
+
+.eq-summary-item--coverage {
+  --eq-metric-ink: var(--eq-green);
+  --eq-metric-tint: var(--eq-green-bg);
+}
+
+.eq-summary-item--service {
+  --eq-metric-ink: #865015;
+  --eq-metric-tint: #fbf0dc;
+}
+
+.eq-page[data-theme='dark'] .eq-summary-item--service {
+  --eq-metric-ink: #edc488;
+  --eq-metric-tint: #3c3020;
+}
+
+.eq-summary-item .eq-summary-icon,
+.eq-summary-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.eq-summary-item .eq-summary-icon {
+  background: var(--eq-metric-tint);
+  color: var(--eq-metric-ink);
+  transition: none;
+}
+
+.eq-summary-copy {
+  min-width: 0;
+}
+
+.eq-summary-corner {
+  position: absolute;
+  inset-inline-end: -15px;
+  inset-block-end: -30px;
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--eq-metric-ink);
+  opacity: 0.17;
+  pointer-events: none;
+}
+
+.eq-summary-corner::before {
+  position: absolute;
+  inset: 10px;
+  border: 1px solid currentColor;
+  border-radius: inherit;
+  content: '';
+}
+
+.eq-summary-item--fleet .eq-summary-corner {
+  border-radius: 24px;
+  rotate: -12deg;
+}
+
+.eq-summary-item--service .eq-summary-corner::before {
+  border-style: dashed;
+}
+
+@media (max-width: 639px) {
+  .eq-summary-corner {
+    opacity: 0.12;
+  }
+}
+
+@media (forced-colors: active) {
+  .eq-summary-corner {
+    display: none;
+  }
 }
 
 .eq-summary-icon,
@@ -245,10 +331,11 @@ body:has(.eq-page) {
 .eq-summary-item strong {
   display: block;
   margin-top: 4px;
-  color: var(--eq-heading);
-  font-size: 30px;
-  line-height: 1.2;
-  font-weight: 600;
+  color: var(--eq-metric-ink);
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
   font-variant-numeric: tabular-nums;
 }
 

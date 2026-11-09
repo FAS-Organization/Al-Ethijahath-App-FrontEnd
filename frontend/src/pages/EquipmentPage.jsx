@@ -912,29 +912,37 @@ export default function EquipmentPage({
               <section className="eq-summary" aria-label="Equipment summary">
                 {[
                   {
+                    tone: 'fleet',
                     label: 'Current equipment',
                     value: current.length,
                     icon: TruckIcon,
                   },
                   {
+                    tone: 'coverage',
                     label: 'AMC covered',
                     value: covered,
                     icon: CheckCircleIcon,
                   },
                   {
+                    tone: 'service',
                     label: 'With active services',
                     value: beingServiced,
                     icon: WrenchIcon,
                   },
-                ].map(({ label, value, icon: Icon }) => (
-                  <div className="eq-summary-item" key={label}>
-                    <span className="eq-summary-icon">
-                      <Icon size={23} aria-hidden="true" />
+                ].map(({ tone, label, value, icon: Icon }) => (
+                  <div className={`eq-summary-item eq-summary-item--${tone}`} key={tone}>
+                    <span className="eq-summary-icon" aria-hidden="true">
+                      <Icon size={23} />
                     </span>
-                    <div>
+
+                    <div className="eq-summary-copy">
                       <span>{label}</span>
                       <strong>{value}</strong>
                     </div>
+
+                    <span className="eq-summary-corner" aria-hidden="true">
+                      <Icon size={60} weight="thin" />
+                    </span>
                   </div>
                 ))}
               </section>

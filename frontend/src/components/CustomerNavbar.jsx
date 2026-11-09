@@ -108,7 +108,12 @@ export default function CustomerNavbar({
       <div className="ae-nav__header">
         <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
           onClick={() => setOpen(false)}>
-          <img src="/images/logo.webp" alt="Al Ethijahath" width="160" height="50" />
+          <img
+            src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
+            alt="Al Ethijahath"
+            width="160"
+            height="50"
+          />
         </NavLink>
         <button ref={toggleRef} type="button" className="ae-nav__toggle"
           aria-expanded={expanded} aria-controls={menuId}
@@ -128,8 +133,10 @@ export default function CustomerNavbar({
           <ul className="ae-nav__links">
             {CUSTOMER_NAV_ITEMS.map(({ id, label, to, icon: Icon, end }) => {
               const content = <>
-                <Icon size={21} aria-hidden="true" />
-                <span>{label}</span>
+                <span className="ae-nav__link-icon" aria-hidden="true">
+                  <Icon size={20} />
+                </span>
+                <span className="ae-nav__link-label">{label}</span>
                 {id === 'notifications' && count > 0 ? (
                   <span className="ae-nav__badge" aria-label={`${count} unread notifications`}>
                     {count > 99 ? '99+' : count}
