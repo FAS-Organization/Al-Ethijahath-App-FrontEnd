@@ -1,4 +1,5 @@
 /* Standalone styles: no DashboardPage.css dependency or global resets. */
+
 .ae-nav {
   --ae-bg: #f6f4ed;
   --ae-text: #282321;

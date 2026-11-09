@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import {
   ArrowDownIcon,
   ArrowUpRightIcon,
@@ -28,6 +28,7 @@ import {
 } from 'recharts'
 
 import CustomerNavbar from '../components/CustomerNavbar'
+import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import { DASHBOARD_PREVIEW_DATA } from '../data/dashboardPreviewData'
 import './DashboardPage.css'
 
@@ -396,7 +397,19 @@ export default function DashboardPage({
   const invoices = ready ? data.invoices : []
   const pendingServiceCharges = ready ? (data.pendingServiceCharges ?? []) : []
   const documents = ready ? data.documents : []
-  const notifications = ready ? data.notifications : []
+  const notificationStore = useContext(NotificationsPreviewContext)
+
+  const notifications = ready
+    ? notificationStore
+      ? notificationStore.data.items.map(item => ({
+          id: item.id,
+          title: item.title,
+          message: item.message,
+          read: Boolean(item.read_at),
+          tone: item.positive ? 'success' : item.requires_action ? 'warning' : 'neutral',
+        }))
+      : data.notifications
+    : []
 
   const unread = notifications.filter(item => !item.read).length
   const covered = equipment.filter(item => item.coverage === 'AMC').length

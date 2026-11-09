@@ -1,11 +1,13 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useContext, useEffect, useId, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   SquaresFourIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
   FileTextIcon, ReceiptIcon, FolderOpenIcon, BellIcon,
   UserCircleIcon, HeadsetIcon, SignOutIcon, ListIcon, XIcon,
 } from '@phosphor-icons/react'
+import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import './CustomerNavbar.css'
+
 
 // Frontend destinations, not Django API endpoints.
 // Enable each destination only after its page is connected to your router.
@@ -28,6 +30,8 @@ const INITIAL_PAGES = [
   'maintenance',
   'billing',
   'documents',
+  'notifications',
+  'account',
 ]
 
 /** Render once within BrowserRouter, outside individual page contents.
@@ -53,7 +57,12 @@ export default function CustomerNavbar({
   const [openedAt, setOpenedAt] = useState(null)
   // Route changes also close the disclosure, including browser Back/Forward.
   const expanded = open && openedAt === location.key
-  const count = Number.isFinite(unreadCount) ? Math.max(0, Math.floor(unreadCount)) : 0
+  const notificationStore = useContext(NotificationsPreviewContext)
+  const badgeCount = notificationStore
+    ? notificationStore.data.items.filter(item => !item.read_at).length
+    : unreadCount
+
+  const count = Number.isFinite(badgeCount) ? Math.max(0, Math.floor(badgeCount)) : 0
 
   useEffect(() => {
     if (!expanded) return
