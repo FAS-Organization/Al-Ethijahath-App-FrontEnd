@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useId, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowUpRightIcon,
@@ -64,22 +64,53 @@ function initialTheme() {
   }
 }
 
-function NotificationCard({ item, onRead }) {
+const relativeTime = new Intl.RelativeTimeFormat('en', {
+  numeric: 'always',
+  style: 'short',
+})
+
+function formatNotificationTime(value, now) {
+  const date = new Date(value)
+  const minutes = Math.floor((now - date.getTime()) / 60000)
+
+  if (!Number.isFinite(minutes)) return 'Date unavailable'
+  if (minutes < 0 || minutes >= 10080) return dateTime.format(date)
+  if (minutes === 0) return 'Just now'
+  if (minutes < 60) return relativeTime.format(-minutes, 'minute')
+  if (minutes < 1440) return relativeTime.format(-Math.floor(minutes / 60), 'hour')
+
+  return relativeTime.format(-Math.floor(minutes / 1440), 'day')
+}
+
+function NotificationCard({ item, onRead, now }) {
+  const [expanded, setExpanded] = useState(false)
+  const detailsId = useId()
   const category = CATEGORIES[item.category]
   const Icon = item.positive ? CheckCircleIcon : category.icon
   const unread = !item.read_at
+  const readAction = unread ? 'Mark as read' : 'Mark as unread'
+  const absoluteTime = dateTime.format(new Date(item.created_at))
 
   return (
     <article
       className={`np-card np-card--${item.priority}${item.positive ? ' is-positive' : ''}`}
+      data-unread={unread}
+      data-expanded={expanded}
     >
       <span className="np-event-icon">
-        <Icon size={24} aria-hidden="true" />
+        <Icon size={19} aria-hidden="true" />
       </span>
 
       <div className="np-card-content">
-        <div className="np-card-meta">
-          <span>{category.label}</span>
+        <div className="np-title-line">
+          <h3>
+            <Link
+              to={item.destination_path}
+              onClick={() => onRead(item.id, true)}
+            >
+              {item.title}
+            </Link>
+          </h3>
 
           {item.priority === 'high' ? (
             <span className="np-badge np-badge--high">Overdue</span>
@@ -87,49 +118,49 @@ function NotificationCard({ item, onRead }) {
             <span className="np-badge np-badge--action">Action required</span>
           ) : null}
 
-          <span className={`np-read-label${unread ? ' is-unread' : ''}`}>
-            {unread ? 'Unread' : 'Read'}
-          </span>
-        </div>
-
-        <h3>{item.title}</h3>
-        <p className="np-message">{item.message}</p>
-
-        <div className="np-reference">
-          <strong>{item.reference}</strong>
-          {item.site && (
-            <span>
-              <MapPinIcon size={14} aria-hidden="true" />
-              {item.site}
+          {unread && (
+            <span className="np-unread-dot">
+              <span className="np-sr-only">Unread</span>
             </span>
           )}
         </div>
 
-        <div className="np-card-bottom">
-          <time dateTime={item.created_at} title="Saudi time">
-            {dateTime.format(new Date(item.created_at))}
-          </time>
+        <p className="np-message">{item.message}</p>
 
-          <div className="np-card-actions">
-            <button
-              type="button"
-              className="np-text-button"
-              onClick={() => onRead(item.id, unread)}
-            >
-              {unread ? 'Mark as read' : 'Mark as unread'}
-              <span className="np-sr-only"> · {item.title}, {item.reference}</span>
-            </button>
-
-            <Link
-              className="np-record-link"
-              to={item.destination_path}
-              onClick={() => onRead(item.id, true)}
-            >
-              {item.action_label}
-              <ArrowUpRightIcon size={16} aria-hidden="true" />
-            </Link>
-          </div>
+        <div id={detailsId} className="np-row-details" hidden={!expanded}>
+          <span>{category.label}</span>
+          {item.reference && <strong>{item.reference}</strong>}
+          {item.site && <span>{item.site}</span>}
+          <span>{absoluteTime} Saudi time</span>
         </div>
+      </div>
+
+      <div className="np-row-tools">
+        <time dateTime={item.created_at} title={`${absoluteTime} Saudi time`}>
+          {formatNotificationTime(item.created_at, now)}
+        </time>
+
+        <button
+          type="button"
+          className="np-read-button"
+          title={readAction}
+          aria-label={`${readAction}: ${item.title}, ${item.reference}`}
+          onClick={() => onRead(item.id, unread)}
+        >
+          {unread
+            ? <CheckCircleIcon size={18} aria-hidden="true" />
+            : <BellIcon size={18} aria-hidden="true" />}
+        </button>
+
+        <button
+          type="button"
+          className="np-details-button"
+          aria-expanded={expanded}
+          aria-controls={detailsId}
+          onClick={() => setExpanded(value => !value)}
+        >
+          {expanded ? 'Less' : 'Details'}
+        </button>
       </div>
     </article>
   )
@@ -142,6 +173,12 @@ export default function NotificationsPage() {
   const [limit, setLimit] = useState(PAGE_SIZE)
   const [announcement, setAnnouncement] = useState('')
   const resultsRef = useRef(null)
+    const [now, setNow] = useState(Date.now)
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60000)
+    return () => window.clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     try {
@@ -305,10 +342,21 @@ export default function NotificationsPage() {
               <p>Service visits, approval requests and payment updates for your account.</p>
             </div>
 
-            <button type="button" className="np-button" disabled={!unread} onClick={markAllRead}>
-              <CheckCircleIcon size={18} aria-hidden="true" />
-              Mark all as read
-            </button>
+            <div className="np-heading-actions">
+              <Link className="np-text-button" to="/account?section=notifications">
+                Contact preferences
+              </Link>
+
+              <button
+                type="button"
+                className="np-button"
+                disabled={!unread}
+                onClick={markAllRead}
+              >
+                <CheckCircleIcon size={18} aria-hidden="true" />
+                Mark all as read
+              </button>
+            </div>
           </div>
 
           <div className="np-preview">
@@ -321,53 +369,32 @@ export default function NotificationsPage() {
             </button>
           </div>
 
-          <section className="np-priorities" aria-label="Outstanding actions">
-            <div className={`np-priority-panel${overdue ? ' has-critical' : ''}`}>
-              <span className="np-priority-icon">
-                <LightningIcon size={28} weight="fill" aria-hidden="true" />
-              </span>
-              <div>
-                <h2>
-                  {overdue
-                    ? `${overdue} overdue ${overdue === 1 ? 'invoice' : 'invoices'}`
-                    : 'No overdue payment alerts'}
-                </h2>
-                <p>Check the remaining balance and confirmed payments for each invoice.</p>
-                {overdue > 0 && (
-                  <button type="button" className="np-priority-link" onClick={showPaymentAlerts}>
-                    Review payment alerts
-                    <ArrowUpRightIcon size={17} aria-hidden="true" />
-                  </button>
-                )}
-              </div>
-            </div>
+                    {(overdue > 0 || approvals > 0) && (
+            <div className="np-alert-strip" role="group" aria-label="Outstanding actions">
+              {overdue > 0 && (
+                <button
+                  type="button"
+                  className="np-alert np-alert--critical"
+                  onClick={showPaymentAlerts}
+                >
+                  <LightningIcon size={17} weight="fill" aria-hidden="true" />
+                  {overdue} overdue {overdue === 1 ? 'invoice' : 'invoices'}
+                  <ArrowUpRightIcon size={15} aria-hidden="true" />
+                </button>
+              )}
 
-            <div className="np-approval-panel">
-              <span className="np-priority-icon">
-                <FileTextIcon size={27} aria-hidden="true" />
-              </span>
-              <div>
-                <h2>{approvals ? `${approvals} awaiting your review` : 'No approvals waiting'}</h2>
-                <p>Quotation decisions and inspection signatures.</p>
-                <Link className="np-priority-link" to="/quotations">
-                  Open inspections &amp; quotations
-                  <ArrowUpRightIcon size={17} aria-hidden="true" />
+              {approvals > 0 && (
+                <Link className="np-alert np-alert--approval" to="/quotations">
+                  <FileTextIcon size={17} aria-hidden="true" />
+                  {approvals} awaiting review
+                  <ArrowUpRightIcon size={15} aria-hidden="true" />
                 </Link>
-              </div>
+              )}
             </div>
-          </section>
+          )}
 
           <section className="np-inbox" aria-labelledby="np-inbox-title">
-            <div className="np-inbox-heading">
-              <div>
-                <h2 id="np-inbox-title">Your updates</h2>
-                <p>Open the related record to review or resolve an outstanding action.</p>
-              </div>
-              <span className="np-total">
-                <BellIcon size={17} aria-hidden="true" />
-                {unread} unread
-              </span>
-            </div>
+            <h2 id="np-inbox-title" className="np-sr-only">Your updates</h2>
 
             <div className="np-tabs" role="group" aria-label="Read status and actions">
               {views.map(view => (
@@ -469,7 +496,12 @@ export default function NotificationsPage() {
             {visible.length ? (
               <div className="np-list">
                 {visible.slice(0, limit).map(item => (
-                  <NotificationCard key={item.id} item={item} onRead={markRead} />
+                  <NotificationCard
+                    key={item.id}
+                    item={item}
+                    onRead={markRead}
+                    now={now}
+                  />
                 ))}
               </div>
             ) : (

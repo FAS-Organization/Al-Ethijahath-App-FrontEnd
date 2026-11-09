@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   ArrowRightIcon,
   BellRingingIcon,
@@ -1243,7 +1243,10 @@ export default function AccountPage({
   const [theme, setTheme] = useState(initialTheme)
   const [source, setSource] = useState(data)
   const [account, setAccount] = useState(data?.account ?? null)
-  const [section, setSection] = useState('profile')
+  const [searchParams] = useSearchParams()
+  const [section, setSection] = useState(() =>
+    searchParams.get('section') === 'notifications' ? 'notifications' : 'profile',
+  )
   const [siteDialog, setSiteDialog] = useState(null)
   const [passwordOpen, setPasswordOpen] = useState(false)
   const tabRefs = useRef({})
