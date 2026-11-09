@@ -1452,12 +1452,6 @@ export default function AccountPage({
 
           {ready && (
             <>
-              {isDemo && (
-                <p className="sv-demo-notice">
-                  Preview mode · Fictional account. Changes are shown on
-                  this page only and are not saved anywhere.
-                </p>
-              )}
 
               <section className="ac-profile" aria-label="Account overview">
                 <div className="ac-cover" aria-hidden="true">
