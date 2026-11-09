@@ -405,9 +405,9 @@ export default function NotificationsPage() {
               </label>
 
               <label className="np-select">
-                <span>Category</span>
                 <select
                   name="notification-category"
+                  aria-label="Category"
                   value={filters.category}
                   onChange={event => changeFilters({ category: event.target.value })}
                 >
@@ -419,9 +419,9 @@ export default function NotificationsPage() {
               </label>
 
               <label className="np-select">
-                <span>Sort</span>
                 <select
                   name="notification-sort"
+                  aria-label="Sort"
                   value={filters.sort}
                   onChange={event => changeFilters({ sort: event.target.value })}
                 >

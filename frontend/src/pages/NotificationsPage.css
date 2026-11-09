@@ -479,9 +479,10 @@ body:has(.np-page) {
   }
 
   .np-select select:is([name='notification-category'], [name='notification-sort'])::picker-icon {
+    flex-shrink: 0;
     width: 8px;
     height: 8px;
-    margin-inline-start: 10px;
+    margin-inline-start: auto;
     border-right: 2px solid var(--np-accent);
     border-bottom: 2px solid var(--np-accent);
     rotate: 45deg;
