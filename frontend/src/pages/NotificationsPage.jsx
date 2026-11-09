@@ -5,6 +5,7 @@ import {
   BellIcon,
   CalendarBlankIcon,
   CheckCircleIcon,
+  ChecksIcon,
   FileTextIcon,
   LightningIcon,
   MagnifyingGlassIcon,
@@ -144,7 +145,7 @@ function NotificationCard({ item, onRead, now }) {
           aria-label={`${readAction}: ${item.title}, ${item.reference}`}
           onClick={() => onRead(item.id, unread)}
         >
-          {readAction}
+          {unread ? 'Mark as read' : <ChecksIcon size={20} aria-hidden="true" />}
         </button>
 
         <button
