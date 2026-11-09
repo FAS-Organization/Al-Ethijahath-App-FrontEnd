@@ -1,18 +1,16 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   ArrowRightIcon,
   ArrowsClockwiseIcon,
-  BuildingsIcon,
   CalendarBlankIcon,
   CheckCircleIcon,
-  ClockIcon,
   FilePdfIcon,
   FileTextIcon,
   MagnifyingGlassIcon,
   MoonIcon,
   SunIcon,
   TruckIcon,
-  UserIcon,
   WarningCircleIcon,
   XIcon,
 } from '@phosphor-icons/react'
@@ -24,12 +22,10 @@ import {
 } from '../data/maintenancePreviewData'
 import './AmcSchedulePage.css'
 
-
-
-
 const TZ = 'Asia/Riyadh'
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 const OPEN_REQUEST = ['pending', 'alternative_proposed']
+const SUMMARIES_SHOWN = 3
 
 const APPOINTMENT_STATUS = {
   planned: 'Planned',
@@ -145,8 +141,8 @@ function months(count) {
 }
 
 function badgeTone(status) {
-  if (['active', 'confirmed', 'completed', 'accepted'].includes(status)) return 'good'
-  if (['planned', 'in_progress', 'pending', 'alternative_proposed', 'overdue'].includes(status)) return 'warn'
+  if (['active', 'confirmed', 'completed', 'accepted', 'visit'].includes(status)) return 'good'
+  if (['planned', 'in_progress', 'pending', 'alternative_proposed', 'unscheduled'].includes(status)) return 'warn'
   if (['expired', 'cancelled', 'withdrawn'].includes(status)) return 'muted'
   return 'accent'
 }
@@ -275,13 +271,163 @@ function Message({ icon: Icon, title, children, action }) {
   )
 }
 
-// ---------- Contract pieces ----------
+function PdfControl({ url, label = 'Contract PDF' }) {
+  return url ? (
+    <a className="sc-action" href={url} target="_blank" rel="noreferrer">
+      <FilePdfIcon size={16} aria-hidden="true" /> {label}
+    </a>
+  ) : (
+    <button className="sc-action" type="button" disabled title="Sample PDF unavailable">
+      <FilePdfIcon size={16} aria-hidden="true" /> Sample PDF unavailable
+    </button>
+  )
+}
+
+// ---------- Current contract (shown in full on the page) ----------
+
+function CurrentContract({ contract, rows, stats, handlers }) {
+  return (
+    <article className="sc-current" aria-labelledby={`sc-current-${contract.id}`}>
+      <div className="sc-current-head">
+        <span className="sc-card-icon">
+          <FileTextIcon size={26} aria-hidden="true" />
+        </span>
+        <div className="sc-card-title">
+          <h3 id={`sc-current-${contract.id}`}>{contract.contract_number}</h3>
+          <p>
+            {fmtDate(contract.start_date)} – {fmtDate(contract.end_date)} · Every {months(contract.interval_months)}
+          </p>
+        </div>
+        <Badge status={contract.status}>{CONTRACT_STATUS[contract.status]}</Badge>
+        <PdfControl url={contract.pdf_url} />
+      </div>
+
+      <dl className="sc-stats">
+        <div className="sc-stat">
+          <dt>Covered machines</dt>
+          <dd>{stats.covered}</dd>
+        </div>
+        <div className="sc-stat">
+          <dt>Next service due</dt>
+          <dd>{stats.nextDue ? fmtDate(stats.nextDue) : 'Not recorded'}</dd>
+        </div>
+        <div className={`sc-stat${stats.overdue ? ' sc-stat--alert' : ''}`}>
+          <dt>Overdue machines</dt>
+          <dd>{stats.overdue}</dd>
+        </div>
+        <div className="sc-stat">
+          <dt>Visits scheduled</dt>
+          <dd>{stats.visits}</dd>
+        </div>
+      </dl>
+
+      <div className="sc-section-title sc-section-title--sub">
+        <h4>Covered machines and updates</h4>
+        <span className="sc-count">{rows.length}</span>
+      </div>
+
+      {!rows.length ? (
+        <p className="sc-muted">No covered machines match your search.</p>
+      ) : (
+        <ul className="sc-machines">
+          {rows.map(row => (
+            <li key={row.coverage.id}>
+              <article className={`sc-machine${row.overdue ? ' sc-machine--overdue' : ''}`}>
+                <div className="sc-machine-top">
+                  <span className="sc-machine-icon">
+                    <TruckIcon size={22} aria-hidden="true" />
+                  </span>
+                  <div className="sc-machine-title">
+                    <h5>{row.equipment.name}</h5>
+                    <p>
+                      {row.equipment.asset} · {row.equipment.serial}
+                    </p>
+                  </div>
+                  <Badge status={row.state.tone}>{row.state.label}</Badge>
+                </div>
+
+                <dl className="sc-machine-dates">
+                  <div>
+                    <dt>Last service</dt>
+                    <dd>
+                      {row.coverage.last_completed_service_date
+                        ? fmtDate(row.coverage.last_completed_service_date)
+                        : '—'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Next due</dt>
+                    <dd className={row.overdue ? 'sc-overdue' : ''}>
+                      {fmtDate(row.coverage.next_service_due_date)}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Interval</dt>
+                    <dd>
+                      Every {months(row.interval)}
+                      {row.override && <small>Equipment override</small>}
+                    </dd>
+                  </div>
+                </dl>
+
+                <p className={`sc-machine-update${row.overdue ? ' is-alert' : ''}`}>
+                  {row.overdue ? (
+                    <WarningCircleIcon size={18} aria-hidden="true" />
+                  ) : (
+                    <CalendarBlankIcon size={18} aria-hidden="true" />
+                  )}
+                  <span>{row.note}</span>
+                </p>
+
+                <div className="sc-machine-foot">
+                  <p className="sc-machine-site">
+                    {row.site?.name || 'Site not recorded'}
+                    <small>
+                      Covered {fmtShort(row.coverage.start_date)} – {fmtDate(row.coverage.end_date)}
+                    </small>
+                  </p>
+
+                  <div className="sc-cell-actions">
+                    <ActionButton
+                      available={Boolean(handlers.onOpenEquipment)}
+                      onClick={() => handlers.onOpenEquipment?.(row.equipment.id)}
+                    >
+                      View equipment
+                    </ActionButton>
+                    <ActionButton
+                      available={Boolean(handlers.onOpenServiceHistory)}
+                      onClick={() => handlers.onOpenServiceHistory?.(row.equipment.id)}
+                    >
+                      Service history
+                    </ActionButton>
+                    {row.visit && (
+                      <ActionButton
+                        available={Boolean(handlers.onOpenAppointment)}
+                        onClick={() => handlers.onOpenAppointment?.(row.visit)}
+                      >
+                        Scheduled visit
+                      </ActionButton>
+                    )}
+                  </div>
+                </div>
+              </article>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <p className="sc-note">
+        Due dates are maintenance targets, not confirmed visits. AMC coverage does not automatically make every repair
+        free of charge. Customers cannot edit contracts, coverage or due dates.
+      </p>
+    </article>
+  )
+}
+// ---------- Previous contracts (compact cards + popup) ----------
 
 function ContractCard({ contract, count, onView }) {
-  const current = contract.status === 'active'
-
   return (
-    <article className="sc-card">
+    <article className="sc-card sc-card--previous">
       <div className="sc-card-header">
         <span className="sc-card-icon">
           <FileTextIcon size={26} aria-hidden="true" />
@@ -300,25 +446,14 @@ function ContractCard({ contract, count, onView }) {
         <Specification label="Covered equipment" value={count} />
       </dl>
 
-      {!current && (
-        <p className="sc-note">Historical coverage. It does not count as current coverage.</p>
-      )}
+      <p className="sc-note">Historical coverage. It does not count as current coverage.</p>
 
       <div className="sc-card-actions">
         <button className="sc-trigger" type="button" aria-haspopup="dialog" onClick={onView}>
           <span>View coverage</span>
           <ArrowRightIcon size={18} aria-hidden="true" />
         </button>
-
-        {contract.pdf_url ? (
-          <a className="sc-action" href={contract.pdf_url} target="_blank" rel="noreferrer">
-            <FilePdfIcon size={16} aria-hidden="true" /> Contract PDF
-          </a>
-        ) : (
-          <button className="sc-action" type="button" disabled title="Sample PDF unavailable">
-            <FilePdfIcon size={16} aria-hidden="true" /> Sample PDF unavailable
-          </button>
-        )}
+        <PdfControl url={contract.pdf_url} />
       </div>
     </article>
   )
@@ -326,7 +461,6 @@ function ContractCard({ contract, count, onView }) {
 
 function ContractDetail({ contract, rows, onClose, handlers }) {
   const titleId = useId()
-  const current = contract.status === 'active'
 
   return (
     <>
@@ -350,15 +484,7 @@ function ContractDetail({ contract, rows, onClose, handlers }) {
         </dl>
 
         <div className="sc-doc-row">
-          {contract.pdf_url ? (
-            <a className="sc-action" href={contract.pdf_url} target="_blank" rel="noreferrer">
-              <FilePdfIcon size={16} aria-hidden="true" /> View / download contract PDF
-            </a>
-          ) : (
-            <button className="sc-action" type="button" disabled>
-              <FilePdfIcon size={16} aria-hidden="true" /> Sample PDF unavailable
-            </button>
-          )}
+          <PdfControl url={contract.pdf_url} label="View / download contract PDF" />
         </div>
 
         <section className="sc-dialog-section">
@@ -376,8 +502,6 @@ function ContractDetail({ contract, rows, onClose, handlers }) {
                   <th scope="col">Site</th>
                   <th scope="col">Coverage dates</th>
                   <th scope="col">Service interval</th>
-                  <th scope="col">Last completed service</th>
-                  <th scope="col">Next service due</th>
                   <th scope="col">Actions</th>
                 </tr>
               </thead>
@@ -397,20 +521,6 @@ function ContractDetail({ contract, rows, onClose, handlers }) {
                       {months(row.interval)}
                       {row.override && <small>Equipment override</small>}
                     </td>
-                    <td>{fmtDate(row.coverage.last_completed_service_date) === 'Not recorded' ? '—' : fmtDate(row.coverage.last_completed_service_date)}</td>
-                    <td>
-                      {current ? (
-                        <>
-                          <strong className={row.overdue ? 'sc-overdue' : ''}>
-                            {fmtDate(row.coverage.next_service_due_date)}
-                            {row.overdue ? ' — overdue' : ''}
-                          </strong>
-                          <small>{row.note}</small>
-                        </>
-                      ) : (
-                        <small>Contract ended</small>
-                      )}
-                    </td>
                     <td>
                       <div className="sc-cell-actions">
                         <ActionButton
@@ -425,14 +535,6 @@ function ContractDetail({ contract, rows, onClose, handlers }) {
                         >
                           View service history
                         </ActionButton>
-                        {row.visit && (
-                          <ActionButton
-                            available={Boolean(handlers.onOpenAppointment)}
-                            onClick={() => handlers.onOpenAppointment?.(row.visit)}
-                          >
-                            View scheduled visit
-                          </ActionButton>
-                        )}
                       </div>
                     </td>
                   </tr>
@@ -442,8 +544,7 @@ function ContractDetail({ contract, rows, onClose, handlers }) {
           </div>
 
           <p className="sc-note">
-            Due dates are maintenance targets, not confirmed visits. AMC coverage does not automatically make every
-            repair free of charge. Customers cannot edit contracts, coverage or due dates.
+            This contract has ended, so it does not count as current coverage and has no active due dates.
           </p>
         </section>
       </div>
@@ -673,6 +774,7 @@ function ScheduleContent({ data, handlers }) {
   const [openContract, setOpenContract] = useState(null)
   const [rescheduleId, setRescheduleId] = useState(null)
   const [message, setMessage] = useState('')
+  const [showAllSummaries, setShowAllSummaries] = useState(false)
 
   // Customers never see internal draft contracts.
   const contracts = data.contracts.filter(contract => contract.status !== 'draft')
@@ -747,15 +849,25 @@ function ScheduleContent({ data, handlers }) {
       .map(coverage => {
         const equipment = equipmentById.get(coverage.equipment_id)
         const current = contract?.status === 'active' && isCurrent(coverage)
+        const overdue = current && coverage.next_service_due_date < today
+        const visit = current ? upcomingVisitFor(coverage.equipment_id) : null
+        const state = overdue
+          ? { tone: 'accent', label: 'Overdue' }
+          : visit
+            ? { tone: 'visit', label: 'Visit scheduled' }
+            : { tone: 'unscheduled', label: 'No visit scheduled' }
+
         return {
           coverage,
           equipment,
           site: siteById.get(equipment?.site_id),
           override: coverage.interval_months_override != null,
           interval: coverage.interval_months_override ?? contract?.interval_months,
-          overdue: current && coverage.next_service_due_date < today,
+          overdue,
+          current,
+          state,
           note: current ? dueNote(coverage) : '',
-          visit: current ? upcomingVisitFor(coverage.equipment_id) : null,
+          visit,
         }
       })
       .filter(row => row.equipment)
@@ -772,20 +884,56 @@ function ScheduleContent({ data, handlers }) {
   }
 
   // ----- Contract filtering -----
-  const visibleContracts = contracts.filter(contract => {
-    const rows = rowsFor(contract.id)
-    const text = [
-      contract.contract_number,
-      ...rows.map(r => `${r.equipment.name} ${r.equipment.asset} ${r.equipment.serial}`),
-    ]
-      .join(' ')
-      .toLowerCase()
-    return (
-      text.includes(query.trim().toLowerCase()) &&
-      (contractStatus === 'all' || contract.status === contractStatus) &&
-      (contractSite === 'all' || rows.some(r => String(r.equipment.site_id) === contractSite))
-    )
-  })
+  const needle = query.trim().toLowerCase()
+  const filtersActive = Boolean(needle) || contractSite !== 'all' || contractStatus !== 'all'
+
+  function rowMatches(row, contract) {
+    const text = `${row.equipment.name} ${row.equipment.asset} ${row.equipment.serial}`.toLowerCase()
+    const contractHit = contract.contract_number.toLowerCase().includes(needle)
+    const matchesText = !needle || contractHit || text.includes(needle)
+    const matchesSite = contractSite === 'all' || String(row.equipment.site_id) === contractSite
+    return matchesText && matchesSite
+  }
+
+  const currentPanels = contracts
+    .filter(c => c.status === 'active' && (contractStatus === 'all' || contractStatus === 'active'))
+    .map(contract => {
+      const allRows = rowsFor(contract.id)
+      const shownRows = allRows.filter(row => rowMatches(row, contract))
+      const dueDates = allRows
+        .filter(row => row.current && row.coverage.next_service_due_date)
+        .map(row => row.coverage.next_service_due_date)
+        .sort()
+      return {
+        contract,
+        rows: shownRows,
+        stats: {
+          covered: allRows.filter(row => row.current).length,
+          nextDue: dueDates[0] || null,
+          overdue: allRows.filter(row => row.overdue).length,
+          visits: allRows.filter(row => row.visit).length,
+        },
+      }
+    })
+    .filter(panel => !filtersActive || panel.rows.length > 0)
+
+  const previousContracts = contracts
+    .filter(c => c.status !== 'active')
+    .filter(c => contractStatus === 'all' || c.status === contractStatus)
+    .filter(c => rowsFor(c.id).some(row => rowMatches(row, c)))
+
+  const visibleContractCount = currentPanels.length + previousContracts.length
+
+  // ----- Monthly summaries: finished months only, newest first -----
+  const finishedSummaries = data.monthly_summaries
+    .filter(entry => {
+      const start = parse(entry.month_start)
+      if (!start) return false
+      const monthEnd = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1))
+      return monthEnd <= now
+    })
+    .sort((a, b) => parse(b.month_start) - parse(a.month_start))
+  const shownSummaries = showAllSummaries ? finishedSummaries : finishedSummaries.slice(0, SUMMARIES_SHOWN)
 
   // ----- Appointment filtering -----
   const visibleAppointments = appointments
@@ -887,7 +1035,8 @@ function ScheduleContent({ data, handlers }) {
 
   const alternativeRequest = requests.find(r => r.id === ALTERNATIVE_PREVIEW.id)
   const alternativeOn = alternativeRequest?.status === 'alternative_proposed'
-  const canTogglePreview = alternativeRequest && OPEN_REQUEST.includes(alternativeRequest.status) && !alternativeRequest.customer_response
+  const canTogglePreview =
+    alternativeRequest && OPEN_REQUEST.includes(alternativeRequest.status) && !alternativeRequest.customer_response
 
   function togglePreview(on) {
     updateRequest(
@@ -927,6 +1076,8 @@ function ScheduleContent({ data, handlers }) {
     { label: 'Upcoming visits', value: stats.visits, icon: CalendarBlankIcon },
     { label: 'Open reschedule requests', value: stats.open, icon: ArrowsClockwiseIcon },
   ]
+
+  const hasActiveContract = contracts.some(c => c.status === 'active')
 
   return (
     <>
@@ -1014,10 +1165,10 @@ function ScheduleContent({ data, handlers }) {
               </div>
 
               <p className="sc-results" role="status" aria-live="polite">
-                Showing {visibleContracts.length} of {contracts.length} contracts
+                Showing {visibleContractCount} of {contracts.length} contracts
               </p>
 
-              {!visibleContracts.length ? (
+              {filtersActive && visibleContractCount === 0 && (
                 <Message
                   title="No matching contracts"
                   action={
@@ -1028,77 +1179,130 @@ function ScheduleContent({ data, handlers }) {
                 >
                   Try a different search or change your filters.
                 </Message>
-              ) : (
-                <div className="sc-grid">
-                  {visibleContracts.map(contract => (
-                    <ContractCard
-                      key={contract.id}
-                      contract={contract}
-                      count={data.coverages.filter(c => c.contract_id === contract.id).length}
-                      onView={() => setOpenContract(contract.id)}
-                    />
-                  ))}
-                </div>
+              )}
+
+              {/* Current contract, in full */}
+              {(currentPanels.length > 0 || (!filtersActive && !hasActiveContract)) && (
+                <section className="sc-section" aria-labelledby="sc-current-title">
+                  <div className="sc-section-title sc-section-title--main">
+                    <h2 id="sc-current-title">Current AMC contract</h2>
+                  </div>
+
+                  {currentPanels.length > 0 ? (
+                    <div className="sc-stack">
+                      {currentPanels.map(panel => (
+                        <CurrentContract
+                          key={panel.contract.id}
+                          contract={panel.contract}
+                          rows={panel.rows}
+                          stats={panel.stats}
+                          handlers={handlers}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <Message icon={FileTextIcon} title="No active AMC contract">
+                      Your previous contracts are listed below. Contact our team if your coverage should be active.
+                    </Message>
+                  )}
+                </section>
+              )}
+
+              {/* Earlier contracts, compact */}
+              {previousContracts.length > 0 && (
+                <section className="sc-section" aria-labelledby="sc-previous-title">
+                  <div className="sc-section-title sc-section-title--main">
+                    <h2 id="sc-previous-title">Previous contracts</h2>
+                    <span className="sc-count">{previousContracts.length}</span>
+                  </div>
+                  <div className="sc-grid">
+                    {previousContracts.map(contract => (
+                      <ContractCard
+                        key={contract.id}
+                        contract={contract}
+                        count={data.coverages.filter(c => c.contract_id === contract.id).length}
+                        onView={() => setOpenContract(contract.id)}
+                      />
+                    ))}
+                  </div>
+                </section>
               )}
             </>
           )}
 
+          {/* Monthly summaries */}
           <section className="sc-block" aria-labelledby="sc-monthly">
             <div className="sc-section-title">
               <h2 id="sc-monthly">Monthly summaries</h2>
-              <span className="sc-count">{data.monthly_summaries.length}</span>
+              <span className="sc-count">{finishedSummaries.length}</span>
             </div>
             <p className="sc-note">
-              Summary generation and delivery are still pending in the backend. These are preview entries only.
+              Summaries cover finished months, newest first. Summary generation and delivery are still pending in the
+              backend, so these are preview entries only.
             </p>
 
-            {!data.monthly_summaries.length ? (
+            {!finishedSummaries.length ? (
               <p className="sc-muted">No monthly summaries are available yet.</p>
             ) : (
-              <div className="sc-grid">
-                {data.monthly_summaries.map(entry => (
-                  <article className="sc-card" key={entry.id}>
-                    <div className="sc-card-header">
-                      <span className="sc-card-icon">
-                        <CalendarBlankIcon size={26} aria-hidden="true" />
-                      </span>
-                      <div className="sc-card-title">
-                        <h3>{fmtMonth(entry.month_start)}</h3>
-                        <p>{entry.contract_number}</p>
+              <>
+                <div className="sc-grid">
+                  {shownSummaries.map(entry => (
+                    <article className="sc-card" key={entry.id}>
+                      <div className="sc-card-header">
+                        <span className="sc-card-icon">
+                          <CalendarBlankIcon size={26} aria-hidden="true" />
+                        </span>
+                        <div className="sc-card-title">
+                          <h3>{fmtMonth(entry.month_start)}</h3>
+                          <p>{entry.contract_number}</p>
+                        </div>
+                        <Badge status="good">
+                          {entry.completed_count} completed AMC {entry.completed_count === 1 ? 'service' : 'services'}
+                        </Badge>
                       </div>
-                      <Badge status="good">
-                        {entry.completed_count} completed AMC {entry.completed_count === 1 ? 'service' : 'services'}
-                      </Badge>
-                    </div>
 
-                    <dl className="sc-facts">
-                      <Specification
-                        label="Equipment serviced"
-                        value={entry.equipment.map(item => `${item.name}, ${item.asset}`).join('; ')}
-                      />
-                      <Specification label="Site" value={entry.site_name} />
-                    </dl>
-                    <p>{entry.summary}</p>
+                      <dl className="sc-facts">
+                        <Specification
+                          label="Equipment serviced"
+                          value={entry.equipment.map(item => `${item.name}, ${item.asset}`).join('; ')}
+                        />
+                        <Specification label="Site" value={entry.site_name} />
+                      </dl>
+                      <p>{entry.summary}</p>
 
-                    <div className="sc-card-actions">
-                      {entry.services.map(service => (
-                        <ActionButton
-                          key={service.reference}
-                          available={Boolean(handlers.onOpenService)}
-                          onClick={() => handlers.onOpenService?.(service.reference)}
-                        >
-                          Service {service.reference}
-                        </ActionButton>
-                      ))}
-                      {entry.pdf_url && (
-                        <a className="sc-action" href={entry.pdf_url} target="_blank" rel="noreferrer">
-                          <FilePdfIcon size={16} aria-hidden="true" /> Sample summary PDF
-                        </a>
-                      )}
-                    </div>
-                  </article>
-                ))}
-              </div>
+                      <div className="sc-card-actions">
+                        {entry.services.map(service => (
+                          <ActionButton
+                            key={service.reference}
+                            available={Boolean(handlers.onOpenService)}
+                            onClick={() => handlers.onOpenService?.(service.reference)}
+                          >
+                            Service {service.reference}
+                          </ActionButton>
+                        ))}
+                        {entry.pdf_url && (
+                          <a className="sc-action" href={entry.pdf_url} target="_blank" rel="noreferrer">
+                            <FilePdfIcon size={16} aria-hidden="true" /> Sample summary PDF
+                          </a>
+                        )}
+                      </div>
+                    </article>
+                  ))}
+                </div>
+
+                {finishedSummaries.length > SUMMARIES_SHOWN && (
+                  <div className="sc-more-row">
+                    <button
+                      className="sc-action"
+                      type="button"
+                      aria-expanded={showAllSummaries}
+                      onClick={() => setShowAllSummaries(value => !value)}
+                    >
+                      {showAllSummaries ? 'Show fewer summaries' : 'Show older summaries'}
+                    </button>
+                  </div>
+                )}
+              </>
             )}
           </section>
         </section>
@@ -1196,7 +1400,7 @@ function ScheduleContent({ data, handlers }) {
                         <strong>{equipment.name}</strong>
                         <p className="sc-muted">{dueNote(coverage)}</p>
                       </div>
-                      <Badge status={overdue ? 'overdue' : 'planned'}>
+                      <Badge status={overdue ? 'accent' : 'planned'}>
                         {overdue ? 'Overdue' : `Due ${fmtShort(coverage.next_service_due_date)}`}
                       </Badge>
                     </li>
@@ -1320,7 +1524,11 @@ function ScheduleContent({ data, handlers }) {
                           {open ? (
                             <div className="sc-cell-actions">
                               {request.status === 'alternative_proposed' && !request.customer_response && (
-                                <button className="sc-action sc-action--solid" type="button" onClick={() => acceptAlternative(request)}>
+                                <button
+                                  className="sc-action sc-action--solid"
+                                  type="button"
+                                  onClick={() => acceptAlternative(request)}
+                                >
                                   Accept {fmtShort(request.alternative_date)}
                                 </button>
                               )}
@@ -1394,7 +1602,7 @@ export default function AmcSchedulePage({
   data = MAINTENANCE_PREVIEW_DATA,
   loading = false,
   error = '',
-  unreadCount = 0,
+  unreadCount = 2,
   onSignOut,
   onOpenEquipment,
   onOpenServiceHistory,
@@ -1402,6 +1610,7 @@ export default function AmcSchedulePage({
   onOpenService,
   onOpenCompletion,
 }) {
+  const navigate = useNavigate()
   const [theme, setTheme] = useState(initialTheme)
 
   useEffect(() => {
@@ -1413,17 +1622,24 @@ export default function AmcSchedulePage({
   }, [theme])
 
   const ready = !loading && !error && Boolean(data)
-  const handlers = { onOpenEquipment, onOpenServiceHistory, onOpenAppointment, onOpenService, onOpenCompletion }
+
+  // Buttons work out of the box. Pass your own handlers to open exact records.
+  const handlers = {
+    onOpenEquipment: onOpenEquipment ?? (() => navigate('/equipment')),
+    onOpenServiceHistory: onOpenServiceHistory ?? (() => navigate('/equipment')),
+    onOpenAppointment: onOpenAppointment ?? (() => navigate('/maintenance')),
+    onOpenService: onOpenService ?? (() => navigate('/services')),
+    onOpenCompletion: onOpenCompletion ?? (() => navigate('/services')),
+  }
 
   return (
     <div className="sc-page" data-theme={theme}>
-
-
       <CustomerNavbar
         companyName="Demo Customer Company"
         customerName="Customer account"
-        unreadCount={2}
+        unreadCount={unreadCount}
         theme={theme}
+        onSignOut={onSignOut}
       />
 
       <div className="sc-main">

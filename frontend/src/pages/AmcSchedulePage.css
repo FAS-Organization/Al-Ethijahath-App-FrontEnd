@@ -71,7 +71,7 @@ body:has(.sc-page) {
   margin-left: 252px;
 }
 
-.sc-main :where(h1, h2, h3, p) {
+.sc-main :where(h1, h2, h3, h4, h5, p) {
   margin: 0;
 }
 
@@ -92,8 +92,7 @@ body:has(.sc-page) {
   text-underline-offset: 4px;
 }
 
-.sc-main :focus-visible,
-.sc-skip:focus-visible {
+.sc-main :focus-visible {
   outline: 3px solid var(--sc-accent);
   outline-offset: 4px;
 }
@@ -123,22 +122,6 @@ body:has(.sc-page) {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-}
-
-.sc-skip {
-  position: fixed;
-  z-index: 100;
-  top: 12px;
-  left: 12px;
-  padding: 12px 18px;
-  border-radius: 8px;
-  background: var(--sc-surface);
-  color: var(--sc-accent);
-  transform: translateY(-200%);
-}
-
-.sc-skip:focus {
-  transform: translateY(0);
 }
 
 /* ---------- Header and summary ---------- */
@@ -540,6 +523,266 @@ body:has(.sc-page) {
   box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
 }
 
+/* ---------- Sections on the contracts tab ---------- */
+
+.sc-section {
+  margin-bottom: 36px;
+}
+
+.sc-stack {
+  display: grid;
+  gap: 24px;
+}
+
+.sc-section-title--main {
+  margin-bottom: 16px;
+}
+
+.sc-section-title--main h2 {
+  font-size: 22px;
+}
+
+.sc-section-title--sub {
+  margin: 8px 0 14px;
+}
+
+.sc-section-title--sub h4 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* ---------- Current contract (full panel) ---------- */
+
+.sc-current {
+  padding: 26px;
+  border: 1px solid var(--sc-accent);
+  border-left-width: 5px;
+  border-radius: 14px;
+  background: var(--sc-surface);
+  animation: sc-rise 520ms var(--sc-ease) backwards;
+}
+
+.sc-current-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.sc-current-head .sc-card-title h3 {
+  font-size: 22px;
+}
+
+.sc-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin: 0 0 24px;
+}
+
+.sc-stat {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--sc-soft);
+}
+
+.sc-stat dt {
+  margin: 0 0 4px;
+  color: var(--sc-muted);
+  font-size: 12px;
+}
+
+.sc-stat dd {
+  margin: 0;
+  color: var(--sc-heading);
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.sc-stat--alert {
+  background: var(--sc-accent-soft);
+}
+
+.sc-stat--alert dd {
+  color: var(--sc-accent);
+}
+
+/* ---------- Covered machines as cards ---------- */
+
+.sc-machines {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sc-machines > li {
+  display: flex;
+  min-width: 0;
+  animation: sc-rise 520ms var(--sc-ease) backwards;
+}
+
+.sc-machines > li:nth-child(2) { animation-delay: 60ms; }
+.sc-machines > li:nth-child(3) { animation-delay: 120ms; }
+.sc-machines > li:nth-child(n + 4) { animation-delay: 180ms; }
+
+.sc-machine {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 20px;
+  border: 1px solid var(--sc-line);
+  border-radius: 12px;
+  background: var(--sc-soft);
+  transition: border-color 260ms ease, transform 320ms var(--sc-ease), background-color 260ms ease;
+}
+
+.sc-machine--overdue {
+  border-left: 4px solid var(--sc-accent);
+}
+
+.sc-machine-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.sc-machine-icon {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--sc-accent-soft);
+  color: var(--sc-accent);
+  transition: background-color 260ms ease, color 260ms ease, transform 320ms var(--sc-ease);
+}
+
+.sc-machine-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.sc-machine-title h5 {
+  margin: 0;
+  color: var(--sc-heading);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.sc-machine-title p {
+  margin: 2px 0 0;
+  color: var(--sc-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+/* Date strip: three short facts side by side */
+.sc-machine-dates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  border: 1px solid var(--sc-line);
+  border-radius: 10px;
+  background: var(--sc-surface);
+}
+
+.sc-machine-dates > div {
+  min-width: 0;
+  padding: 12px 14px;
+}
+
+.sc-machine-dates > div + div {
+  border-left: 1px solid var(--sc-line);
+}
+
+.sc-machine-dates dt {
+  margin: 0 0 4px;
+  color: var(--sc-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sc-machine-dates dd {
+  margin: 0;
+  color: var(--sc-text);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.sc-machine-dates dd small {
+  display: block;
+  margin-top: 2px;
+  color: var(--sc-muted);
+  font-size: 11px;
+  font-weight: 400;
+}
+
+/* Update note */
+.sc-machine-update {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--sc-surface);
+  color: var(--sc-text);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.sc-machine-update svg {
+  margin-top: 2px;
+  color: var(--sc-muted);
+}
+
+.sc-machine-update.is-alert {
+  background: var(--sc-accent-soft);
+  color: var(--sc-accent);
+  font-weight: 600;
+}
+
+.sc-machine-update.is-alert svg {
+  color: var(--sc-accent);
+}
+
+/* Footer: site on top, actions below */
+.sc-machine-foot {
+  display: grid;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 14px;
+  border-top: 1px solid var(--sc-line);
+}
+
+.sc-machine-site {
+  margin: 0;
+  color: var(--sc-heading);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sc-machine-site small {
+  display: block;
+  margin-top: 2px;
+  color: var(--sc-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+
 /* ---------- Cards ---------- */
 
 .sc-grid {
@@ -559,6 +802,10 @@ body:has(.sc-page) {
   background: var(--sc-surface);
   animation: sc-rise 520ms var(--sc-ease) backwards;
   transition: border-color 260ms ease, transform 320ms var(--sc-ease);
+}
+
+.sc-card--previous {
+  background: var(--sc-soft);
 }
 
 .sc-card:focus-within {
@@ -638,6 +885,12 @@ body:has(.sc-page) {
   margin: 4px 0 14px !important;
   color: var(--sc-muted);
   font-size: 12px;
+}
+
+.sc-more-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 /* ---------- Badges, buttons ---------- */
@@ -822,6 +1075,10 @@ body:has(.sc-page) {
   font-weight: 600;
 }
 
+.sc-section-title--main h2 {
+  font-size: 22px;
+}
+
 .sc-count {
   display: grid;
   place-items: center;
@@ -919,6 +1176,7 @@ body:has(.sc-page) {
   margin-top: 4px;
   color: var(--sc-muted);
   font-size: 12px;
+  font-weight: 400;
   line-height: 1.6;
 }
 
@@ -930,14 +1188,62 @@ body:has(.sc-page) {
   color: var(--sc-accent);
 }
 
+/* ----- Compact action buttons (tables and machine cards) ----- */
+
 .sc-cell-actions {
-  flex-direction: column;
-  align-items: stretch;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
 }
 
 .sc-cell-actions .sc-action {
-  justify-content: space-between;
-  text-align: left;
+  position: relative;
+  justify-content: center;
+  min-height: 30px;
+  padding: 3px 10px;
+  border: 1px solid var(--sc-line);
+  border-radius: 6px;
+  background: var(--sc-accent-soft);
+  color: var(--sc-accent);
+  font-size: 12px !important;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease,
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    transform 200ms var(--sc-ease);
+}
+
+.sc-cell-actions .sc-action svg {
+  display: none;
+}
+
+.sc-cell-actions .sc-action::after {
+  content: '';
+  position: absolute;
+  inset: -6px -3px;
+}
+
+.sc-cell-actions .sc-action--solid {
+  border-color: var(--sc-button);
+  background: var(--sc-button);
+  color: #fff;
+}
+
+.sc-cell-actions .sc-action:disabled {
+  border-style: dashed;
+  border-color: var(--sc-line);
+  background: var(--sc-surface);
+  color: var(--sc-muted);
+  cursor: not-allowed;
+}
+
+.sc-cell-actions .sc-action:not(:disabled):active {
+  transform: scale(0.97);
 }
 
 /* ---------- Preview toggle ---------- */
@@ -1200,7 +1506,20 @@ body:has(.sc-page) {
   }
 
   .sc-summary-item:hover .sc-summary-icon,
-  .sc-card:hover .sc-card-icon {
+  .sc-card:hover .sc-card-icon,
+  .sc-current:hover .sc-card-icon {
+    background: var(--sc-button);
+    color: #fff;
+    transform: rotate(-4deg);
+  }
+
+  .sc-machine:hover {
+    border-color: var(--sc-accent);
+    background: var(--sc-surface);
+    transform: translateY(-2px);
+  }
+
+  .sc-machine:hover .sc-machine-icon {
     background: var(--sc-button);
     color: #fff;
     transform: rotate(-4deg);
@@ -1238,6 +1557,24 @@ body:has(.sc-page) {
     transform: translateX(4px);
   }
 
+  .sc-cell-actions .sc-action:not(:disabled):hover {
+    border-color: var(--sc-button);
+    background: var(--sc-button);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgb(143 0 13 / 22%);
+  }
+
+  .sc-cell-actions .sc-action--solid:not(:disabled):hover {
+    border-color: var(--sc-accent);
+    background: var(--sc-accent);
+  }
+
+  .sc-page[data-theme='dark'] .sc-cell-actions .sc-action--solid:not(:disabled):hover {
+    border-color: var(--sc-button);
+    background: var(--sc-button);
+  }
+
   .sc-theme-button:hover,
   .sc-close:hover {
     background: var(--sc-accent-soft);
@@ -1272,7 +1609,15 @@ body:has(.sc-page) {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .sc-machines {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .sc-filters--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sc-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -1324,8 +1669,17 @@ body:has(.sc-page) {
 
   .sc-toolbar,
   .sc-card,
-  .sc-appointment {
+  .sc-appointment,
+  .sc-current {
     padding: 18px;
+  }
+
+  .sc-current-head .sc-card-title h3 {
+    font-size: 19px;
+  }
+
+  .sc-stats {
+    gap: 10px;
   }
 
   .sc-appointment {
@@ -1385,6 +1739,21 @@ body:has(.sc-page) {
   }
 }
 
+@media (max-width: 479px) {
+  .sc-machine {
+    padding: 16px;
+  }
+
+  .sc-machine-dates {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sc-machine-dates > div + div {
+    border-top: 1px solid var(--sc-line);
+    border-left: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .sc-main *,
   .sc-main *::before,
@@ -1397,7 +1766,9 @@ body:has(.sc-page) {
 
   .sc-summary-item:hover,
   .sc-card:hover,
-  .sc-appointment:hover {
+  .sc-appointment:hover,
+  .sc-machine:hover,
+  .sc-cell-actions .sc-action:hover {
     transform: none !important;
   }
 }
