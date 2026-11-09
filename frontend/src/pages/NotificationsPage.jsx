@@ -18,10 +18,7 @@ import {
 import CustomerNavbar from '../components/CustomerNavbar'
 import DateRangeFilter from '../components/DateRangeFilter'
 import { inDateRange } from '../utils/dateRange'
-import {
-  createNotificationsPreviewData,
-  NotificationsPreviewContext,
-} from '../data/notificationsPreviewData'
+import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import './NotificationsPage.css'
 
 const THEME_KEY = 'ethijahath-dashboard-theme'
@@ -147,9 +144,7 @@ function NotificationCard({ item, onRead, now }) {
           aria-label={`${readAction}: ${item.title}, ${item.reference}`}
           onClick={() => onRead(item.id, unread)}
         >
-          {unread
-            ? <CheckCircleIcon size={18} aria-hidden="true" />
-            : <BellIcon size={18} aria-hidden="true" />}
+          {readAction}
         </button>
 
         <button
@@ -280,11 +275,7 @@ export default function NotificationsPage() {
     resultsRef.current?.focus({ preventScroll: true })
   }
 
-  function resetPreview() {
-    setData(createNotificationsPreviewData())
-    clearFilters()
-    setAnnouncement('Preview notifications reset.')
-  }
+
 
   function showPaymentAlerts() {
     setFilters({ ...INITIAL_FILTERS, view: 'attention', category: 'billing' })
@@ -343,9 +334,6 @@ export default function NotificationsPage() {
             </div>
 
             <div className="np-heading-actions">
-              <Link className="np-text-button" to="/account?section=notifications">
-                Contact preferences
-              </Link>
 
               <button
                 type="button"
@@ -357,16 +345,6 @@ export default function NotificationsPage() {
                 Mark all as read
               </button>
             </div>
-          </div>
-
-          <div className="np-preview">
-            <p>
-              <strong>Frontend preview.</strong> Read status resets on refresh.
-              Schedule reminders use the {data.schedule_preview_date} demo snapshot.
-            </p>
-            <button type="button" className="np-text-button" onClick={resetPreview}>
-              Reset preview
-            </button>
           </div>
 
                     {(overdue > 0 || approvals > 0) && (
