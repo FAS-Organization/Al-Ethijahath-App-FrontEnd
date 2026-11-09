@@ -575,15 +575,103 @@ body:has(.qt-page) {
 }
 
 .qt-site-filter select {
+  --qt-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  appearance: none;
+  min-width: 0;
   max-width: 260px;
   min-height: 46px;
-  padding: 10px 32px 10px 12px;
+  padding: 10px 34px 10px 12px;
   border: 1px solid var(--qt-line);
   border-radius: 8px;
-  background: var(--qt-surface);
+  background: var(--qt-soft) var(--qt-chevron) no-repeat right 11px center / 16px;
   color: var(--qt-text);
   font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
+}
+
+.qt-page[data-theme='dark'] .qt-site-filter select {
+  --qt-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23ed9299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.qt-site-filter select:hover {
+  border-color: var(--qt-accent);
+}
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .qt-site-filter select,
+  .qt-site-filter select::picker(select) {
+    appearance: base-select;
+  }
+
+  .qt-site-filter select {
+    align-items: center;
+    padding-inline-end: 13px;
+    background-image: none;
+  }
+
+  .qt-site-filter select::picker-icon {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-inline-start: auto;
+    border-right: 2px solid var(--qt-accent);
+    border-bottom: 2px solid var(--qt-accent);
+    rotate: 45deg;
+    translate: 0 -2px;
+    content: '';
+  }
+
+  .qt-site-filter select:open {
+    border-color: var(--qt-accent);
+  }
+
+  .qt-site-filter select:open::picker-icon {
+    rotate: 225deg;
+    translate: 0 2px;
+  }
+
+  .qt-site-filter select::picker(select) {
+    max-block-size: min(320px, 60dvh);
+    overflow-y: auto;
+    margin-block: 5px;
+    padding: 5px;
+    border: 1px solid var(--qt-line);
+    border-radius: 10px;
+    background: var(--qt-surface);
+    color: var(--qt-text);
+    box-shadow: 0 8px 24px rgb(40 35 33 / 12%);
+  }
+
+  .qt-site-filter select option {
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: normal;
+    cursor: pointer;
+  }
+
+  .qt-site-filter select option:hover,
+  .qt-site-filter select option:focus-visible {
+    background: var(--qt-soft);
+  }
+
+  .qt-site-filter select option:checked {
+    background: var(--qt-accent-soft);
+    color: var(--qt-accent);
+    font-weight: 700;
+  }
+
+  .qt-site-filter select option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--qt-accent);
+  }
 }
 
 .qt-results-line {
@@ -1554,9 +1642,8 @@ body:has(.qt-page) {
   background: var(--qt-accent-soft);
 }
 
-/* Inputs sit subtly inside the main panel. */
-.qt-search,
-.qt-site-filter select {
+/* The search field sits subtly inside the main panel. */
+.qt-search {
   background: var(--qt-soft);
 }
 

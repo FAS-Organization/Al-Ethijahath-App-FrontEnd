@@ -316,14 +316,103 @@ body:has(.eq-page) {
 }
 
 .eq-filters select {
+  --eq-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  appearance: none;
   width: 100%;
+  min-width: 0;
   min-height: 44px;
-  padding: 9px 12px;
+  padding: 9px 34px 9px 12px;
   border: 1px solid var(--eq-line);
-  border-radius: 7px;
-  background: var(--eq-soft);
+  border-radius: 8px;
+  background: var(--eq-soft) var(--eq-chevron) no-repeat right 11px center / 16px;
   color: var(--eq-text);
   font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.eq-page[data-theme='dark'] .eq-filters select {
+  --eq-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23ed9299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.eq-filters select:hover {
+  border-color: var(--eq-accent);
+}
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .eq-filters select,
+  .eq-filters select::picker(select) {
+    appearance: base-select;
+  }
+
+  .eq-filters select {
+    align-items: center;
+    padding-inline-end: 13px;
+    background-image: none;
+  }
+
+  .eq-filters select::picker-icon {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-inline-start: auto;
+    border-right: 2px solid var(--eq-accent);
+    border-bottom: 2px solid var(--eq-accent);
+    rotate: 45deg;
+    translate: 0 -2px;
+    content: '';
+  }
+
+  .eq-filters select:open {
+    border-color: var(--eq-accent);
+  }
+
+  .eq-filters select:open::picker-icon {
+    rotate: 225deg;
+    translate: 0 2px;
+  }
+
+  .eq-filters select::picker(select) {
+    max-block-size: min(320px, 60dvh);
+    overflow-y: auto;
+    margin-block: 5px;
+    padding: 5px;
+    border: 1px solid var(--eq-line);
+    border-radius: 10px;
+    background: var(--eq-surface);
+    color: var(--eq-text);
+    box-shadow: 0 8px 24px rgb(40 35 33 / 12%);
+  }
+
+  .eq-filters select option {
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: normal;
+    cursor: pointer;
+  }
+
+  .eq-filters select option:hover,
+  .eq-filters select option:focus-visible {
+    background: var(--eq-soft);
+  }
+
+  .eq-filters select option:checked {
+    background: var(--eq-accent-soft);
+    color: var(--eq-accent);
+    font-weight: 700;
+  }
+
+  .eq-filters select option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--eq-accent);
+  }
 }
 
 .eq-results {

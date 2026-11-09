@@ -507,14 +507,103 @@ body:has(.dp-page) {
 }
 
 .dp-select select {
+  --dp-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  appearance: none;
   width: 100%;
+  min-width: 0;
   min-height: 46px;
-  padding: 10px 12px;
+  padding: 10px 34px 10px 12px;
   border: 1px solid var(--dp-line);
   border-radius: 8px;
-  background: var(--dp-surface);
+  background: var(--dp-surface) var(--dp-chevron) no-repeat right 11px center / 16px;
   color: var(--dp-text);
   font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dp-page[data-theme='dark'] .dp-select select {
+  --dp-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23ed9299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+.dp-select select:hover {
+  border-color: var(--dp-accent);
+}
+
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .dp-select select,
+  .dp-select select::picker(select) {
+    appearance: base-select;
+  }
+
+  .dp-select select {
+    align-items: center;
+    padding-inline-end: 13px;
+    background-image: none;
+  }
+
+  .dp-select select::picker-icon {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-inline-start: auto;
+    border-right: 2px solid var(--dp-accent);
+    border-bottom: 2px solid var(--dp-accent);
+    rotate: 45deg;
+    translate: 0 -2px;
+    content: '';
+  }
+
+  .dp-select select:open {
+    border-color: var(--dp-accent);
+  }
+
+  .dp-select select:open::picker-icon {
+    rotate: 225deg;
+    translate: 0 2px;
+  }
+
+  .dp-select select::picker(select) {
+    max-block-size: min(320px, 60dvh);
+    overflow-y: auto;
+    margin-block: 5px;
+    padding: 5px;
+    border: 1px solid var(--dp-line);
+    border-radius: 10px;
+    background: var(--dp-surface);
+    color: var(--dp-text);
+    box-shadow: 0 8px 24px rgb(40 35 33 / 12%);
+  }
+
+  .dp-select select option {
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: normal;
+    cursor: pointer;
+  }
+
+  .dp-select select option:hover,
+  .dp-select select option:focus-visible {
+    background: var(--dp-soft);
+  }
+
+  .dp-select select option:checked {
+    background: var(--dp-accent-soft);
+    color: var(--dp-accent);
+    font-weight: 700;
+  }
+
+  .dp-select select option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--dp-accent);
+  }
 }
 
 .dp-date-help {
