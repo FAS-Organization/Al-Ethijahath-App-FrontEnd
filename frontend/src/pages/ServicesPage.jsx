@@ -1158,8 +1158,10 @@ export default function ServicesPage({
                     aria-pressed={tab === item.value}
                     onClick={() => setTab(item.value)}
                   >
-                    {item.label}
-                    <span>{counts[item.value]}</span>
+                    <span className="sv-tab-label" data-label={item.label}>
+                      <span>{item.label}</span>
+                    </span>
+                    <span className="sv-tab-count">{counts[item.value]}</span>
                   </button>
                 ))}
               </div>

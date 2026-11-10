@@ -404,7 +404,12 @@ body:has(.sv-page) {
     border-color 220ms ease;
 }
 
-.sv-tab span {
+.sv-tab-label {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sv-tab-count {
   min-width: 24px;
   padding: 1px 7px;
   border-radius: 6px;
@@ -419,13 +424,9 @@ body:has(.sv-page) {
   border-color: var(--sv-accent);
   background: var(--sv-accent-soft);
   color: var(--sv-accent);
-  font-weight: 700;
 }
 
-.sv-tab[aria-pressed='true'] span {
-  background: var(--sv-button);
-  color: #fff;
-}
+
 
 .sv-toolbar {
   display: grid;

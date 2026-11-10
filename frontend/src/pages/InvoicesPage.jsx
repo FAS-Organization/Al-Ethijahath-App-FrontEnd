@@ -1019,8 +1019,8 @@ export default function InvoicesPage({
                     aria-pressed={tab === item.value}
                     onClick={() => setTab(item.value)}
                   >
-                    {item.label}
-                    <span>{counts[item.value]}</span>
+                    <span className="sv-tab-label">{item.label}</span>
+                    <span className="sv-tab-count">{counts[item.value]}</span>
                   </button>
                 ))}
               </div>
