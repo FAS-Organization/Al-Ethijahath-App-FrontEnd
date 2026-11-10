@@ -1,9 +1,16 @@
+
 import {
   BrowserRouter,
   Routes,
   Route,
+  useLocation,
 } from 'react-router-dom'
+
 import { useState } from 'react'
+
+import ErrorBoundary from './components/ErrorBoundary'
+import ErrorPage, { ErrorPreviewPage } from './components/ErrorPage'
+
 import NotificationsPage from './pages/NotificationsPage'
 import {
   createNotificationsPreviewData,
@@ -20,6 +27,41 @@ import InvoicesPage from './pages/InvoicesPage'
 import DocumentsPage from './pages/DocumentsPage'
 import AccountPage from './pages/AccountPage'
 
+
+function AppRoutes() {
+  const location = useLocation()
+
+  return (
+    <ErrorBoundary resetKey={location.pathname}>
+      <Routes>
+        <Route path="/" element={<SignupPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/equipment" element={<EquipmentPage />} />
+        <Route path="/services" element={<ServicesPage />} />
+        <Route path="/quotations" element={<QuotationsPage />} />
+        <Route path="/maintenance" element={<AmcSchedulePage />} />
+        <Route path="/billing" element={<InvoicesPage />} />
+        <Route path="/documents" element={<DocumentsPage />} />
+        <Route path="/notifications" element={<NotificationsPage />} />
+        <Route path="/account" element={<AccountPage />} />
+
+        {/* Preview any error page */}
+        <Route
+          path="/error/:type"
+          element={<ErrorPreviewPage />}
+        />
+
+        {/* Any other address */}
+        <Route
+          path="*"
+          element={<ErrorPage type="not_found" />}
+        />
+      </Routes>
+    </ErrorBoundary>
+  )
+}
+
+
 export default function App() {
   const [notificationData, setNotificationData] = useState(
     createNotificationsPreviewData,
@@ -27,22 +69,13 @@ export default function App() {
 
   return (
     <NotificationsPreviewContext.Provider
-      value={{ data: notificationData, setData: setNotificationData }}
+      value={{
+        data: notificationData,
+        setData: setNotificationData,
+      }}
     >
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SignupPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/equipment" element={<EquipmentPage />} />
-          <Route path="/services" element={<ServicesPage />} />
-          <Route path="/quotations" element={<QuotationsPage />} />
-          <Route path="/maintenance" element={<AmcSchedulePage />} />
-          <Route path="/billing" element={<InvoicesPage />} />
-          <Route path="/documents" element={<DocumentsPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/account" element={<AccountPage />} />
-
-        </Routes>
+        <AppRoutes />
       </BrowserRouter>
     </NotificationsPreviewContext.Provider>
   )

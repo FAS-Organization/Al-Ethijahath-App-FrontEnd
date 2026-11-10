@@ -1,0 +1,250 @@
+/* Error page: only the centered content. The header, footer and the
+   glossy background come from SignupPage.css. */
+
+.er-body {
+  justify-items: center;
+  min-width: 0;
+}
+
+.er-content {
+  width: min(560px, 90%);
+  min-width: 0;
+  animation: er-rise 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* The image was missing sizing, so its 500px width attribute overflowed phones. */
+.er-art {
+  display: block;
+  width: min(100%, 500px);
+  height: auto;
+  max-width: 100%;
+  margin: 0 0 12px;
+  object-fit: contain;
+}
+
+.er-code {
+  margin: 0 0 12px;
+  color: var(--primary);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.er-content h1 {
+  margin: 0 0 18px;
+  color: var(--heading);
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(34px, 4.6vw, 56px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-align: center;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+.er-content h1:focus {
+  outline: none;
+}
+
+.er-message {
+  max-width: 44ch;
+  margin: 0 auto;
+  color: var(--body);
+  font-size: 17px;
+  line-height: 1.7;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.er-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+.er-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 50px;
+  padding: 0 24px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--heading);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.signup-shell a.er-btn--solid,
+.er-btn--solid {
+  border-color: transparent;
+  background: var(--button);
+  color: #ffffff;
+}
+
+@media (hover: hover) {
+  .er-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .er-btn:not(.er-btn--solid):hover {
+    background: rgb(143 0 13 / 8%);
+  }
+
+  .signup-shell a.er-btn--solid:hover,
+  .er-btn--solid:hover {
+    background: var(--primary);
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(143, 0, 13, 0.16);
+  }
+}
+
+@keyframes er-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+/* ---------- Small phones ---------- */
+@media (max-width: 480px) {
+  .er-content {
+    width: 100%;
+    padding-inline: 20px;
+    box-sizing: border-box;
+  }
+
+  /* Smaller image, capped by screen height so it never forces a scroll. */
+  .er-art {
+    width: min(78%, 260px);
+    max-height: 26dvh;
+    margin-bottom: 8px;
+  }
+
+  .er-content h1 {
+    margin-bottom: 12px;
+    font-size: clamp(26px, 8vw, 32px);
+    line-height: 1.15;
+  }
+
+  .er-message {
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .er-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 10px;
+    margin-top: 22px;
+  }
+
+  .er-actions .er-btn {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px;
+    box-sizing: border-box;
+  }
+}
+
+/* Short screens (small phones, landscape): shrink further instead of scrolling. */
+@media (max-width: 480px) and (max-height: 640px) {
+  .er-art {
+    max-height: 18dvh;
+  }
+
+  .er-content h1 {
+    font-size: 24px;
+  }
+
+  .er-message {
+    font-size: 14px;
+  }
+
+  .er-actions {
+    margin-top: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .er-content {
+    animation: none;
+  }
+
+  .er-btn {
+    transition: none;
+  }
+}
+
+/* ---------- Fit the error page to one screen (no scrollbar) ---------- */
+.signup-shell:has(.er-body) {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.er-body {
+  min-height: 0;
+  padding-block: clamp(8px, 2dvh, 32px);
+  align-content: center;
+  overflow: hidden;
+}
+
+.er-content {
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* Image shrinks with window height, keeping its aspect ratio. */
+.er-art {
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: clamp(120px, 34dvh, 300px);
+  margin-bottom: clamp(4px, 1.5dvh, 12px);
+}
+
+.er-content h1 {
+  margin-bottom: clamp(8px, 2dvh, 18px);
+  font-size: clamp(26px, min(4.6vw, 6.5dvh), 56px);
+}
+
+.er-message {
+  font-size: clamp(14px, 2.2dvh, 17px);
+  line-height: 1.55;
+}
+
+.er-actions {
+  margin-top: clamp(14px, 3dvh, 32px);
+}
+
+.er-btn {
+  height: clamp(42px, 6dvh, 50px);
+}
+
+/* Keep the mobile rules from earlier working with this */
+@media (max-width: 480px) {
+  .er-art {
+    max-height: clamp(110px, 26dvh, 260px);
+  }
+}
