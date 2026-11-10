@@ -1135,7 +1135,7 @@ export default function ServicesPage({
                 ))}
               </section>
 
-              {counts.action > 0 && tab === 'active' && (
+              {counts.action > 0 && tab !== 'action' && (
                 <div className="sv-banner" role="status">
                   <WarningCircleIcon size={22} aria-hidden="true" />
                   <p>
