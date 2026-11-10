@@ -153,7 +153,6 @@ const APPROVAL_LINKS = {
 
 const TABS = [
   { value: 'active', label: 'Active' },
-  { value: 'action', label: 'Needs your action' },
   { value: 'completed', label: 'Completed' },
   { value: 'all', label: 'All jobs' },
 ]
@@ -1136,7 +1135,7 @@ export default function ServicesPage({
                 ))}
               </section>
 
-              {counts.action > 0 && tab !== 'action' && (
+              {counts.action > 0 && tab === 'active' && (
                 <div className="sv-banner" role="status">
                   <WarningCircleIcon size={22} aria-hidden="true" />
                   <p>
