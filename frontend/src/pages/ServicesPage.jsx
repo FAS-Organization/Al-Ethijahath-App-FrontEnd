@@ -1209,15 +1209,23 @@ export default function ServicesPage({
                     </select>
                   </label>
                 </div>
-                  <DateRangeFilter
-                  label="Requested date"
-                  from={dateFrom}
-                  to={dateTo}
-                  onChange={(from, to) => {
-                    setDateFrom(from)
-                    setDateTo(to)
-                  }}
-                  />
+                <details className="sv-date-filters">
+                  <summary>
+                    Filter by date{(dateFrom || dateTo) && ' · Active'}
+                  </summary>
+
+                  <div className="sv-date-filters-body">
+                    <DateRangeFilter
+                      label="Requested date"
+                      from={dateFrom}
+                      to={dateTo}
+                      onChange={(from, to) => {
+                        setDateFrom(from)
+                        setDateTo(to)
+                      }}
+                    />
+                  </div>
+                </details>
               </div>
 
               <p className="sv-results" role="status" aria-live="polite">

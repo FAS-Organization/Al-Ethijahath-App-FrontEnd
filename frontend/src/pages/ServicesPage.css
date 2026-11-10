@@ -439,6 +439,31 @@ body:has(.sv-page) {
   background: var(--sv-surface);
 }
 
+.sv-date-filters {
+  grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.sv-date-filters > summary {
+  width: fit-content;
+  padding: 7px 12px;
+  border: 1px solid var(--sv-line);
+  border-radius: 8px;
+  color: var(--sv-accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.sv-date-filters > summary:hover,
+.sv-date-filters[open] > summary {
+  background: var(--sv-accent-soft);
+}
+
+.sv-date-filters-body {
+  padding-top: 12px;
+}
+
 .sv-search {
   display: flex;
   align-items: center;

@@ -1054,15 +1054,23 @@ export default function InvoicesPage({
                   </label>
 
                 </div>
-                  <DateRangeFilter
-                    label={tab === 'payments' ? 'Payment date' : 'Invoice date'}
-                    from={dateFrom}
-                    to={dateTo}
-                    onChange={(from, to) => {
-                      setDateFrom(from)
-                      setDateTo(to)
-                    }}
-                  />
+                <details className="sv-date-filters">
+                  <summary>
+                    Filter by date{(dateFrom || dateTo) && ' · Active'}
+                  </summary>
+
+                  <div className="sv-date-filters-body">
+                    <DateRangeFilter
+                      label={tab === 'payments' ? 'Payment date' : 'Invoice date'}
+                      from={dateFrom}
+                      to={dateTo}
+                      onChange={(from, to) => {
+                        setDateFrom(from)
+                        setDateTo(to)
+                      }}
+                    />
+                  </div>
+                </details>
               </div>
 
               {!invoices.length ? (
