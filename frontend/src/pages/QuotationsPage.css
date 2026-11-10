@@ -522,6 +522,39 @@ body:has(.qt-page) {
   border-color: var(--qt-accent);
 }
 
+.qt-filter-disclosure > summary {
+  width: fit-content;
+  margin: 0 24px 12px;
+  padding: 7px 12px;
+  border: 1px solid var(--qt-line);
+  border-radius: 8px;
+  color: var(--qt-accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.qt-filter-disclosure > summary:hover,
+.qt-filter-disclosure[open] > summary {
+  background: var(--qt-accent-soft);
+}
+
+.qt-filter-disclosure > summary:focus-visible {
+  outline: 3px solid var(--qt-accent);
+  outline-offset: 4px;
+}
+
+@media (max-width: 479px) {
+  .qt-filter-disclosure > summary,
+  .qt-filter-disclosure .drf-wrap {
+    margin-inline: 16px;
+  }
+
+  .qt-filter-disclosure .drf-wrap {
+    padding-inline: 0;
+  }
+}
+
 .qt-toolbar {
   display: flex;
   align-items: center;

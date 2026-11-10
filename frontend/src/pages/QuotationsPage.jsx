@@ -1243,61 +1243,65 @@ export default function QuotationsPage({
               </span>
             </div>
 
-            <div className="qt-filters" aria-label="Filter quotations by status">
-              {FILTERS.map(filter => (
-                <button
-                  key={filter.value}
-                  type="button"
-                  className={`qt-filter${
-                    statusFilter === filter.value ? ' is-active' : ''
-                  }`}
-                  aria-pressed={statusFilter === filter.value}
-                  onClick={() => setStatusFilter(filter.value)}
-                >
-                  {filter.label}
+            <details className="qt-filter-disclosure">
+              <summary>Filter quotations</summary>
 
-                  <span>
-                    {filter.value === 'all'
-                      ? currentQuotations.length
-                      : counts[filter.value] || 0}
+              <div className="qt-filters" aria-label="Filter quotations by status">
+                {FILTERS.map(filter => (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    className={`qt-filter${
+                      statusFilter === filter.value ? ' is-active' : ''
+                    }`}
+                    aria-pressed={statusFilter === filter.value}
+                    onClick={() => setStatusFilter(filter.value)}
+                  >
+                    {filter.label}
+
+                    <span>
+                      {filter.value === 'all'
+                        ? currentQuotations.length
+                        : counts[filter.value] || 0}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="qt-toolbar">
+                <label className="qt-search">
+                  <span className="qt-sr-only">
+                    Search quotation, equipment, asset, service or site
                   </span>
-                </button>
-              ))}
-            </div>
 
-            <div className="qt-toolbar">
-              <label className="qt-search">
-                <span className="qt-sr-only">
-                  Search quotation, equipment, asset, service or site
-                </span>
+                  <MagnifyingGlassIcon size={20} aria-hidden="true" />
 
-                <MagnifyingGlassIcon size={20} aria-hidden="true" />
+                  <input
+                    type="search"
+                    value={search}
+                    onChange={event => setSearch(event.target.value)}
+                    placeholder="Search quotation, equipment or service"
+                  />
+                </label>
 
-                <input
-                  type="search"
-                  value={search}
-                  onChange={event => setSearch(event.target.value)}
-                  placeholder="Search quotation, equipment or service"
-                />
-              </label>
+                <label className="qt-site-filter">
+                  <span>Site</span>
 
-              <label className="qt-site-filter">
-                <span>Site</span>
+                  <select
+                    value={siteFilter}
+                    onChange={event => setSiteFilter(event.target.value)}
+                  >
+                    <option value="all">All sites</option>
 
-                <select
-                  value={siteFilter}
-                  onChange={event => setSiteFilter(event.target.value)}
-                >
-                  <option value="all">All sites</option>
+                    {sites.map(site => (
+                      <option key={site} value={site}>
+                        {site}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
 
-                  {sites.map(site => (
-                    <option key={site} value={site}>
-                      {site}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </div>
               <div className="drf-wrap">
                 <DateRangeFilter
                   label="Sent date"
@@ -1309,6 +1313,8 @@ export default function QuotationsPage({
                   }}
                 />
               </div>
+            </details>
+
             <div className="qt-results-line" role="status" aria-live="polite">
               <span>
                 Showing {visibleQuotations.length} of{' '}
