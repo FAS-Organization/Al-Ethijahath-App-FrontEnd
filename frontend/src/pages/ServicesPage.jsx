@@ -1107,7 +1107,6 @@ export default function ServicesPage({
                     label: 'Need your action',
                     value: counts.action,
                     icon: WarningCircleIcon,
-                    alert: counts.action > 0,
                   },
                   {
                     label: 'Upcoming visits',
@@ -1119,18 +1118,20 @@ export default function ServicesPage({
                     value: counts.completed,
                     icon: CheckCircleIcon,
                   },
-                ].map(({ label, value, icon: Icon, alert }) => (
-                  <div
-                    className={`sv-summary-item${alert ? ' sv-summary-item--alert' : ''}`}
-                    key={label}
-                  >
-                    <span className="sv-summary-icon">
-                      <Icon size={23} aria-hidden="true" />
+                ].map(({ label, value, icon: Icon }) => (
+                   <div className="sv-summary-item" key={label}>
+                    <span className="sv-summary-icon" aria-hidden="true">
+                      <Icon size={23} />
                     </span>
-                    <div>
+
+                    <div className="sv-summary-copy">
                       <span>{label}</span>
                       <strong>{value}</strong>
                     </div>
+
+                    <span className="sv-summary-corner" aria-hidden="true">
+                      <Icon size={60} weight="thin" />
+                    </span>
                   </div>
                 ))}
               </section>

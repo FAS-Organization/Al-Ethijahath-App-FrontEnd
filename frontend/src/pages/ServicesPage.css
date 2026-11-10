@@ -233,13 +233,83 @@ body:has(.sv-page) {
 }
 
 .sv-summary-item {
+  --sv-metric-ink: var(--sv-accent);
+  --sv-metric-tint: var(--sv-accent-soft);
+
+  position: relative;
+  isolation: isolate;
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
+  overflow: hidden;
   padding: 22px;
   border: 1px solid var(--sv-line);
   border-radius: 12px;
-  background: var(--sv-surface);
+  transition: border-color 260ms ease, transform 320ms var(--sv-ease);
+  background: linear-gradient(
+    135deg,
+    var(--sv-surface) 28%,
+    var(--sv-metric-tint) 100%
+  );
+}
+
+.sv-summary-item:nth-child(1) {
+  --sv-metric-ink: #365f9d;
+  --sv-metric-tint: #edf3ff;
+}
+
+.sv-summary-item:nth-child(2) {
+  --sv-metric-ink: #94621e;
+  --sv-metric-tint: #fbf0dc;
+}
+
+.sv-summary-item:nth-child(3) {
+  --sv-metric-ink: #24734d;
+  --sv-metric-tint: #eaf7f0;
+}
+
+.sv-summary-item:nth-child(4) {
+  --sv-metric-ink: #7451a3;
+  --sv-metric-tint: #f3edfc;
+}
+
+.sv-summary-item .sv-summary-icon,
+.sv-summary-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.sv-summary-item .sv-summary-icon {
+  background: var(--sv-metric-tint);
+  color: var(--sv-metric-ink);
+}
+
+.sv-summary-copy {
+  min-width: 0;
+}
+
+.sv-summary-corner {
+  position: absolute;
+  inset-inline-end: -15px;
+  inset-block-end: -30px;
+  display: grid;
+  place-items: center;
+  width: 116px;
+  height: 116px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: var(--sv-metric-ink);
+  opacity: 0.17;
+  pointer-events: none;
+}
+
+.sv-summary-corner::before {
+  position: absolute;
+  inset: 10px;
+  border: 1px solid currentColor;
+  border-radius: inherit;
+  content: '';
 }
 
 .sv-summary-icon,
@@ -252,16 +322,14 @@ body:has(.sv-page) {
   border-radius: 12px;
   background: var(--sv-accent-soft);
   color: var(--sv-accent);
+
+  transition:
+    background-color 260ms ease,
+    color 260ms ease,
+    transform 320ms var(--sv-ease);
 }
 
-.sv-summary-item--alert {
-  border-color: var(--sv-accent);
-}
 
-.sv-summary-item--alert .sv-summary-icon {
-  background: var(--sv-button);
-  color: #fff;
-}
 
 .sv-summary-item > div > span {
   color: var(--sv-muted);
@@ -1585,5 +1653,18 @@ body:has(.sv-page) {
 
   .sv-dialog-footer > button {
     flex: 1;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sv-summary-item:hover {
+    border-color: var(--sv-accent);
+    transform: translateY(-3px);
+  }
+
+  .sv-summary-item:hover .sv-summary-icon {
+    background: var(--sv-button);
+    color: #fff;
+    transform: rotate(-4deg);
   }
 }

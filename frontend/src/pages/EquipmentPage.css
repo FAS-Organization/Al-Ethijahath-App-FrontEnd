@@ -225,6 +225,7 @@ body:has(.eq-page) {
   padding: 22px;
   border: 1px solid var(--eq-line);
   border-radius: 12px;
+  transition: border-color 260ms ease, transform 320ms var(--eq-ease);
   background: linear-gradient(
     135deg,
     var(--eq-surface) 28%,
@@ -256,7 +257,10 @@ body:has(.eq-page) {
 .eq-summary-item .eq-summary-icon {
   background: var(--eq-metric-tint);
   color: var(--eq-metric-ink);
-  transition: none;
+  transition:
+    background-color 260ms ease,
+    color 260ms ease,
+    transform 320ms var(--eq-ease);
 }
 
 .eq-summary-copy {
@@ -1174,5 +1178,18 @@ body:has(.eq-page) {
   .eq-card-dates,
   .eq-card-identifiers {
     grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .eq-summary-item:hover {
+    border-color: var(--eq-accent);
+    transform: translateY(-3px);
+  }
+
+  .eq-summary-item:hover .eq-summary-icon {
+    background: var(--eq-button);
+    color: #fff;
+    transform: rotate(-4deg);
   }
 }

@@ -1089,16 +1089,21 @@ function ScheduleContent({ data, handlers }) {
 
       <section className="sc-summary" aria-label="Schedule summary">
         {summary.map(({ label, value, icon: Icon }) => (
-          <div className="sc-summary-item" key={label}>
-            <span className="sc-summary-icon">
-              <Icon size={23} aria-hidden="true" />
-            </span>
-            <div>
-              <span>{label}</span>
-              <strong>{value}</strong>
+            <div className="sc-summary-item" key={label}>
+              <span className="sc-summary-icon" aria-hidden="true">
+                <Icon size={23} />
+              </span>
+
+              <div className="sc-summary-copy">
+                <span>{label}</span>
+                <strong>{value}</strong>
+              </div>
+
+              <span className="sc-summary-corner" aria-hidden="true">
+                <Icon size={60} weight="thin" />
+              </span>
             </div>
-          </div>
-        ))}
+          ))}
       </section>
 
       <p className="sc-notice" role="status" aria-live="polite">
