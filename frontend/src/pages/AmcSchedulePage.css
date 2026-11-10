@@ -1880,10 +1880,16 @@ body:has(.sc-page) {
   .sc-dialog,
   .sc-dialog::backdrop {
     animation: none !important;
+  }
+
+  .sc-main *:not(.sc-summary-item, .sc-summary-icon),
+  .sc-main *::before,
+  .sc-main *::after,
+  .sc-dialog,
+  .sc-dialog::backdrop {
     transition: none !important;
   }
 
-  .sc-summary-item:hover,
   .sc-card:hover,
   .sc-appointment:hover,
   .sc-machine:hover,

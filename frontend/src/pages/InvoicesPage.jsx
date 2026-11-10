@@ -90,7 +90,6 @@ const CATEGORIES = {
 
 const TABS = [
   { value: 'open', label: 'Open' },
-  { value: 'overdue', label: 'Overdue' },
   { value: 'paid', label: 'Paid' },
   { value: 'payments', label: 'Payment history' },
   { value: 'all', label: 'All invoices' },
@@ -993,7 +992,7 @@ export default function InvoicesPage({
                 </div>
               </section>
 
-              {counts.overdue > 0 && tab !== 'overdue' && (
+              {counts.overdue > 0 && (
                 <div className="sv-banner" role="status">
                   <WarningCircleIcon size={22} aria-hidden="true" />
                   <p>
@@ -1002,8 +1001,11 @@ export default function InvoicesPage({
                       : `${counts.overdue} invoices are overdue`}
                     : {moneyList(overdueTotals)} remaining.
                   </p>
-                  <button type="button" onClick={() => setTab('overdue')}>
-                    Show them
+                  <button
+                    type="button"
+                    onClick={() => setTab(tab === 'overdue' ? 'open' : 'overdue')}
+                  >
+                    {tab === 'overdue' ? 'Show open invoices' : 'Show them'}
                   </button>
                 </div>
               )}
