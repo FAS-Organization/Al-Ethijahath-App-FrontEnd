@@ -640,21 +640,29 @@ export default function DocumentsPage({
                     </select>
                   </label>
 
-                  <DateRangeFilter
-                    from={dateFrom}
-                    to={dateTo}
-                    label="Record date"
-                    onChange={(from, to) => {
-                      setDateFrom(from)
-                      setDateTo(to)
-                    }}
-                  />
+                  <details className="dp-date-filters">
+                    <summary>
+                      Filter by date{(dateFrom || dateTo) && ' · Active'}
+                    </summary>
 
-                  <p className="dp-date-help">
-                    Dates follow the label on each record: sent, issued,
-                    inspected, service completed or contract starts.
-                    Records without dates are excluded when a date range is selected.
-                  </p>
+                    <div className="dp-date-filters-body">
+                      <DateRangeFilter
+                        from={dateFrom}
+                        to={dateTo}
+                        label="Record date"
+                        onChange={(from, to) => {
+                          setDateFrom(from)
+                          setDateTo(to)
+                        }}
+                      />
+
+                      <p className="dp-date-help">
+                        Dates follow the label on each record: sent, issued,
+                        inspected, service completed or contract starts.
+                        Records without dates are excluded when a date range is selected.
+                      </p>
+                    </div>
+                  </details>
                 </div>
 
                 {invalidRange && (

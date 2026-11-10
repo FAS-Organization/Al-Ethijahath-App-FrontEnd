@@ -606,8 +606,34 @@ body:has(.dp-page) {
   }
 }
 
-.dp-date-help {
+.dp-date-filters {
   grid-column: 1 / -1;
+  min-width: 0;
+}
+
+.dp-date-filters > summary {
+  width: fit-content;
+  padding: 7px 12px;
+  border: 1px solid var(--dp-line);
+  border-radius: 8px;
+  color: var(--dp-accent);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dp-date-filters > summary:hover,
+.dp-date-filters[open] > summary {
+  background: var(--dp-accent-soft);
+}
+
+.dp-date-filters-body {
+  display: grid;
+  gap: 8px;
+  padding-top: 12px;
+}
+
+.dp-date-help {
   color: var(--dp-muted);
   font-size: 11px;
 }
