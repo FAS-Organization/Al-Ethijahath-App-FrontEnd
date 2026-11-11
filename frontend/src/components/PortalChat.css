@@ -130,3 +130,82 @@
   margin: 8px 0 4px;
   color: var(--chat-muted);
 }
+
+.portal-chat__messages {
+  display: grid;
+  gap: 8px;
+  max-height: min(260px, 34dvh);
+  margin-top: 12px;
+  overflow-y: auto;
+}
+
+.portal-chat__message {
+  justify-self: start;
+  max-width: 94%;
+  padding: 8px 12px;
+  border: 1px solid var(--chat-line);
+  border-radius: 10px;
+  overflow-wrap: anywhere;
+}
+
+.portal-chat__message--user {
+  justify-self: end;
+  background: var(--chat-close-hover);
+}
+
+.portal-chat__message p {
+  margin: 2px 0 0;
+  white-space: pre-wrap;
+}
+
+.portal-chat__form {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.portal-chat__form label {
+  display: grid;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.portal-chat__form input {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 10px;
+  border: 1px solid var(--chat-line);
+  border-radius: 8px;
+  background: var(--chat-surface);
+  color: var(--chat-text);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.portal-chat__form input:focus-visible {
+  outline: 2px solid var(--chat-focus);
+  outline-offset: 2px;
+}
+
+.portal-chat__send {
+  justify-self: end;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 8px;
+  background: #8f000d;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.portal-chat__send:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.portal-chat__form p {
+  margin: 0;
+}
