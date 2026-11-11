@@ -10,6 +10,7 @@ import { useState } from 'react'
 
 import ErrorBoundary from './components/ErrorBoundary'
 import ErrorPage, { ErrorPreviewPage } from './components/ErrorPage'
+import PortalChat from './components/PortalChat'
 
 import NotificationsPage from './pages/NotificationsPage'
 import {
@@ -76,6 +77,7 @@ export default function App() {
     >
       <BrowserRouter>
         <AppRoutes />
+        <PortalChat />
       </BrowserRouter>
     </NotificationsPreviewContext.Provider>
   )
