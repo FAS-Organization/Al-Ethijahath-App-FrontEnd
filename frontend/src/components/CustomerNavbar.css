@@ -169,3 +169,123 @@
 }
 @media (prefers-reduced-motion: reduce) { .ae-nav .ae-nav__link { transition: none; } }
 @media (forced-colors: active) { .ae-nav .ae-nav__link.is-active { outline: 2px solid Highlight; outline-offset: -2px; } }
+
+
+/* ---------- Support pop-up: slides up from the bottom of the sidebar ---------- */
+.ae-support {
+  --ae-surface: #fffdfd;
+  position: fixed;
+  inset: auto auto 0 0;
+  margin: 0;
+  width: 252px;
+  max-width: 100vw;
+  max-height: 100dvh;
+  padding: 0;
+  border: 1px solid var(--ae-line);
+  border-inline-start: 0;
+  border-block-end: 0;
+  border-radius: 0 16px 0 0;
+  background: var(--ae-bg);
+  color: var(--ae-text);
+  box-shadow: 0 -18px 50px rgb(40 20 20 / 28%);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.ae-nav[data-theme='dark'] .ae-support { --ae-surface: #211d1e; }
+.ae-support::backdrop { background: rgb(30 14 16 / 45%); }
+.ae-support[open] { animation: ae-sheet-up 380ms cubic-bezier(0.16, 1, 0.3, 1); }
+.ae-support[open]::backdrop { animation: ae-fade-in 300ms ease; }
+.ae-support[data-closing='true'] { animation: ae-sheet-down 240ms cubic-bezier(0.5, 0, 0.75, 0) forwards; }
+.ae-support[data-closing='true']::backdrop { animation: ae-fade-out 240ms ease forwards; }
+
+.ae-support__panel { padding: 16px 14px 18px; }
+.ae-support__head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.ae-support__head h2 { margin: 0; font-size: 19px; line-height: 1.2; color: var(--ae-accent); }
+.ae-support__head p { margin: 3px 0 0; font-size: 12px; color: var(--ae-muted); }
+.ae-support__close { display: grid; place-items: center; flex: none; width: 36px; height: 36px; padding: 0; border: 1px solid var(--ae-line); border-radius: 8px; background: transparent; color: var(--ae-text); cursor: pointer; transition: background-color 160ms ease, transform 200ms ease; }
+.ae-support__close:hover { background: var(--ae-hover); transform: rotate(90deg); }
+
+/* "Coming soon" AI banner: made to be noticed first. */
+.ae-ai {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  color: #fff;
+  background: radial-gradient(circle at 88% 100%, rgb(255 255 255 / 35%) 0%, rgb(255 255 255 / 0%) 55%),
+              linear-gradient(135deg, #6e0a14 0%, #b01226 58%, #d9475a 100%);
+  box-shadow: 0 10px 26px rgb(143 0 13 / 32%);
+  animation: ae-ai-glow 2.4s ease-in-out infinite;
+}
+.ae-ai::after { /* light sweep */
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 38%), transparent);
+  transform: skewX(-18deg);
+  animation: ae-ai-sweep 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+.ae-ai__icon { flex: none; width: 28px; height: 28px; animation: ae-ai-twinkle 2.2s ease-in-out infinite; filter: drop-shadow(0 0 8px rgb(255 255 255 / 70%)); }
+.ae-ai__text { display: grid; gap: 3px; min-width: 0; }
+.ae-ai__text strong { font-size: 15px; line-height: 1.2; }
+.ae-ai__text > span:last-child { font-size: 12px; line-height: 1.35; opacity: 0.92; }
+.ae-ai__pill { display: inline-flex; align-items: center; gap: 6px; justify-self: start; padding: 2px 9px; border-radius: 999px; background: rgb(255 255 255 / 22%); font-size: 10.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.ae-ai__pill i { width: 7px; height: 7px; border-radius: 50%; background: #fff; animation: ae-ai-pulse 1.4s ease-out infinite; }
+
+.ae-support__list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ae-support .ae-support__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 1px solid var(--ae-line);
+  border-radius: 12px;
+  background: var(--ae-surface);
+  color: var(--ae-text);
+  text-decoration: none;
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1), border-color 160ms ease, box-shadow 200ms ease;
+}
+.ae-support__icon { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--ae-active); color: var(--ae-accent); transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1), background-color 160ms ease, color 160ms ease; }
+.ae-support__icon svg { width: 22px; height: 22px; }
+.ae-support__label { display: grid; min-width: 0; line-height: 1.3; }
+.ae-support__label strong { font-size: 14px; }
+.ae-support__label span { font-size: 12px; color: var(--ae-muted); overflow-wrap: anywhere; }
+.ae-support__arrow { display: none; margin-inline-start: auto; flex: none; color: var(--ae-muted); transition: transform 200ms ease, color 160ms ease; }
+@media (hover: hover) {
+  .ae-support .ae-support__item:hover { transform: translateY(-2px); border-color: var(--ae-accent); box-shadow: 0 8px 20px rgb(143 0 13 / 14%); }
+  .ae-support .ae-support__item:hover .ae-support__icon { background: var(--ae-accent); color: #fff; transform: scale(1.1) rotate(-6deg); }
+  .ae-support .ae-support__item:hover .ae-support__arrow { color: var(--ae-accent); transform: translate(3px, -3px); }
+}
+
+/* Phones and tablets: the menu is a top bar, so the panel uses the full width. */
+@media (max-width: 1023px) {
+  .ae-support {
+    width: 100%;
+    max-height: 92dvh;
+    border-inline-end: 0;
+    border-radius: 16px 16px 0 0;
+  }
+  .ae-support__panel { padding: 18px 16px 22px; }
+  .ae-support__arrow { display: block; }
+}
+
+@keyframes ae-sheet-up { from { transform: translateY(100%); } }
+@keyframes ae-sheet-down { to { transform: translateY(100%); } }
+@keyframes ae-fade-in { from { opacity: 0; } }
+@keyframes ae-fade-out { to { opacity: 0; } }
+@keyframes ae-ai-sweep { 0% { inset-inline-start: -60%; } 55%, 100% { inset-inline-start: 130%; } }
+@keyframes ae-ai-twinkle { 0%, 100% { transform: scale(1) rotate(0); } 50% { transform: scale(1.18) rotate(14deg); } }
+@keyframes ae-ai-pulse { 0% { box-shadow: 0 0 0 0 rgb(255 255 255 / 80%); } 80%, 100% { box-shadow: 0 0 0 8px rgb(255 255 255 / 0%); } }
+@keyframes ae-ai-glow { 0%, 100% { box-shadow: 0 10px 26px rgb(143 0 13 / 28%); } 50% { box-shadow: 0 12px 34px rgb(217 71 90 / 55%); } }
+@media (prefers-reduced-motion: reduce) {
+  .ae-support[open], .ae-support[open]::backdrop, .ae-ai, .ae-ai::after, .ae-ai__icon, .ae-ai__pill i { animation: none; }
+  .ae-support .ae-support__item, .ae-support__icon, .ae-support__arrow, .ae-support__close { transition: none; }
+}

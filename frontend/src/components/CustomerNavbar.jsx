@@ -4,6 +4,8 @@ import {
   SquaresFourIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
   FileTextIcon, ReceiptIcon, FolderOpenIcon, BellIcon,
   UserCircleIcon, HeadsetIcon, SignOutIcon, ListIcon, XIcon,
+  WhatsappLogoIcon, EnvelopeSimpleIcon, PhoneCallIcon,
+  SparkleIcon, ArrowUpRightIcon,
 } from '@phosphor-icons/react'
 import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import './CustomerNavbar.css'
@@ -34,6 +36,11 @@ const INITIAL_PAGES = [
   'account',
 ]
 
+// Support contact details shown in the Support pop-up.
+const SUPPORT_PHONE_DISPLAY = '+966 50 937 4109'
+const SUPPORT_PHONE_LINK = '+966509374109'
+const SUPPORT_EMAIL = 'info@alethijahath.com'
+
 /** Render once within BrowserRouter, outside individual page contents.
  * onSignOut must await your real logout request and clear authenticated state.
  * No session, identity, badge counts, or backend endpoints are fabricated here.
@@ -50,6 +57,7 @@ export default function CustomerNavbar({
   const [signingOut, setSigningOut] = useState(false)
   const [error, setError] = useState('')
   const rootRef = useRef(null)
+  const supportRef = useRef(null)
   const toggleRef = useRef(null)
   const busyRef = useRef(false)
   const menuId = useId()
@@ -102,7 +110,28 @@ export default function CustomerNavbar({
       setSigningOut(false)
     }
   }
+  function openSupport() {
+    setOpen(false)
+    const dialog = supportRef.current
+    if (!dialog || dialog.open) return
+    delete dialog.dataset.closing
+    dialog.showModal()
+  }
 
+  // Slides the panel back down, then closes it.
+  function closeSupport() {
+    const dialog = supportRef.current
+    if (!dialog || !dialog.open || dialog.dataset.closing) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      dialog.close()
+      return
+    }
+    dialog.dataset.closing = 'true'
+    setTimeout(() => {
+      dialog.close()
+      delete dialog.dataset.closing
+    }, 240)
+  }
   return (
     <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
       <div className="ae-nav__header">
@@ -163,9 +192,10 @@ export default function CustomerNavbar({
         </nav>
 
         <div className="ae-nav__footer">
-          <a className="ae-nav__link" href="mailto:info@alethijahath.com">
-            <HeadsetIcon size={21} aria-hidden="true" /><span>Contact support</span>
-          </a>
+          <button type="button" className="ae-nav__link" onClick={openSupport}
+            aria-haspopup="dialog">
+            <HeadsetIcon size={21} aria-hidden="true" /><span>Support</span>
+          </button>
           {onSignOut ? (
             <button type="button" className="ae-nav__link" onClick={signOut}
               disabled={signingOut} aria-busy={signingOut}>
@@ -176,6 +206,70 @@ export default function CustomerNavbar({
           {error ? <p className="ae-nav__error" role="alert">{error}</p> : null}
         </div>
       </div>
+      <dialog
+        ref={supportRef}
+        className="ae-support"
+        aria-labelledby="ae-support-title"
+        onCancel={event => { event.preventDefault(); closeSupport() }}
+        onClick={event => { if (event.target === event.currentTarget) closeSupport() }}
+      >
+        <div className="ae-support__panel">
+          <header className="ae-support__head">
+            <div>
+              <h2 id="ae-support-title">Support</h2>
+              <p>How would you like to reach us?</p>
+            </div>
+            <button type="button" className="ae-support__close" onClick={closeSupport}
+              aria-label="Close support">
+              <XIcon size={20} aria-hidden="true" />
+            </button>
+          </header>
+
+          <div className="ae-ai" role="note">
+            <SparkleIcon className="ae-ai__icon" size={34} weight="fill" aria-hidden="true" />
+            <div className="ae-ai__text">
+              <span className="ae-ai__pill"><i aria-hidden="true" />Coming soon</span>
+              <strong>Ask Al Ethijahath AI</strong>
+              <span>Instant answers, right inside your portal.</span>
+            </div>
+          </div>
+
+          <ul className="ae-support__list">
+            <li>
+              <a className="ae-support__item" href={`https://wa.me/${SUPPORT_PHONE_LINK.replace('+', '')}`}
+                target="_blank" rel="noopener noreferrer">
+                <span className="ae-support__icon"><WhatsappLogoIcon size={26} weight="fill" aria-hidden="true" /></span>
+                <span className="ae-support__label">
+                  <strong>WhatsApp</strong>
+                  <span>{SUPPORT_PHONE_DISPLAY}</span>
+                </span>
+                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+                <span className="ae-nav__sr"> (opens WhatsApp in a new tab)</span>
+              </a>
+            </li>
+            <li>
+              <a className="ae-support__item" href={`mailto:${SUPPORT_EMAIL}`}>
+                <span className="ae-support__icon"><EnvelopeSimpleIcon size={26} weight="fill" aria-hidden="true" /></span>
+                <span className="ae-support__label">
+                  <strong>Email</strong>
+                  <span>{SUPPORT_EMAIL}</span>
+                </span>
+                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+              </a>
+            </li>
+            <li>
+              <a className="ae-support__item" href={`tel:${SUPPORT_PHONE_LINK}`}>
+                <span className="ae-support__icon"><PhoneCallIcon size={26} weight="fill" aria-hidden="true" /></span>
+                <span className="ae-support__label">
+                  <strong>Call us</strong>
+                  <span>{SUPPORT_PHONE_DISPLAY}</span>
+                </span>
+                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+              </a>
+            </li>
+          </ul>
+        </div>
+      </dialog>
     </aside>
   )
 }
