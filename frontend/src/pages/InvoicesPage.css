@@ -184,14 +184,14 @@
   border-bottom: 0;
 }
 
-.iv-table .iv-num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+.iv-table th:last-child,
+.iv-table td.iv-num {
+  text-align: center;
 }
 
-.iv-table tbody tr > :first-child {
-  transition: box-shadow 260ms ease;
+.iv-table .iv-num {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .iv-ledger-head {
