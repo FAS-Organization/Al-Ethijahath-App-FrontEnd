@@ -1007,7 +1007,7 @@ body:has(.dp-page) {
   }
 }
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   .dp-main {
     margin-left: 0;
   }
