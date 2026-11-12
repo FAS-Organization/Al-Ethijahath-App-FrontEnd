@@ -124,17 +124,13 @@ function closeSupport() {
 
   if (!dialog || !dialog.open || dialog.dataset.closing) return;
 
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    dialog.close();
-    return;
-  }
 
   dialog.dataset.closing = 'true';
 
   setTimeout(() => {
     dialog.close();
     delete dialog.dataset.closing;
-  }, 900);
+  }, 200);
 }
   return (
     <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
@@ -218,23 +214,23 @@ function closeSupport() {
         onClick={event => { if (event.target === event.currentTarget) closeSupport() }}
       >
         <div className="ae-support__panel">
-          <header className="ae-support__head">
-            <div>
-              <h2 id="ae-support-title">Support</h2>
-              <p>How would you like to reach us?</p>
-            </div>
-            <button type="button" className="ae-support__close" onClick={closeSupport}
-              aria-label="Close support">
-              <XIcon size={20} aria-hidden="true" />
+          <div className="ae-support__head">
+            <h2 id="ae-support-title">Get in Touch</h2>
+            <button
+              type="button"
+              className="ae-support__close"
+              onClick={closeSupport}
+              aria-label="Close support"
+            >
+              <XIcon size={18} aria-hidden="true" />
             </button>
-          </header>
+          </div>
 
           <div className="ae-ai" role="note">
-            <SparkleIcon className="ae-ai__icon" size={34} weight="fill" aria-hidden="true" />
+            <SparkleIcon className="ae-ai__icon" size={22} weight="fill" aria-hidden="true" />
             <div className="ae-ai__text">
-              <span className="ae-ai__pill"><i aria-hidden="true" />Coming soon</span>
               <strong>Ask Al Ethijahath AI</strong>
-              <span>Instant answers, right inside your portal.</span>
+              <span>Invoices &amp; service</span>
             </div>
           </div>
 
