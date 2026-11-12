@@ -215,7 +215,7 @@ function closeSupport() {
       >
         <div className="ae-support__panel">
           <div className="ae-support__head">
-            <h2 id="ae-support-title">Get in Touch</h2>
+            <h2 id="ae-support-title">Support</h2>
             <button
               type="button"
               className="ae-support__close"
