@@ -448,20 +448,521 @@ body:has(.ed-dashboard) {
   margin-bottom: 24px;
 }
 
-.ed-section-heading h2 {
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: -0.015em;
+
+/* =========================================================
+   ACTIVE SERVICE JOBS — SECTION HEADING
+   ========================================================= */
+
+#active-jobs > .ed-section-heading {
+  align-items: center;
+  margin-bottom: 26px;
 }
 
-.ed-section-heading p {
-  max-width: 60ch;
-  margin-top: 6px;
-  color: var(--ed-muted);
-  font-size: 12px;
-  line-height: 1.7;
+/* Small editorial label */
+#active-jobs > .ed-section-heading > div:first-child::before {
+  content: "SERVICE OPERATIONS";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--ed-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
 }
+
+/* Main title */
+#active-jobs .ed-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ed-heading);
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.045em;
+}
+
+/* SVG icon container */
+#active-jobs .ed-section-heading h2::before {
+  content: "";
+  display: block;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background-color: var(--ed-button);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14.7 6.3a5 5 0 0 0-6.6 6.6L3.5 17.5a2.1 2.1 0 0 0 3 3l4.6-4.6a5 5 0 0 0 6.6-6.6L14.5 12l-2.5-2.5 2.7-3.2Z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 23px;
+
+  box-shadow: 0 5px 12px rgb(143 0 13 / 15%);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Description */
+#active-jobs .ed-section-heading p {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Small hover interaction */
+@media (hover: hover) {
+  #active-jobs:hover .ed-section-heading h2::before {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgb(143 0 13 / 22%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  #active-jobs .ed-section-heading h2 {
+    font-size: 18px;
+    gap: 10px;
+  }
+
+  #active-jobs .ed-section-heading h2::before {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background-size: 21px;
+  }
+}
+
+/* =========================================================
+   RECENT NOTIFICATIONS — SECTION HEADING
+   ========================================================= */
+
+#notifications > .ed-section-heading {
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+/* Editorial label */
+#notifications > .ed-section-heading > div:first-child::before {
+  content: "LATEST UPDATES";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--ed-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+/* Main title */
+#notifications .ed-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ed-heading);
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.045em;
+}
+
+/* Custom document / updates SVG — no bell */
+#notifications .ed-section-heading h2::before {
+  content: "";
+  display: block;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background-color: var(--ed-button);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='5' y='3' width='14' height='18' rx='2'/%3E%3Cpath d='M9 8h6M9 12h6M9 16h3'/%3E%3Ccircle cx='17' cy='16' r='2.5' fill='%23ffffff' stroke='%238f000d' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 23px;
+
+  box-shadow: 0 5px 12px rgb(143 0 13 / 15%);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Description */
+#notifications .ed-section-heading p {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Hover interaction */
+@media (hover: hover) {
+  #notifications:hover .ed-section-heading h2::before {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgb(143 0 13 / 22%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  #notifications .ed-section-heading h2 {
+    font-size: 18px;
+    gap: 10px;
+  }
+
+  #notifications .ed-section-heading h2::before {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background-size: 21px;
+  }
+}
+
+/* =========================================================
+   AWAITING APPROVAL — SECTION HEADING
+   ========================================================= */
+
+.ed-quotation-panel > .ed-section-heading {
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+/* Editorial label */
+.ed-quotation-panel > .ed-section-heading > div:first-child::before {
+  content: "CUSTOMER ACTION";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--ed-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+/* Main title */
+.ed-quotation-panel .ed-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ed-heading);
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.045em;
+}
+
+/* Hide the existing JSX icon */
+.ed-quotation-panel .ed-section-heading > svg {
+  display: none;
+}
+
+/* Quotation approval SVG */
+.ed-quotation-panel .ed-section-heading h2::before {
+  content: "";
+  display: block;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background-color: var(--ed-button);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6M8 13h3M8 17h2'/%3E%3Cpath d='m14 16 2 2 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 23px;
+
+  box-shadow: 0 5px 12px rgb(143 0 13 / 15%);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Description */
+.ed-quotation-panel .ed-section-heading p {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Hover interaction */
+@media (hover: hover) {
+  .ed-quotation-panel:hover .ed-section-heading h2::before {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgb(143 0 13 / 22%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  .ed-quotation-panel .ed-section-heading h2 {
+    font-size: 18px;
+    gap: 10px;
+  }
+
+  .ed-quotation-panel .ed-section-heading h2::before {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background-size: 21px;
+  }
+}
+
+/* =========================================================
+   LATEST REPORTS — SECTION HEADING
+   ========================================================= */
+
+#documents > .ed-section-heading {
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+/* Editorial label */
+#documents > .ed-section-heading > div:first-child::before {
+  content: "SERVICE DOCUMENTATION";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--ed-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+/* Main title */
+#documents .ed-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ed-heading);
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.3;
+  letter-spacing: -0.045em;
+}
+
+/* Verified report SVG */
+#documents .ed-section-heading h2::before {
+  content: "";
+  display: block;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background-color: var(--ed-button);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpath d='M14 2v6h6M8 13h8M8 17h4'/%3E%3Ccircle cx='17' cy='17' r='3' fill='%23ffffff' stroke='%238f000d' stroke-width='1.2'/%3E%3Cpath d='m15.8 17 0.8 0.8 1.6-1.7' stroke='%238f000d' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 23px;
+
+  box-shadow: 0 5px 12px rgb(143 0 13 / 15%);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Description */
+#documents .ed-section-heading p {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Hover interaction */
+@media (hover: hover) {
+  #documents:hover .ed-section-heading h2::before {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgb(143 0 13 / 22%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  #documents .ed-section-heading h2 {
+    font-size: 18px;
+    gap: 10px;
+  }
+
+  #documents .ed-section-heading h2::before {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background-size: 21px;
+  }
+}
+
+/* =========================================================
+   INVOICES & PAYMENTS — SECTION HEADING
+   ========================================================= */
+
+#invoices > .ed-section-heading {
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+/* Editorial label */
+#invoices > .ed-section-heading > div:first-child::before {
+  content: "FINANCIAL OVERVIEW";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--ed-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+/* Main title */
+#invoices .ed-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ed-heading);
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.045em;
+}
+
+/* Invoice and payment SVG */
+#invoices .ed-section-heading h2::before {
+  content: "";
+  display: block;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background-color: var(--ed-button);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 3h12v18l-3-2-3 2-3-2-3 2V3Z'/%3E%3Cpath d='M9 8h6M9 12h3'/%3E%3Ccircle cx='16' cy='15' r='3' fill='%23ffffff' stroke='%238f000d' stroke-width='1.2'/%3E%3Cpath d='M16 13.5v3M17 14.2c-.3-.5-1.7-.5-1.7.2 0 .8 1.7.4 1.7 1.2 0 .7-1.4.8-1.8.2' stroke='%238f000d' stroke-width='0.9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 23px;
+
+  box-shadow: 0 5px 12px rgb(143 0 13 / 15%);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Description */
+#invoices .ed-section-heading p {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Keep the remaining-balance indicator aligned */
+#invoices .ed-balance-label {
+  align-self: center;
+}
+
+/* Hover interaction */
+@media (hover: hover) {
+  #invoices:hover .ed-section-heading h2::before {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgb(143 0 13 / 22%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  #invoices .ed-section-heading h2 {
+    font-size: 18px;
+    gap: 10px;
+  }
+
+  #invoices .ed-section-heading h2::before {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background-size: 21px;
+  }
+}
+
+
+/* =========================================================
+   YOUR EQUIPMENT — SECTION HEADING
+   ========================================================= */
+
+#equipment > .ed-section-heading {
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+/* Editorial label */
+#equipment > .ed-section-heading > div:first-child::before {
+  content: "EQUIPMENT REGISTER";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--ed-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+/* Main title */
+#equipment .ed-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ed-heading);
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.045em;
+}
+
+/* Industrial forklift / equipment SVG */
+#equipment .ed-section-heading h2::before {
+  content: "";
+  display: block;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background-color: var(--ed-button);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 17V7h9l3 5v5H3Z'/%3E%3Cpath d='M12 7v5h3M17 5v12M20 5v12M17 5h3'/%3E%3Cpath d='M3 17h18'/%3E%3Ccircle cx='7' cy='18' r='2' fill='%23ffffff' stroke='%238f000d' stroke-width='1.2'/%3E%3Ccircle cx='16' cy='18' r='2' fill='%23ffffff' stroke='%238f000d' stroke-width='1.2'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 23px;
+
+  box-shadow: 0 5px 12px rgb(143 0 13 / 15%);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Description */
+#equipment .ed-section-heading p {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Keep equipment search aligned */
+#equipment .ed-search {
+  align-self: center;
+}
+
+/* Hover interaction */
+@media (hover: hover) {
+  #equipment:hover .ed-section-heading h2::before {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgb(143 0 13 / 22%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  #equipment .ed-section-heading h2 {
+    font-size: 18px;
+    gap: 10px;
+  }
+
+  #equipment .ed-section-heading h2::before {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background-size: 21px;
+  }
+}
+
 
 .ed-section-heading > svg {
   color: var(--ed-accent);
@@ -491,16 +992,114 @@ body:has(.ed-dashboard) {
    SERVICE ACTIVITY CHART
    ========================================================= */
 
+
 .ed-select {
-  min-height: 40px;
-  padding: 8px 12px;
+  --ed-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  appearance: none;
+  min-width: 150px;
+  min-height: 44px;
+  padding: 9px 34px 9px 12px;
   border: 1px solid var(--ed-line);
-  border-radius: 7px;
-  background: var(--ed-surface);
+  border-radius: 8px;
+  background: var(--ed-soft-surface) var(--ed-chevron) no-repeat right 11px center / 16px;
   color: var(--ed-text);
-  font-size: 12px !important;
+  font-size: 13px !important;
+  font-weight: 600;
   cursor: pointer;
 }
+
+.ed-select:hover {
+  border-color: var(--ed-accent);
+}
+
+.ed-select:focus-visible {
+  outline: 2px solid var(--ed-accent);
+  outline-offset: 2px;
+}
+
+/* Custom dropdown popup — supported browsers */
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .ed-select,
+  .ed-select::picker(select) {
+    appearance: base-select;
+  }
+
+  .ed-select {
+    align-items: center;
+    padding-inline-end: 13px;
+    background-image: none;
+  }
+
+  /* Dropdown arrow */
+  .ed-select::picker-icon {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-inline-start: auto;
+    border-right: 2px solid var(--ed-accent);
+    border-bottom: 2px solid var(--ed-accent);
+    rotate: 45deg;
+    translate: 0 -2px;
+    content: '';
+  }
+
+  .ed-select:open {
+    border-color: var(--ed-accent);
+  }
+
+  .ed-select:open::picker-icon {
+    rotate: 225deg;
+    translate: 0 2px;
+  }
+
+  /* Dropdown options container */
+  .ed-select::picker(select) {
+    max-block-size: min(320px, 60dvh);
+    overflow-y: auto;
+    margin-block: 5px;
+    padding: 5px;
+    border: 1px solid var(--ed-line);
+    border-radius: 10px;
+    background: var(--ed-surface);
+    color: var(--ed-text);
+    box-shadow: 0 8px 24px rgb(40 35 33 / 12%);
+  }
+
+  /* Individual options */
+  .ed-select option {
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: normal;
+    cursor: pointer;
+  }
+
+  /* Hover and keyboard focus */
+  .ed-select option:hover,
+  .ed-select option:focus-visible {
+    background: var(--ed-soft-surface);
+  }
+
+  /* Selected option */
+  .ed-select option:checked {
+    background: var(--ed-accent-soft);
+    color: var(--ed-accent);
+    font-weight: 700;
+  }
+
+  /* Tick beside selected option */
+  .ed-select option::checkmark {
+    order: 1;
+    margin-inline-start: auto;
+    color: var(--ed-accent);
+  }
+}
+
 
 .ed-chart-summary {
   display: flex;

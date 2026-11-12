@@ -119,19 +119,23 @@ export default function CustomerNavbar({
   }
 
   // Slides the panel back down, then closes it.
-  function closeSupport() {
-    const dialog = supportRef.current
-    if (!dialog || !dialog.open || dialog.dataset.closing) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      dialog.close()
-      return
-    }
-    dialog.dataset.closing = 'true'
-    setTimeout(() => {
-      dialog.close()
-      delete dialog.dataset.closing
-    }, 240)
+function closeSupport() {
+  const dialog = supportRef.current;
+
+  if (!dialog || !dialog.open || dialog.dataset.closing) return;
+
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    dialog.close();
+    return;
   }
+
+  dialog.dataset.closing = 'true';
+
+  setTimeout(() => {
+    dialog.close();
+    delete dialog.dataset.closing;
+  }, 900);
+}
   return (
     <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
       <div className="ae-nav__header">

@@ -107,6 +107,7 @@
   font-size: 12px;
 }
 
+
 /* Small helpers */
 .iv-copy,
 .iv-link {
@@ -460,6 +461,57 @@
   color: var(--sv-muted);
   font-size: 12px;
 }
+
+/* Invoice reference number icon */
+.iv-card .sv-card-title h2 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iv-card .sv-card-title h2::before {
+  content: "";
+  display: inline-block;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+
+  border: 1px solid var(--sv-line);
+  border-radius: 9px;
+  background-color: var(--sv-accent-soft);
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238f000d' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h7l5 5v12a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2Z'/%3E%3Cpath d='M14 3.5v5h5M9 13h6M9 17h6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 19px 19px;
+}
+
+/* Invoice reference icon hover effect */
+@media (hover: hover) and (pointer: fine) {
+  .iv-card .sv-card-title h2::before {
+    transition:
+      background-color 260ms ease,
+      border-color 260ms ease,
+      transform 320ms var(--sv-ease),
+      box-shadow 260ms ease;
+  }
+
+  .iv-card:hover .sv-card-title h2::before {
+    background-color: var(--sv-accent);
+    border-color: var(--sv-accent);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 3.5h7l5 5v12a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2v-14a2 2 0 0 1 2-2Z'/%3E%3Cpath d='M14 3.5v5h5M9 13h6M9 17h6'/%3E%3C/svg%3E");
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(143, 0, 13, 0.16);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .iv-card .sv-card-title h2::before {
+    transition: none;
+  }
+}
+
 
 /* Interaction */
 @media (hover: hover) and (pointer: fine) {
