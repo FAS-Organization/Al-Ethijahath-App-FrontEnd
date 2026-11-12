@@ -117,20 +117,31 @@ export default function CustomerNavbar({
     dialog.showModal()
   }
 
-  // Slides the panel back down, then closes it.
-function closeSupport() {
-  const dialog = supportRef.current;
+  function closeSupport() {
+    const dialog = supportRef.current
+    if (!dialog?.open || dialog.dataset.closing) return
 
-  if (!dialog || !dialog.open || dialog.dataset.closing) return;
+    dialog.dataset.closing = 'true'
 
+    setTimeout(() => {
+      dialog.close()
+      delete dialog.dataset.closing
+    }, 200)
+  }
 
-  dialog.dataset.closing = 'true';
+  function openSupportChat() {
+    const supportDialog = supportRef.current
+    if (!supportDialog?.open || supportDialog.dataset.closing) return
 
-  setTimeout(() => {
-    dialog.close();
-    delete dialog.dataset.closing;
-  }, 200);
-}
+    const chatDialog = document.getElementById('portal-chat-dialog')
+    if (!(chatDialog instanceof HTMLDialogElement)) return
+
+    supportDialog.addEventListener('close', () => {
+      if (!chatDialog.open) chatDialog.showModal()
+    }, { once: true })
+
+    closeSupport()
+  }
   return (
     <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
       <div className="ae-nav__header">
@@ -225,7 +236,13 @@ function closeSupport() {
             </button>
           </div>
 
-          <div className="ae-ai" role="note">
+          <button
+            type="button"
+            className="ae-ai"
+            onClick={openSupportChat}
+            aria-haspopup="dialog"
+            aria-controls="portal-chat-dialog"
+          >
             <svg
               className="ae-ai__icon"
               width="22"
@@ -244,11 +261,11 @@ function closeSupport() {
                 d="M240,80h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"
               />
             </svg>
-            <div className="ae-ai__text">
+            <span className="ae-ai__text">
               <strong>Ask Al Ethijahath Ai</strong>
               <span>Invoices &amp; service</span>
-            </div>
-          </div>
+            </span>
+          </button>
 
           <ul className="ae-support__list">
             <li>

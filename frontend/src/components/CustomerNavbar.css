@@ -297,6 +297,10 @@
   position: relative;
   display: flex;
   align-items: center;
+  width: 100%;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   gap: 10px;
   min-height: 54px;
   margin-bottom: 8px;

@@ -1,6 +1,7 @@
 
 import {
   BrowserRouter,
+  Outlet,
   Routes,
   Route,
   useLocation,
@@ -36,15 +37,25 @@ function AppRoutes() {
     <ErrorBoundary resetKey={location.pathname}>
       <Routes>
         <Route path="/" element={<SignupPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
-        <Route path="/equipment" element={<EquipmentPage />} />
-        <Route path="/services" element={<ServicesPage />} />
-        <Route path="/quotations" element={<QuotationsPage />} />
-        <Route path="/maintenance" element={<AmcSchedulePage />} />
-        <Route path="/billing" element={<InvoicesPage />} />
-        <Route path="/documents" element={<DocumentsPage />} />
-        <Route path="/notifications" element={<NotificationsPage />} />
-        <Route path="/account" element={<AccountPage />} />
+
+        <Route
+          element={
+            <>
+              <Outlet />
+              <PortalChat />
+            </>
+          }
+        >
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/equipment" element={<EquipmentPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/quotations" element={<QuotationsPage />} />
+          <Route path="/maintenance" element={<AmcSchedulePage />} />
+          <Route path="/billing" element={<InvoicesPage />} />
+          <Route path="/documents" element={<DocumentsPage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/account" element={<AccountPage />} />
+        </Route>
 
         {/* Preview any error page */}
         <Route
@@ -77,7 +88,6 @@ export default function App() {
     >
       <BrowserRouter>
         <AppRoutes />
-        <PortalChat />
       </BrowserRouter>
     </NotificationsPreviewContext.Provider>
   )
