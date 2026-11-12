@@ -4,8 +4,7 @@ import {
   SquaresFourIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
   FileTextIcon, ReceiptIcon, FolderOpenIcon, BellIcon,
   UserCircleIcon, HeadsetIcon, SignOutIcon, ListIcon, XIcon,
-  WhatsappLogoIcon, EnvelopeSimpleIcon, PhoneCallIcon,
-  SparkleIcon, ArrowUpRightIcon,
+  WhatsappLogoIcon, EnvelopeSimpleIcon, PhoneCallIcon, ArrowUpRightIcon,
 } from '@phosphor-icons/react'
 import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import './CustomerNavbar.css'
@@ -227,9 +226,26 @@ function closeSupport() {
           </div>
 
           <div className="ae-ai" role="note">
-            <SparkleIcon className="ae-ai__icon" size={22} weight="fill" aria-hidden="true" />
+            <svg
+              className="ae-ai__icon"
+              width="22"
+              height="22"
+              viewBox="0 0 256 256"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path className="ae-ai__star ae-ai__star--large" d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144Z" />
+              <path
+                className="ae-ai__star ae-ai__star--upper"
+                d="M152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Z"
+              />
+              <path
+                className="ae-ai__star ae-ai__star--right"
+                d="M240,80h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"
+              />
+            </svg>
             <div className="ae-ai__text">
-              <strong>Ask Al Ethijahath AI</strong>
+              <strong>Ask Al Ethijahath Ai</strong>
               <span>Invoices &amp; service</span>
             </div>
           </div>
