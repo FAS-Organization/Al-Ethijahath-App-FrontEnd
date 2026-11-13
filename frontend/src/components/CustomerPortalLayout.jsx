@@ -43,7 +43,10 @@ export default function CustomerPortalLayout() {
             rel="noopener noreferrer"
           >
             <LightningIcon size={17} weight="fill" aria-hidden="true" />
-            Emergency dispatch
+            <span className="ed-dispatch-label">
+              <span>Emergency</span>{' '}
+              <span className="ed-dispatch-second-line">dispatch</span>
+            </span>
             <span className="ed-sr-only"> (opens in a new tab)</span>
           </a>
 

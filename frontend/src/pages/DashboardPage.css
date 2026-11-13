@@ -2926,6 +2926,43 @@ html:has(.ed-dashboard) {
   }
 }
 
+@media (width < 425px) {
+  .portal-topbar .ed-dispatch {
+    display: inline-grid;
+    grid-template-columns: minmax(5px, 1fr) 17px max-content;
+    grid-template-rows: 15px 17px;
+    align-content: center;
+    align-items: center;
+    gap: 0 3px;
+    min-height: 44px;
+    padding: 4px 8px;
+    line-height: 1;
+    
+  }
+  .ed-dispatch svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .ed-dispatch-label {
+    display: contents;
+  }
+
+  .ed-dispatch-label > span:first-child {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .portal-topbar .ed-dispatch > svg {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .ed-dispatch-second-line {
+    grid-column: 3;
+    grid-row: 2;
+  }
+}
 /* =========================================================
    UPCOMING MAINTENANCE — SECTION HEADING
    ========================================================= */
