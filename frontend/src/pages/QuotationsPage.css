@@ -1337,7 +1337,7 @@ body:has(.qt-page) {
   }
 }
 
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   .qt-main {
     margin-left: 0;
   }
