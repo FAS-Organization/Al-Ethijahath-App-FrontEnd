@@ -274,6 +274,40 @@ body:has(.sv-page) {
   --sv-metric-tint: #f3edfc;
 }
 
+/* =========================================================
+   SUMMARY CARDS — MATCH EQUIPMENT PAGE
+   ========================================================= */
+
+/* Match Equipment page number typography */
+.sv-summary-item strong {
+  color: var(--sv-metric-ink);
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dark mode — proper muted card tints */
+.sv-page[data-theme='dark'] .sv-summary-item:nth-child(1) {
+  --sv-metric-ink: #a9c7f5;
+  --sv-metric-tint: #29364a;
+}
+
+.sv-page[data-theme='dark'] .sv-summary-item:nth-child(2) {
+  --sv-metric-ink: #efc990;
+  --sv-metric-tint: #3c3020;
+}
+
+.sv-page[data-theme='dark'] .sv-summary-item:nth-child(3) {
+  --sv-metric-ink: #a0d6b5;
+  --sv-metric-tint: #24392d;
+}
+
+.sv-page[data-theme='dark'] .sv-summary-item:nth-child(4) {
+  --sv-metric-ink: #c5aff0;
+  --sv-metric-tint: #352b45;
+}
 .sv-summary-item .sv-summary-icon,
 .sv-summary-copy {
   position: relative;

@@ -1905,3 +1905,44 @@ body:has(.sc-page) {
     outline-offset: -2px;
   }
 }
+
+/* =========================================================
+   SUMMARY CARDS — MATCH EQUIPMENT PAGE
+   ========================================================= */
+
+/* Match Equipment page number typography */
+.sc-summary-item strong {
+  color: var(--sc-metric-ink);
+  font-size: 34px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Dark mode card colours */
+.sc-page[data-theme='dark'] .sc-summary-item:nth-child(1) {
+  --sc-metric-ink: #a9c7f5;
+  --sc-metric-tint: #29364a;
+}
+
+.sc-page[data-theme='dark'] .sc-summary-item:nth-child(2) {
+  --sc-metric-ink: #a0d6b5;
+  --sc-metric-tint: #24392d;
+}
+
+.sc-page[data-theme='dark'] .sc-summary-item:nth-child(3) {
+  --sc-metric-ink: #efc990;
+  --sc-metric-tint: #3c3020;
+}
+
+.sc-page[data-theme='dark'] .sc-summary-item:nth-child(4) {
+  --sc-metric-ink: #c5aff0;
+  --sc-metric-tint: #352b45;
+}
+
+/* Remove the extra decorative circle.
+   The existing .sc-summary-corner already provides it. */
+.sc-summary-item::after {
+  content: none;
+}
