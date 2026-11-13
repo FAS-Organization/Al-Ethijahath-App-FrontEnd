@@ -71,6 +71,21 @@
   color: #d5e4ff;
 }
 
+@media (width < 425px) {
+  .portal-chat__launcher {
+    gap: 7px;
+    min-height: 46px;
+    padding: 0 12px 0 7px;
+    font-size: 13px;
+  }
+
+  .portal-chat__launcher > svg {
+    width: 28px;
+    height: 28px;
+    padding: 5px;
+  }
+}
+
 .portal-chat__dialog {
   position: fixed;
   inset: auto var(--chat-right) var(--chat-bottom) auto;
