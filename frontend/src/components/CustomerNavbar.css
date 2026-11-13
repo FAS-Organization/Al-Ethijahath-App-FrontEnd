@@ -879,7 +879,9 @@
 }
 
 .ae-nav__links {
+  grid-template-columns: minmax(0, 1fr);
   min-height: 0;
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
@@ -892,8 +894,3 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .ae-nav .ae-nav__body {
-    transition: none;
-  }
-}
