@@ -856,13 +856,69 @@
 }
 
 /* Reduced motion accessibility */
+/* ==========================================
+   SIDEBAR TOGGLE — MOVE WITH THE DRAWER
+========================================== */
+
+/* ==========================================
+   MOBILE SIDEBAR — CLOSE BUTTON TIMING
+========================================== */
+
+/* ==========================================
+   MOBILE SIDEBAR — CLOSE BUTTON TIMING
+========================================== */
+
 @media screen and (max-width: 1023px) {
 
-  /* Position the close button beside the company name */
+  .ae-nav {
+    --ae-sidebar-width: min(320px, 86vw);
+    --ae-sidebar-duration: 550ms;
+    --ae-sidebar-easing: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Keep the existing sidebar slide animation */
+  .ae-nav .ae-nav__body {
+    transition:
+      transform var(--ae-sidebar-duration) var(--ae-sidebar-easing),
+      visibility var(--ae-sidebar-duration);
+  }
+
+  /* Close button position */
   .ae-nav .ae-nav__toggle[aria-expanded='true'] {
     position: fixed;
     top: 16px;
-    left: min(264px, calc(86vw - 56px));
+    left: calc(var(--ae-sidebar-width) - 56px);
     z-index: 1003;
+
+    /* Hide X while the sidebar is moving */
+    opacity: 0;
+    visibility: hidden;
+
+    /* Show X after the sidebar finishes */
+    animation: ae-sidebar-close-button-appear
+      1ms linear var(--ae-sidebar-duration) forwards;
+  }
+
+  @keyframes ae-sidebar-close-button-appear {
+    from {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    to {
+      opacity: 1;
+      visibility: visible;
+    }
+  }
+}
+
+/* Respect reduced-motion settings */
+@media (prefers-reduced-motion: reduce) {
+  .ae-nav .ae-nav__body {
+    transition: none !important;
+  }
+
+  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
+    animation-delay: 0ms;
   }
 }

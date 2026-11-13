@@ -220,18 +220,21 @@ function SummaryValues({ list, fallback }) {
   if (!list.length) {
     return (
       <div className="iv-values">
-        <strong>{fallback}</strong>
+        <strong style={{ '--len': fallback.length }}>{fallback}</strong>
       </div>
     )
   }
 
   return (
     <div className={`iv-values${list.length > 1 ? ' iv-values--multi' : ''}`}>
-      {list.map(item => (
-        <strong key={item.currency}>
-          {formatMoney(item.minor / 100, item.currency)}
-        </strong>
-      ))}
+      {list.map(item => {
+        const text = formatMoney(item.minor / 100, item.currency)
+        return (
+          <strong key={item.currency} style={{ '--len': text.length }}>
+            {text}
+          </strong>
+        )
+      })}
     </div>
   )
 }
@@ -946,7 +949,7 @@ export default function InvoicesPage({
                 </p>
               )}
 
-              <section className="sv-summary" aria-label="Invoice summary">
+              <section className="sv-summary iv-summary" aria-label="Invoice summary">
                 <div className="sv-summary-item">
                   <span className="sv-summary-icon">
                     <WalletIcon size={23} aria-hidden="true" />
@@ -986,7 +989,7 @@ export default function InvoicesPage({
                   <div>
                     <span>Open invoices</span>
                     <div className="iv-values">
-                      <strong>{counts.open}</strong>
+                      <strong style={{ '--len': String(counts.open).length }}>{counts.open}</strong>
                     </div>
                   </div>
                 </div>
