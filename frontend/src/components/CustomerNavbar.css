@@ -885,7 +885,33 @@
   overflow-y: auto;
   overscroll-behavior-y: contain;
   scrollbar-width: thin;
-  scrollbar-color: var(--ae-muted) var(--ae-bg);
+  scrollbar-color: rgb(255 255 255 / 60%) transparent;
+}
+
+@supports selector(::-webkit-scrollbar) {
+  .ae-nav__links {
+    scrollbar-width: auto;
+    scrollbar-color: auto;
+  }
+
+  .ae-nav__links::-webkit-scrollbar {
+    width: 2px;
+    background: transparent;
+  }
+
+  .ae-nav__links::-webkit-scrollbar-track {
+    margin: 10px 0;
+    background: transparent;
+  }
+
+  .ae-nav__links::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    background: rgba(213, 22, 22, 0.192);
+  }
+
+  .ae-nav__links::-webkit-scrollbar-button {
+    display: none;
+  }
 }
 
 @media (min-width: 1024px) {
