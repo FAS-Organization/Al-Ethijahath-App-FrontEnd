@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from 'react'
-import { Link, Outlet } from 'react-router-dom'
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Link, Outlet, useLocation } from 'react-router-dom'
 import { BellIcon, LightningIcon, MoonIcon, SunIcon } from '@phosphor-icons/react'
 import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import CustomerNavbar from './CustomerNavbar'
@@ -17,6 +17,32 @@ function initialTheme() {
 
 export default function CustomerPortalLayout() {
   const [theme, setTheme] = useState(initialTheme)
+  const { pathname } = useLocation()
+  const scrollPositions = useRef(new Map())
+
+  useLayoutEffect(() => {
+    const previous = window.history.scrollRestoration
+    window.history.scrollRestoration = 'manual'
+
+    return () => {
+      window.history.scrollRestoration = previous
+    }
+  }, [])
+
+  useLayoutEffect(() => {
+    const top = scrollPositions.current.get(pathname) ?? 0
+    window.scrollTo({ top, left: 0, behavior: 'instant' })
+
+    function rememberScroll() {
+      scrollPositions.current.set(pathname, window.scrollY)
+    }
+
+    window.addEventListener('scroll', rememberScroll, { passive: true })
+
+    return () => {
+      window.removeEventListener('scroll', rememberScroll)
+    }
+  }, [pathname])
   const notifications = useContext(NotificationsPreviewContext)?.data
   const unread = notifications?.items.filter(item => !item.read_at).length ?? 0
 
