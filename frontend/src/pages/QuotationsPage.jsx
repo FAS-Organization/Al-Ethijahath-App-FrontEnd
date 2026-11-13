@@ -1022,11 +1022,7 @@ export default function QuotationsPage({
       />
       <main className="qt-main" id="qt-main" tabIndex={-1}>
         <header className="qt-topbar">
-          <div className="qt-breadcrumb">
-            <span>Customer portal</span>
-            <span aria-hidden="true">/</span>
-            <strong>Inspections &amp; quotations</strong>
-          </div>
+
 
           <div className="qt-topbar-actions">
             <span className="qt-region">

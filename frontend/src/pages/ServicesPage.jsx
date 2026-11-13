@@ -1017,9 +1017,7 @@ export default function ServicesPage({
 
       <div className="sv-main">
         <header className="sv-topbar">
-          <span>
-            Customer portal / <strong>Service jobs</strong>
-          </span>
+
 
           <button
             className="sv-theme-button"

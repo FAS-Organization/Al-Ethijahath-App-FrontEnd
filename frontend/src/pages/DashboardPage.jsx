@@ -501,9 +501,7 @@ export default function DashboardPage({
       <div className="ed-main">
         {/* DASHBOARD TOPBAR */}
         <header className="ed-topbar">
-          <div className="ed-breadcrumb">
-            Customer portal <span>/</span> <strong>Overview</strong>
-          </div>
+
 
           <div className="ed-top-actions">
             <a

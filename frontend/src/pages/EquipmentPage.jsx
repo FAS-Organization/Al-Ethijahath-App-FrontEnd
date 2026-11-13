@@ -846,7 +846,7 @@ export default function EquipmentPage({
 
       <div className="eq-main">
         <header className="eq-topbar">
-          <span>Customer portal / <strong>My equipment</strong></span>
+
 
           <button
             className="eq-theme-button"

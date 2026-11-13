@@ -302,11 +302,7 @@ export default function NotificationsPage() {
 
       <main className="np-main">
         <header className="np-topbar">
-          <div className="np-breadcrumb">
-            <span>Customer portal</span>
-            <span aria-hidden="true">/</span>
-            <strong>Notifications</strong>
-          </div>
+
 
           <div className="np-topbar-actions">
             <span className="np-region">

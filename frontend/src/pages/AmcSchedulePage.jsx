@@ -1649,9 +1649,7 @@ export default function AmcSchedulePage({
 
       <div className="sc-main">
         <header className="sc-topbar">
-          <span>
-            Customer portal / <strong>AMC &amp; service schedule</strong>
-          </span>
+
 
           <button
             className="sc-theme-button"

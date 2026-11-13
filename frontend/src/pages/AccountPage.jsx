@@ -1401,9 +1401,7 @@ export default function AccountPage({
 
       <div className="sv-main">
         <header className="sv-topbar">
-          <span>
-            Customer portal / <strong>My account</strong>
-          </span>
+
 
           <button
             className="sv-theme-button"

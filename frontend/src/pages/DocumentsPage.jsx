@@ -450,11 +450,7 @@ export default function DocumentsPage({
 
       <main className="dp-main">
         <header className="dp-topbar">
-          <div className="dp-breadcrumb">
-            <span>Customer portal</span>
-            <span aria-hidden="true">/</span>
-            <strong>Reports &amp; documents</strong>
-          </div>
+
 
           <div className="dp-topbar-actions">
             {archive?.region_name && (

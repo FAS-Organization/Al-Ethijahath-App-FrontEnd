@@ -30,7 +30,13 @@
 .ae-nav ::selection { background: var(--ae-active); color: var(--ae-accent); }
 .ae-nav :focus-visible { outline: 3px solid var(--ae-accent); outline-offset: 3px; }
 .ae-nav :where(a, button) { touch-action: manipulation; }
-.ae-nav__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; }
+.ae-nav__header {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-inline: -16px;
+  padding: 24px 20px 8px;
+}
 .ae-nav .ae-nav__brand { display: inline-flex; padding: 4px 8px; border-radius: 6px; }
 .ae-nav__brand img { display: block; width: 152px; height: 48px; object-fit: contain; }
 .ae-nav[data-theme='dark'] .ae-nav__brand { background: transparent; }
@@ -161,7 +167,6 @@
 .ae-nav .ae-nav__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 @media (min-width: 1024px) {
   .ae-nav { position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 40; width: 252px; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; border-block-end: 0; border-inline-end: 1px solid var(--ae-line); display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--ae-muted) var(--ae-bg); }
-  .ae-nav__header { padding: 24px 20px 8px; }
   .ae-nav__toggle { display: none; }
   .ae-nav__body { display: flex; flex-direction: column; flex: 1; }
   /* Apply to your page wrapper when using this fixed desktop sidebar. */
@@ -378,7 +383,7 @@
 }
 
 /* Phones and tablets: the menu is a top bar, so the panel uses the full width. */
-@media (max-width: 1023px) {
+@media (width < 1024px) {
   .ae-support {
     width: 100%;
     max-height: 92dvh;
@@ -761,213 +766,91 @@
 }
 
 
-/* ==========================================
-   MOBILE & TABLET NAVBAR
-   Left slide-out navigation
-   ========================================== */
+.ae-nav__toggle-slot { display: none; }
 
-@media screen and (max-width: 1023px) {
-
-  /* Main navbar */
+/* Mobile and tablet navigation */
+@media (width < 1024px) {
   .ae-nav {
+    --ae-drawer-width: min(252px, 100vw);
+    --ae-drawer-duration: 550ms;
     position: relative;
     z-index: 10000;
-    width: 100%;
+    background: transparent;
+    border: 0;
   }
 
-  /* Header: toggle left, logo right */
-  .ae-nav .ae-nav__header {
+  .ae-nav__toggle-slot {
+    display: inline-flex;
+    order: -1;
+    flex: 0 0 44px;
+    height: 44px;
+    margin-inline-end: auto;
+  }
+
+  .ae-nav__toggle-slot .ae-nav__toggle {
+    box-sizing: border-box;
+    border-color: #e8e1d9;
+    color: #282321;
+  }
+
+  .ae-nav__toggle-slot[data-theme='dark'] .ae-nav__toggle {
+    border-color: #3a3033;
+    color: #f1e9e5;
+  }
+
+  .ae-nav__toggle-slot .ae-nav__toggle[aria-expanded='true'] {
+    position: fixed;
+    z-index: 10003;
+    inset-inline-start: calc(min(252px, 100vw) - 56px);
+    inset-block-start: 24px;
+    border-color: #8f000d;
+    background: #8f000d;
+    color: #fff;
+  }
+
+  .ae-nav .ae-nav__body {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: 0;
+    z-index: 1001;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-    min-height: 80px;
-    padding: 12px 20px;
-    position: relative;
-    z-index: 1002;
+    flex-direction: column;
+    width: var(--ae-drawer-width);
+    height: 100dvh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ae-muted) var(--ae-bg);
+    background: var(--ae-bg);
+    border-inline-end: 1px solid var(--ae-line);
+    transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    transition:
+      transform var(--ae-drawer-duration) cubic-bezier(0.16, 1, 0.3, 1),
+      visibility var(--ae-drawer-duration);
   }
 
-  /* Toggle on the left */
-  .ae-nav .ae-nav__toggle {
-    order: 1;
-    display: grid;
-    flex-shrink: 0;
-    margin-right: auto;
-  }
-
-  /* Company logo on the right */
-  .ae-nav .ae-nav__brand {
-    order: 2;
-    margin-left: auto;
-  }
-
-  /* Sidebar: hidden outside the screen */
-.ae-nav .ae-nav__body {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  z-index: 1001;
-
-  display: flex;
-  flex-direction: column;
-  width: min(320px, 86vw);
-  height: 100dvh;
-  max-height: 100dvh;
-
-  padding: 16px 16px 24px;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-
-  background: var(--ae-bg);
-  border-right: 1px solid var(--ae-line);
-
-  transform: translateX(-100%);
-  visibility: hidden;
-  pointer-events: none;
-
-  transition:
-    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
-    visibility 320ms;
-}
-
-  /* Sidebar when toggle is clicked */
   .ae-nav .ae-nav__body[data-open='true'] {
-    display: flex;
     transform: translateX(0);
     visibility: visible;
     pointer-events: auto;
-
     box-shadow: 0 0 0 100vmax rgb(0 0 0 / 42%);
   }
-
-  /* Sidebar contents */
-  .ae-nav .ae-nav__identity {
-    padding: 16px 12px 24px;
-  }
-
-  .ae-nav .ae-nav__links {
-    gap: 6px;
-  }
-
-  .ae-nav .ae-nav__links .ae-nav__link {
-    min-height: 46px;
-  }
 }
 
-/* Reduced motion accessibility */
-/* ==========================================
-   SIDEBAR TOGGLE — MOVE WITH THE DRAWER
-========================================== */
-
-/* ==========================================
-   MOBILE SIDEBAR — CLOSE BUTTON TIMING
-========================================== */
-
-/* ==========================================
-   MOBILE SIDEBAR — CLOSE BUTTON TIMING
-========================================== */
-
-@media screen and (max-width: 1023px) {
-
-  .ae-nav {
-    --ae-sidebar-width: min(320px, 86vw);
-    --ae-sidebar-duration: 550ms;
-    --ae-sidebar-easing: cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  /* Keep the existing sidebar slide animation */
-  .ae-nav .ae-nav__body {
-    transition:
-      transform var(--ae-sidebar-duration) var(--ae-sidebar-easing),
-      visibility var(--ae-sidebar-duration);
-  }
-
-  /* Close button position */
-  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
-    position: fixed;
-    top: 16px;
-    left: calc(var(--ae-sidebar-width) - 56px);
-    z-index: 1003;
-
-    /* Hide X while the sidebar is moving */
-    opacity: 0;
-    visibility: hidden;
-
-    /* Show X after the sidebar finishes */
-    animation: ae-sidebar-close-button-appear
-      1ms linear var(--ae-sidebar-duration) forwards;
-  }
-
-  @keyframes ae-sidebar-close-button-appear {
-    from {
-      opacity: 0;
-      visibility: hidden;
-    }
-
-    to {
-      opacity: 1;
-      visibility: visible;
-    }
-  }
-}
-
-/* Respect reduced-motion settings */
 @media (prefers-reduced-motion: reduce) {
   .ae-nav .ae-nav__body {
-    transition: none !important;
-  }
-
-  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
-    animation-delay: 0ms;
+    transition: none;
   }
 }
 
-/* ==========================================
-   MOBILE TOGGLE — BURGUNDY ONLY WHEN OPEN
-========================================== */
-
-@media screen and (max-width: 1023px) {
-  /* Default: transparent button */
-  .ae-nav .ae-nav__toggle {
-    background: transparent;
-    color: var(--ae-text);
-    border: 1px solid var(--ae-line);
-    box-shadow: none;
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* Burgundy only when sidebar is open (X button) */
-  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
-    background: #8f000d;
-    color: #fff;
-    border-color: #8f000d;
-    box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
-  }
-
-  /* Remove blue focus/selection colour */
-  .ae-nav .ae-nav__toggle:focus,
-  .ae-nav .ae-nav__toggle:focus-visible,
-  .ae-nav .ae-nav__toggle:active {
-    outline: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  /* No blue background on hover when closed */
-  @media (hover: hover) and (pointer: fine) {
-    .ae-nav .ae-nav__toggle:not([aria-expanded='true']):hover {
-      background: transparent;
-      color: var(--ae-text);
-      border-color: var(--ae-line);
-      box-shadow: none;
-    }
-  }
-}
-
-/* Keep toggle hidden on desktop */
-@media screen and (min-width: 1024px) {
-  .ae-nav .ae-nav__toggle {
-    display: none !important;
-  }
+.ed-topbar > .ed-top-actions,
+.eq-topbar > .eq-theme-button,
+.sv-topbar > .sv-theme-button,
+.sc-topbar > .sc-theme-button,
+.qt-topbar > .qt-topbar-actions,
+.dp-topbar > .dp-topbar-actions,
+.np-topbar > .np-topbar-actions {
+  margin-inline-start: auto;
 }

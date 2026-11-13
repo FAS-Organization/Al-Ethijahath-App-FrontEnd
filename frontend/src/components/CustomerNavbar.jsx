@@ -1,4 +1,5 @@
 import { useContext, useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   SquaresFourIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
@@ -55,6 +56,7 @@ export default function CustomerNavbar({
   const [open, setOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const [error, setError] = useState('')
+  const [topbar, setTopbar] = useState(null)
   const rootRef = useRef(null)
   const supportRef = useRef(null)
   const toggleRef = useRef(null)
@@ -72,9 +74,23 @@ export default function CustomerNavbar({
   const count = Number.isFinite(badgeCount) ? Math.max(0, Math.floor(badgeCount)) : 0
 
   useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const page = rootRef.current?.nextElementSibling
+      setTopbar(page?.querySelector(':scope > header') ?? null)
+    })
+
+    return () => cancelAnimationFrame(frame)
+  }, [])
+
+  useEffect(() => {
     if (!expanded) return
     function dismiss(event) {
-      if (!rootRef.current?.contains(event.target)) setOpen(false)
+      if (
+        !rootRef.current?.contains(event.target) &&
+        !toggleRef.current?.contains(event.target)
+      ) {
+        setOpen(false)
+      }
     }
     function escape(event) {
       if (event.key === 'Escape') {
@@ -144,25 +160,30 @@ export default function CustomerNavbar({
   }
   return (
     <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
-      <div className="ae-nav__header">
-        <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
-          onClick={() => setOpen(false)}>
-          <img
-            src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
-            alt="Al Ethijahath"
-            width="160"
-            height="50"
-          />
-        </NavLink>
-        <button ref={toggleRef} type="button" className="ae-nav__toggle"
-          aria-expanded={expanded} aria-controls={menuId}
-          aria-label={expanded ? 'Close navigation' : 'Open navigation'}
-          onClick={() => { setOpenedAt(location.key); setOpen(!expanded) }}>
-          {expanded ? <XIcon size={24} aria-hidden="true" /> : <ListIcon size={24} aria-hidden="true" />}
-        </button>
-      </div>
+      {topbar && createPortal(
+        <span className="ae-nav__toggle-slot" data-theme={theme}>
+          <button ref={toggleRef} type="button" className="ae-nav__toggle"
+            aria-expanded={expanded} aria-controls={menuId}
+            aria-label={expanded ? 'Close navigation' : 'Open navigation'}
+            onClick={() => { setOpenedAt(location.key); setOpen(!expanded) }}>
+            {expanded ? <XIcon size={24} aria-hidden="true" /> : <ListIcon size={24} aria-hidden="true" />}
+          </button>
+        </span>,
+        topbar,
+      )}
 
       <div id={menuId} className="ae-nav__body" data-open={expanded}>
+        <div className="ae-nav__header">
+          <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
+            onClick={() => setOpen(false)}>
+            <img
+              src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
+              alt="Al Ethijahath"
+              width="160"
+              height="50"
+            />
+          </NavLink>
+        </div>
         <div className="ae-nav__identity">
           <strong>{companyName || 'Customer portal'}</strong>
           {customerName ? <span>{customerName}</span> : null}

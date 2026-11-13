@@ -881,9 +881,7 @@ export default function InvoicesPage({
 
       <div className="sv-main">
         <header className="sv-topbar">
-          <span>
-            Customer portal / <strong>Invoices &amp; payments</strong>
-          </span>
+
 
           <button
             className="sv-theme-button"
