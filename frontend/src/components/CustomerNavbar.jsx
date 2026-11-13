@@ -1,5 +1,4 @@
 import { useContext, useEffect, useId, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   SquaresFourIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
@@ -57,7 +56,8 @@ export default function CustomerNavbar({
   const [open, setOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
   const [error, setError] = useState('')
-  const [topbar, setTopbar] = useState(null)
+  const [topbarScroll, setTopbarScroll] = useState({ key: null, hidden: false })
+  const topbarRef = useRef(null)
   const rootRef = useRef(null)
   const supportRef = useRef(null)
   const toggleRef = useRef(null)
@@ -75,13 +75,32 @@ export default function CustomerNavbar({
   const count = Number.isFinite(badgeCount) ? Math.max(0, Math.floor(badgeCount)) : 0
 
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      const page = rootRef.current?.nextElementSibling
-      setTopbar(page?.querySelector(':scope > header') ?? null)
-    })
+    let previousY = Math.max(0, window.scrollY)
+    let hidden = false
 
-    return () => cancelAnimationFrame(frame)
-  }, [])
+    function handleScroll() {
+      const y = Math.max(0, window.scrollY)
+      const delta = y - previousY
+
+      if (y <= 0) {
+        hidden = false
+      } else if (Math.abs(delta) < 4) {
+        return
+      } else {
+        hidden = delta > 0 && y >= (topbarRef.current?.offsetHeight ?? 0)
+      }
+
+      previousY = y
+      setTopbarScroll(current =>
+        current.key === location.key && current.hidden === hidden
+          ? current
+          : { key: location.key, hidden },
+      )
+    }
+
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [location.key])
 
   useEffect(() => {
     if (!expanded) return
@@ -326,7 +345,12 @@ export default function CustomerNavbar({
           </div>
         </dialog>
       </aside>
-      <header className="ed-topbar portal-topbar ae-nav-content" data-theme={theme}>
+      <header
+        ref={topbarRef}
+        className="ed-topbar portal-topbar ae-nav-content"
+        data-theme={theme}
+        data-scroll-hidden={!expanded && topbarScroll.key === location.key && topbarScroll.hidden}
+      >
         <span className="ae-nav__toggle-slot">
           <button ref={toggleRef} type="button" className="ae-nav__toggle"
             aria-expanded={expanded} aria-controls={menuId}

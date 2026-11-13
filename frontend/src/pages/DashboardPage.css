@@ -2879,6 +2879,10 @@ html:has(.ed-dashboard) {
   font-size: 12px;
 }
 .portal-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  transition: transform 180ms cubic-bezier(0.23, 1, 0.32, 1);
   --ed-bg: #fbfaf1;
   --ed-surface: #fffdfd;
   --ed-text: #282321;
@@ -2891,6 +2895,10 @@ html:has(.ed-dashboard) {
   background: var(--ed-bg);
   color: var(--ed-text);
   font: 14px/1.6 Arial, Helvetica, sans-serif;
+}
+
+.portal-topbar[data-scroll-hidden='true']:not(:has(:focus-visible)) {
+  transform: translateY(-100%);
 }
 
 .portal-topbar[data-theme='dark'] {
