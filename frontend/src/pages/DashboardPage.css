@@ -2918,3 +2918,86 @@ html:has(.ed-dashboard) {
   color: var(--ed-muted);
   font-size: 12px;
 }
+
+/* =========================================================
+   UPCOMING MAINTENANCE — SECTION HEADING
+   ========================================================= */
+
+#maintenance > .ed-section-heading {
+  align-items: center;
+  margin-bottom: 26px;
+}
+
+/* Editorial label */
+#maintenance > .ed-section-heading > div:first-child::before {
+  content: "MAINTENANCE SCHEDULE";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--ed-accent);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+/* Main title */
+#maintenance .ed-section-heading h2 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ed-heading);
+  font-size: 21px;
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.045em;
+}
+
+/* Calendar + maintenance SVG */
+#maintenance .ed-section-heading h2::before {
+  content: "";
+  display: block;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+
+  background-color: var(--ed-button);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='1.7' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M16 3v4M8 3v4M3 10h18'/%3E%3Cpath d='m10 16 1.5 1.5 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 23px;
+
+  box-shadow: 0 5px 12px rgb(143 0 13 / 15%);
+  transition:
+    transform 250ms ease,
+    box-shadow 250ms ease;
+}
+
+/* Description */
+#maintenance .ed-section-heading p {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* Hover interaction */
+@media (hover: hover) {
+  #maintenance:hover .ed-section-heading h2::before {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgb(143 0 13 / 22%);
+  }
+}
+
+/* Mobile */
+@media (max-width: 479px) {
+  #maintenance .ed-section-heading h2 {
+    font-size: 18px;
+    gap: 10px;
+  }
+
+  #maintenance .ed-section-heading h2::before {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    background-size: 21px;
+  }
+}

@@ -759,3 +759,110 @@
     translate: 0 -2px;
   }
 }
+
+
+/* ==========================================
+   MOBILE & TABLET NAVBAR
+   Left slide-out navigation
+   ========================================== */
+
+@media screen and (max-width: 1023px) {
+
+  /* Main navbar */
+  .ae-nav {
+    position: relative;
+    z-index: 10000;
+    width: 100%;
+  }
+
+  /* Header: toggle left, logo right */
+  .ae-nav .ae-nav__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 80px;
+    padding: 12px 20px;
+    position: relative;
+    z-index: 1002;
+  }
+
+  /* Toggle on the left */
+  .ae-nav .ae-nav__toggle {
+    order: 1;
+    display: grid;
+    flex-shrink: 0;
+    margin-right: auto;
+  }
+
+  /* Company logo on the right */
+  .ae-nav .ae-nav__brand {
+    order: 2;
+    margin-left: auto;
+  }
+
+  /* Sidebar: hidden outside the screen */
+.ae-nav .ae-nav__body {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1001;
+
+  display: flex;
+  flex-direction: column;
+  width: min(320px, 86vw);
+  height: 100dvh;
+  max-height: 100dvh;
+
+  padding: 16px 16px 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+
+  background: var(--ae-bg);
+  border-right: 1px solid var(--ae-line);
+
+  transform: translateX(-100%);
+  visibility: hidden;
+  pointer-events: none;
+
+  transition:
+    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+    visibility 320ms;
+}
+
+  /* Sidebar when toggle is clicked */
+  .ae-nav .ae-nav__body[data-open='true'] {
+    display: flex;
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: auto;
+
+    box-shadow: 0 0 0 100vmax rgb(0 0 0 / 42%);
+  }
+
+  /* Sidebar contents */
+  .ae-nav .ae-nav__identity {
+    padding: 16px 12px 24px;
+  }
+
+  .ae-nav .ae-nav__links {
+    gap: 6px;
+  }
+
+  .ae-nav .ae-nav__links .ae-nav__link {
+    min-height: 46px;
+  }
+}
+
+/* Reduced motion accessibility */
+@media screen and (max-width: 1023px) {
+
+  /* Position the close button beside the company name */
+  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
+    position: fixed;
+    top: 16px;
+    left: min(264px, calc(86vw - 56px));
+    z-index: 1003;
+  }
+}
