@@ -85,7 +85,6 @@ body:has(.qt-page) {
 
 .qt-main {
   min-width: 0;
-  margin-left: 252px;
 }
 
 .qt-main :where(h1, h2, h3, p) {
@@ -1338,10 +1337,6 @@ body:has(.qt-page) {
 }
 
 @media (width < 1024px) {
-  .qt-main {
-    margin-left: 0;
-  }
-
   .qt-topbar {
     padding-inline: 24px;
   }

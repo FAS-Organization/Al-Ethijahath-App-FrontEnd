@@ -765,7 +765,6 @@
   }
 }
 
-
 .ae-nav__toggle-slot { display: none; }
 
 /* Mobile and tablet navigation */
@@ -781,7 +780,6 @@
 
   .ae-nav__toggle-slot {
     display: inline-flex;
-    order: -1;
     flex: 0 0 44px;
     height: 44px;
     margin-inline-end: auto;
@@ -793,7 +791,7 @@
     color: #282321;
   }
 
-  .ae-nav__toggle-slot[data-theme='dark'] .ae-nav__toggle {
+  .portal-topbar[data-theme='dark'] .ae-nav__toggle-slot .ae-nav__toggle {
     border-color: #3a3033;
     color: #f1e9e5;
   }
@@ -843,14 +841,4 @@
   .ae-nav .ae-nav__body {
     transition: none;
   }
-}
-
-.ed-topbar > .ed-top-actions,
-.eq-topbar > .eq-theme-button,
-.sv-topbar > .sv-theme-button,
-.sc-topbar > .sc-theme-button,
-.qt-topbar > .qt-topbar-actions,
-.dp-topbar > .dp-topbar-actions,
-.np-topbar > .np-topbar-actions {
-  margin-inline-start: auto;
 }

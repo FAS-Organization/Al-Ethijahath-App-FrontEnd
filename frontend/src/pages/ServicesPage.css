@@ -66,7 +66,6 @@ body:has(.sv-page) {
 
 .sv-main {
   min-width: 0;
-  margin-left: 252px;
 }
 
 .sv-main :where(h1, h2, h3, p, dl, dd, ol) {
@@ -1253,12 +1252,6 @@ body:has(.sv-page) {
 
   .sv-toolbar {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (width < 1024px) {
-  .sv-main {
-    margin-left: 0;
   }
 }
 

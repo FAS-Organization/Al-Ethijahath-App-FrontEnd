@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import {
   ArrowCounterClockwiseIcon,
   ArrowUpRightIcon,
@@ -8,19 +8,14 @@ import {
   DownloadSimpleIcon,
   FileTextIcon,
   MagnifyingGlassIcon,
-  MapPinIcon,
-  MoonIcon,
-  SunIcon,
   XIcon,
 } from '@phosphor-icons/react'
-import CustomerNavbar from '../components/CustomerNavbar'
 import DateRangeFilter from '../components/DateRangeFilter'
 import { inDateRange } from '../utils/dateRange'
 import { createDemoQuotations } from '../data/quotationsPreviewData'
 import { INSPECTIONS_PREVIEW_DATA } from '../data/inspectionsPreviewData'
 import './QuotationsPage.css'
 
-const THEME_KEY = 'ethijahath-dashboard-theme'
 
 const STATUS_LABELS = {
   sent: 'Awaiting approval',
@@ -847,21 +842,7 @@ export default function QuotationsPage({
   const [dateTo, setDateTo] = useState('')
   const [selectedId, setSelectedId] = useState(null)
 
-  const [theme, setTheme] = useState(() => {
-    try {
-      return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
-    } catch {
-      return 'light'
-    }
-  })
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // The page still works if browser storage is unavailable.
-    }
-  }, [theme])
+  const { theme = 'light' } = useOutletContext() ?? {}
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 30000)
@@ -1014,41 +995,7 @@ export default function QuotationsPage({
     <div className="qt-page" data-theme={theme}>
 
 
-      <CustomerNavbar
-        companyName="Demo Customer Company"
-        customerName="Customer account"
-        unreadCount={2}
-        theme={theme}
-      />
       <main className="qt-main" id="qt-main" tabIndex={-1}>
-        <header className="qt-topbar">
-
-
-          <div className="qt-topbar-actions">
-            <span className="qt-region">
-              <MapPinIcon size={17} aria-hidden="true" />
-              Riyadh
-            </span>
-
-            <button
-              type="button"
-              className="qt-icon-button"
-              onClick={() =>
-                setTheme(current => (current === 'light' ? 'dark' : 'light'))
-              }
-              aria-label={`Switch to ${
-                theme === 'light' ? 'dark' : 'light'
-              } theme`}
-            >
-              {theme === 'light' ? (
-                <MoonIcon size={20} aria-hidden="true" />
-              ) : (
-                <SunIcon size={20} aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </header>
-
         <div className="qt-content">
           <div className="qt-page-heading">
             <div>

@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import {
   ArrowRightIcon,
   BellRingingIcon,
@@ -14,14 +14,12 @@ import {
   LockKeyIcon,
   LockSimpleIcon,
   MapPinIcon,
-  MoonIcon,
   PencilSimpleIcon,
   PhoneIcon,
   PlusIcon,
   ReceiptIcon,
   SignOutIcon,
   StorefrontIcon,
-  SunIcon,
   TreeStructureIcon,
   TruckIcon,
   UserCircleIcon,
@@ -33,7 +31,6 @@ import {
   XIcon,
 } from '@phosphor-icons/react'
 
-import CustomerNavbar from '../components/CustomerNavbar'
 import CompanyAvatar from '../components/CompanyAvatar'
 import { ACCOUNT_PREVIEW_DATA } from '../data/accountPreviewData'
 import './ServicesPage.css'
@@ -86,7 +83,6 @@ import './AccountPage.css'
 // the login and is not editable here.
 // =========================================================
 
-const THEME_KEY = 'ethijahath-dashboard-theme'
 
 const STATUSES = {
   active: { label: 'Active', tone: 'green' },
@@ -146,18 +142,6 @@ const TOPICS = [
     hint: 'New invoices and overdue reminders.',
   },
 ]
-
-function initialTheme() {
-  try {
-    const saved = localStorage.getItem(THEME_KEY)
-
-    if (saved === 'light' || saved === 'dark') return saved
-  } catch {
-    // Theme persistence is optional.
-  }
-
-  return 'light'
-}
 
 function formatDate(value) {
   if (!value) return 'Not recorded'
@@ -1240,7 +1224,7 @@ export default function AccountPage({
   onSignOut,
 }) {
   const idBase = useId()
-  const [theme, setTheme] = useState(initialTheme)
+  const { theme = 'light' } = useOutletContext() ?? {}
   const [source, setSource] = useState(data)
   const [account, setAccount] = useState(data?.account ?? null)
   const [searchParams] = useSearchParams()
@@ -1256,14 +1240,6 @@ export default function AccountPage({
     setSource(data)
     setAccount(data?.account ?? null)
   }
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // The page remains usable without storage.
-    }
-  }, [theme])
 
   const ready = !loading && !error && Boolean(account)
   const isDemo = Boolean(data?.is_demo)
@@ -1391,34 +1367,7 @@ export default function AccountPage({
 
   return (
     <div className="sv-page ac-page" data-theme={theme}>
-      <CustomerNavbar
-        companyName={company?.name || 'Customer portal'}
-        customerName={account?.contact.full_name || 'Customer account'}
-        unreadCount={2}
-        theme={theme}
-        onSignOut={onSignOut}
-      />
-
       <div className="sv-main">
-        <header className="sv-topbar">
-
-
-          <button
-            className="sv-theme-button"
-            type="button"
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            onClick={() =>
-              setTheme(value => (value === 'light' ? 'dark' : 'light'))
-            }
-          >
-            {theme === 'light' ? (
-              <MoonIcon size={21} aria-hidden="true" />
-            ) : (
-              <SunIcon size={21} aria-hidden="true" />
-            )}
-          </button>
-        </header>
-
         <main
           className="sv-content"
           id="account-content"

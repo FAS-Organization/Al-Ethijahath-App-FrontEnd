@@ -5,14 +5,12 @@ import {
   CalendarBlankIcon,
   CheckCircleIcon,
   MagnifyingGlassIcon,
-  MoonIcon,
-  SunIcon,
   TruckIcon,
   WrenchIcon,
   XIcon,
 } from '@phosphor-icons/react'
 
-import CustomerNavbar from '../components/CustomerNavbar'
+import { useOutletContext } from 'react-router-dom'
 import { EQUIPMENT_PREVIEW_DATA } from '../data/equipmentPreviewData'
 import './EquipmentPage.css'
 
@@ -92,20 +90,6 @@ const SERVICE_STATUSES = {
   on_hold: 'On hold',
   completed: 'Completed',
   cancelled: 'Cancelled',
-}
-
-function initialTheme() {
-  try {
-    const saved = localStorage.getItem('ethijahath-dashboard-theme')
-
-    if (saved === 'light' || saved === 'dark') {
-      return saved
-    }
-  } catch {
-    // Theme persistence is optional.
-  }
-
-  return 'light'
 }
 
 function formatDate(value) {
@@ -732,7 +716,6 @@ export default function EquipmentPage({
   data = EQUIPMENT_PREVIEW_DATA,
   loading = false,
   error = '',
-  onSignOut,
   onOpenService,
   onOpenCoverage,
   onOpenAppointment,
@@ -740,20 +723,12 @@ export default function EquipmentPage({
   onRequestService,
 }) {
 
-  const [theme, setTheme] = useState(initialTheme)
+  const { theme = 'light' } = useOutletContext() ?? {}
   const [query, setQuery] = useState('')
   const [site, setSite] = useState('all')
   const [coverageFilter, setCoverageFilter] = useState('all')
   const [recordFilter, setRecordFilter] = useState('current')
   const [activityFilter, setActivityFilter] = useState('all')
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('ethijahath-dashboard-theme', theme)
-    } catch {
-      // The page remains usable without storage.
-    }
-  }, [theme])
 
   const ready = !loading && !error && Boolean(data)
   const equipment = ready ? data.equipment : []
@@ -837,33 +812,7 @@ export default function EquipmentPage({
     <div className="eq-page" data-theme={theme}>
 
 
-      <CustomerNavbar
-        companyName="Demo Customer Company"
-        customerName="Customer account"
-        unreadCount={2}
-        theme={theme}
-      />
-
       <div className="eq-main">
-        <header className="eq-topbar">
-
-
-          <button
-            className="eq-theme-button"
-            type="button"
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            onClick={() =>
-              setTheme(value => value === 'light' ? 'dark' : 'light')
-            }
-          >
-            {theme === 'light' ? (
-              <MoonIcon size={21} aria-hidden="true" />
-            ) : (
-              <SunIcon size={21} aria-hidden="true" />
-            )}
-          </button>
-        </header>
-
         <main
           className="eq-content"
           id="equipment-content"

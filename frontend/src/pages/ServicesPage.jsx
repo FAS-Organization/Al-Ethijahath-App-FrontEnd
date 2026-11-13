@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useOutletContext } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import {
   ArrowRightIcon,
@@ -11,16 +11,13 @@ import {
   FileTextIcon,
   MagnifyingGlassIcon,
   MapPinIcon,
-  MoonIcon,
   PlusIcon,
-  SunIcon,
   UserIcon,
   WarningCircleIcon,
   WrenchIcon,
   XIcon,
 } from '@phosphor-icons/react'
 
-import CustomerNavbar from '../components/CustomerNavbar'
 import DateRangeFilter from '../components/DateRangeFilter'
 import { inDateRange } from '../utils/dateRange'
 import { SERVICES_PREVIEW_DATA } from '../data/servicesPreviewData'
@@ -77,7 +74,6 @@ import './ServicesPage.css'
 // This page expects the complete collection, not one API page.
 // =========================================================
 
-const THEME_KEY = 'ethijahath-dashboard-theme'
 
 const JOB_TYPES = {
   amc: 'AMC',
@@ -158,20 +154,6 @@ const TABS = [
 ]
 
 const ACTIVE_JOB_STATUSES = ['enquiry', 'open', 'in_progress']
-
-function initialTheme() {
-  try {
-    const saved = localStorage.getItem(THEME_KEY)
-
-    if (saved === 'light' || saved === 'dark') {
-      return saved
-    }
-  } catch {
-    // Theme persistence is optional.
-  }
-
-  return 'light'
-}
 
 function formatDate(value, includeTime = false) {
   if (!value) return 'Not recorded'
@@ -918,7 +900,7 @@ export default function ServicesPage({
   const [searchParams] = useSearchParams()
   const initialServiceReference = searchParams.get('service') || ''
 
-  const [theme, setTheme] = useState(initialTheme)
+  const { theme = 'light' } = useOutletContext() ?? {}
   const [tab, setTab] = useState(
     initialServiceReference ? 'all' : 'active',
   )
@@ -928,14 +910,6 @@ export default function ServicesPage({
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [requestOpen, setRequestOpen] = useState(false)
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // The page remains usable without storage.
-    }
-  }, [theme])
 
   const ready = !loading && !error && Boolean(data)
   const jobs = ready ? data.jobs : []
@@ -1008,33 +982,7 @@ export default function ServicesPage({
     <div className="sv-page" data-theme={theme}>
 
 
-      <CustomerNavbar
-        companyName="Demo Customer Company"
-        customerName="Customer account"
-        unreadCount={2}
-        theme={theme}
-      />
-
       <div className="sv-main">
-        <header className="sv-topbar">
-
-
-          <button
-            className="sv-theme-button"
-            type="button"
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            onClick={() =>
-              setTheme(value => (value === 'light' ? 'dark' : 'light'))
-            }
-          >
-            {theme === 'light' ? (
-              <MoonIcon size={21} aria-hidden="true" />
-            ) : (
-              <SunIcon size={21} aria-hidden="true" />
-            )}
-          </button>
-        </header>
-
         <main
           className="sv-content"
           id="services-content"

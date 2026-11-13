@@ -68,7 +68,6 @@ body:has(.sc-page) {
 
 .sc-main {
   min-width: 0;
-  margin-left: 252px;
 }
 
 .sc-main :where(h1, h2, h3, h4, h5, p) {
@@ -1738,12 +1737,6 @@ body:has(.sc-page) {
 
   .sc-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (width < 1024px) {
-  .sc-main {
-    margin-left: 0;
   }
 }
 

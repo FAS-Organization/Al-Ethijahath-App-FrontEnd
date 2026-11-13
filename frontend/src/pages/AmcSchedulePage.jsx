@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useOutletContext } from 'react-router-dom'
 import {
   ArrowRightIcon,
   ArrowsClockwiseIcon,
@@ -8,14 +8,11 @@ import {
   FilePdfIcon,
   FileTextIcon,
   MagnifyingGlassIcon,
-  MoonIcon,
-  SunIcon,
   TruckIcon,
   WarningCircleIcon,
   XIcon,
 } from '@phosphor-icons/react'
 
-import CustomerNavbar from '../components/CustomerNavbar'
 import {
   MAINTENANCE_PREVIEW_DATA,
   ALTERNATIVE_PREVIEW,
@@ -1593,22 +1590,10 @@ function ScheduleContent({ data, handlers }) {
 // AMC & SERVICE SCHEDULE PAGE
 // =========================================================
 
-function initialTheme() {
-  try {
-    const saved = localStorage.getItem('ethijahath-dashboard-theme')
-    if (saved === 'light' || saved === 'dark') return saved
-  } catch {
-    // Theme persistence is optional.
-  }
-  return 'light'
-}
-
 export default function AmcSchedulePage({
   data = MAINTENANCE_PREVIEW_DATA,
   loading = false,
   error = '',
-  unreadCount = 2,
-  onSignOut,
   onOpenEquipment,
   onOpenServiceHistory,
   onOpenAppointment,
@@ -1616,15 +1601,7 @@ export default function AmcSchedulePage({
   onOpenCompletion,
 }) {
   const navigate = useNavigate()
-  const [theme, setTheme] = useState(initialTheme)
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('ethijahath-dashboard-theme', theme)
-    } catch {
-      // The page remains usable without storage.
-    }
-  }, [theme])
+  const { theme = 'light' } = useOutletContext() ?? {}
 
   const ready = !loading && !error && Boolean(data)
 
@@ -1639,28 +1616,7 @@ export default function AmcSchedulePage({
 
   return (
     <div className="sc-page" data-theme={theme}>
-      <CustomerNavbar
-        companyName="Demo Customer Company"
-        customerName="Customer account"
-        unreadCount={unreadCount}
-        theme={theme}
-        onSignOut={onSignOut}
-      />
-
       <div className="sc-main">
-        <header className="sc-topbar">
-
-
-          <button
-            className="sc-theme-button"
-            type="button"
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            onClick={() => setTheme(value => (value === 'light' ? 'dark' : 'light'))}
-          >
-            {theme === 'light' ? <MoonIcon size={21} aria-hidden="true" /> : <SunIcon size={21} aria-hidden="true" />}
-          </button>
-        </header>
-
         <main className="sc-content" id="schedule-content" tabIndex={-1} aria-busy={loading}>
           <div className="sc-heading">
             <h1>AMC &amp; service schedule</h1>

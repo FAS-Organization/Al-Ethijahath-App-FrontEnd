@@ -7,10 +7,7 @@ import {
   CheckCircleIcon,
   FilePdfIcon,
   FileTextIcon,
-  LightningIcon,
-  MoonIcon,
   ReceiptIcon,
-  SunIcon,
   TruckIcon,
   WrenchIcon,
 } from '@phosphor-icons/react'
@@ -27,7 +24,7 @@ import {
   YAxis,
 } from 'recharts'
 
-import CustomerNavbar from '../components/CustomerNavbar'
+import { useOutletContext } from 'react-router-dom'
 import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import { DASHBOARD_PREVIEW_DATA } from '../data/dashboardPreviewData'
 import './DashboardPage.css'
@@ -252,20 +249,6 @@ function AnimatedValue({
   )
 }
 
-function initialTheme() {
-  try {
-    const saved = localStorage.getItem('ethijahath-dashboard-theme')
-
-    if (saved === 'light' || saved === 'dark') {
-      return saved
-    }
-  } catch {
-    // The theme still works without browser storage.
-  }
-
-  return 'light'
-}
-
 function Status({ children, tone = 'neutral' }) {
   return (
     <span className={`ed-status ed-status--${tone}`}>
@@ -369,21 +352,12 @@ export default function DashboardPage({
   onReviewQuotation,
   onReschedule,
   onOpenEquipment,
-  onSignOut,
 }) {
   const dashboardRef = useRef(null)
-  const [theme, setTheme] = useState(initialTheme)
+  const { theme = 'light' } = useOutletContext() ?? {}
   const [period, setPeriod] = useState('6')
   const [query, setQuery] = useState('')
   const reducedMotion = false
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('ethijahath-dashboard-theme', theme)
-    } catch {
-      // Storage is optional.
-    }
-  }, [theme])
 
 
   const ready = !loading && !error && Boolean(data)
@@ -491,58 +465,7 @@ export default function DashboardPage({
     >
 
 
-      <CustomerNavbar
-        companyName="Demo Customer Company"
-        customerName="Customer account"
-        unreadCount={2}
-        theme={theme}
-      />
-
       <div className="ed-main">
-        {/* DASHBOARD TOPBAR */}
-        <header className="ed-topbar">
-
-
-          <div className="ed-top-actions">
-            <a
-              className="ed-dispatch"
-              href="https://www.alethijahath.com/#dispatch-form"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <LightningIcon size={17} weight="fill" aria-hidden="true" />
-              Emergency dispatch
-              <span className="ed-sr-only"> (opens in a new tab)</span>
-            </a>
-
-            <a
-              className="ed-icon-button"
-              href="#notifications"
-              aria-label={`Notifications, ${unread} unread`}
-            >
-              <BellIcon size={21} aria-hidden="true" />
-              {unread > 0 && (
-                <span className="ed-notification-count">{unread}</span>
-              )}
-            </a>
-
-            <button
-              type="button"
-              className="ed-icon-button"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              onClick={() =>
-                setTheme(current => current === 'light' ? 'dark' : 'light')
-              }
-            >
-              {theme === 'light' ? (
-                <MoonIcon size={21} aria-hidden="true" />
-              ) : (
-                <SunIcon size={21} aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </header>
-
         <main
           className="ed-content"
           id="overview"

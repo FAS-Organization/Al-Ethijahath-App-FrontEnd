@@ -1,7 +1,6 @@
 
 import {
   BrowserRouter,
-  Outlet,
   Routes,
   Route,
   useLocation,
@@ -11,7 +10,7 @@ import { useState } from 'react'
 
 import ErrorBoundary from './components/ErrorBoundary'
 import ErrorPage, { ErrorPreviewPage } from './components/ErrorPage'
-import PortalChat from './components/PortalChat'
+import CustomerPortalLayout from './components/CustomerPortalLayout'
 
 import NotificationsPage from './pages/NotificationsPage'
 import {
@@ -38,14 +37,7 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<SignupPage />} />
 
-        <Route
-          element={
-            <>
-              <Outlet />
-              <PortalChat />
-            </>
-          }
-        >
+        <Route element={<CustomerPortalLayout />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/equipment" element={<EquipmentPage />} />
           <Route path="/services" element={<ServicesPage />} />

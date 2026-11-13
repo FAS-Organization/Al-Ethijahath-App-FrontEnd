@@ -76,7 +76,6 @@ body:has(.dp-page) {
 
 .dp-main {
   min-width: 0;
-  margin-left: 252px;
 }
 
 .dp-main :where(h1, h2, h3, p) {
@@ -1008,10 +1007,6 @@ body:has(.dp-page) {
 }
 
 @media (width < 1024px) {
-  .dp-main {
-    margin-left: 0;
-  }
-
   .dp-topbar {
     padding-inline: 24px;
   }

@@ -66,7 +66,6 @@ body:has(.eq-page) {
 
 .eq-main {
   min-width: 0;
-  margin-left: 252px;
 }
 
 .eq-main :where(h1, h2, h3, p) {
@@ -1087,12 +1086,6 @@ body:has(.eq-page) {
   .eq-summary-item {
     padding: 16px;
     gap: 12px;
-  }
-}
-
-@media (width < 1024px) {
-  .eq-main {
-    margin-left: 0;
   }
 }
 

@@ -7,15 +7,13 @@ import {
   DownloadSimpleIcon,
   MagnifyingGlassIcon,
   MapPinIcon,
-  MoonIcon,
   ReceiptIcon,
-  SunIcon,
   WalletIcon,
   WarningCircleIcon,
   XIcon,
 } from '@phosphor-icons/react'
 
-import CustomerNavbar from '../components/CustomerNavbar'
+import { useOutletContext } from 'react-router-dom'
 import DateRangeFilter from '../components/DateRangeFilter'
 import { inDateRange } from '../utils/dateRange'
 import { INVOICES_PREVIEW_DATA } from '../data/invoicesPreviewData'
@@ -69,7 +67,6 @@ import './InvoicesPage.css'
 // - Customers cannot pay or edit here. Our team records payments.
 // =========================================================
 
-const THEME_KEY = 'ethijahath-dashboard-theme'
 
 const JOB_TYPES = { amc: 'AMC', service: 'Service', general: 'General' }
 
@@ -94,20 +91,6 @@ const TABS = [
   { value: 'payments', label: 'Payment history' },
   { value: 'all', label: 'All invoices' },
 ]
-
-function initialTheme() {
-  try {
-    const saved = localStorage.getItem(THEME_KEY)
-
-    if (saved === 'light' || saved === 'dark') {
-      return saved
-    }
-  } catch {
-    // Theme persistence is optional.
-  }
-
-  return 'light'
-}
 
 const toMinor = value => Math.round(Number(value || 0) * 100)
 
@@ -769,21 +752,13 @@ export default function InvoicesPage({
   onDownloadInvoice,
   onDownloadStatement,
 }) {
-  const [theme, setTheme] = useState(initialTheme)
+  const { theme = 'light' } = useOutletContext() ?? {}
   const [tab, setTab] = useState('open')
   const [query, setQuery] = useState('')
   const [site, setSite] = useState('all')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
   const [selected, setSelected] = useState(null)
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // The page remains usable without storage.
-    }
-  }, [theme])
 
   const ready = !loading && !error && Boolean(data)
   const invoices = ready ? data.invoices : []
@@ -872,33 +847,7 @@ export default function InvoicesPage({
     <div className="sv-page" data-theme={theme}>
 
 
-      <CustomerNavbar
-        companyName="Demo Customer Company"
-        customerName="Customer account"
-        unreadCount={2}
-        theme={theme}
-      />
-
       <div className="sv-main">
-        <header className="sv-topbar">
-
-
-          <button
-            className="sv-theme-button"
-            type="button"
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            onClick={() =>
-              setTheme(value => (value === 'light' ? 'dark' : 'light'))
-            }
-          >
-            {theme === 'light' ? (
-              <MoonIcon size={21} aria-hidden="true" />
-            ) : (
-              <SunIcon size={21} aria-hidden="true" />
-            )}
-          </button>
-        </header>
-
         <main
           className="sv-content"
           id="invoices-content"

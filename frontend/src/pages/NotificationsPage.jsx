@@ -1,5 +1,5 @@
 import { useContext, useEffect, useId, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useOutletContext } from 'react-router-dom'
 import {
   ArrowUpRightIcon,
   BellIcon,
@@ -9,20 +9,15 @@ import {
   FileTextIcon,
   LightningIcon,
   MagnifyingGlassIcon,
-  MapPinIcon,
-  MoonIcon,
   ReceiptIcon,
-  SunIcon,
   WrenchIcon,
 } from '@phosphor-icons/react'
 
-import CustomerNavbar from '../components/CustomerNavbar'
 import DateRangeFilter from '../components/DateRangeFilter'
 import { inDateRange } from '../utils/dateRange'
 import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import './NotificationsPage.css'
 
-const THEME_KEY = 'ethijahath-dashboard-theme'
 const PAGE_SIZE = 8
 
 const CATEGORIES = {
@@ -53,14 +48,6 @@ const dateTime = new Intl.DateTimeFormat('en-GB', {
   hour: '2-digit',
   minute: '2-digit',
 })
-
-function initialTheme() {
-  try {
-    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
-  } catch {
-    return 'light'
-  }
-}
 
 const relativeTime = new Intl.RelativeTimeFormat('en', {
   numeric: 'always',
@@ -164,7 +151,7 @@ function NotificationCard({ item, onRead, now }) {
 
 export default function NotificationsPage() {
   const store = useContext(NotificationsPreviewContext)
-  const [theme, setTheme] = useState(initialTheme)
+  const { theme = 'light' } = useOutletContext() ?? {}
   const [filters, setFilters] = useState(INITIAL_FILTERS)
   const [limit, setLimit] = useState(PAGE_SIZE)
   const [announcement, setAnnouncement] = useState('')
@@ -175,14 +162,6 @@ export default function NotificationsPage() {
     const timer = window.setInterval(() => setNow(Date.now()), 60000)
     return () => window.clearInterval(timer)
   }, [])
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // Theme still works when browser storage is unavailable.
-    }
-  }, [theme])
 
   if (!store) {
     return <main><h1>Notification preview is unavailable</h1></main>
@@ -294,35 +273,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="np-page" data-theme={theme}>
-      <CustomerNavbar
-        companyName={data.company_name}
-        customerName={data.customer_name}
-        theme={theme}
-      />
-
       <main className="np-main">
-        <header className="np-topbar">
-
-
-          <div className="np-topbar-actions">
-            <span className="np-region">
-              <MapPinIcon size={17} aria-hidden="true" />
-              {data.region_name}
-            </span>
-
-            <button
-              type="button"
-              className="np-icon-button"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-              onClick={() => setTheme(value => value === 'light' ? 'dark' : 'light')}
-            >
-              {theme === 'light'
-                ? <MoonIcon size={20} aria-hidden="true" />
-                : <SunIcon size={20} aria-hidden="true" />}
-            </button>
-          </div>
-        </header>
-
         <div className="np-content">
           <div className="np-heading">
             <div>

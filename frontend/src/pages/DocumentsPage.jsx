@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useRef, useState } from 'react'
+import { Link, useOutletContext } from 'react-router-dom'
 import {
   DownloadSimpleIcon,
   ArrowUpRightIcon,
@@ -9,21 +9,16 @@ import {
   FileTextIcon,
   FolderOpenIcon,
   MagnifyingGlassIcon,
-  MapPinIcon,
-  MoonIcon,
   PaperclipIcon,
   ReceiptIcon,
-  SunIcon,
   XIcon,
 } from '@phosphor-icons/react'
 
-import CustomerNavbar from '../components/CustomerNavbar'
 import DateRangeFilter from '../components/DateRangeFilter'
 import { inDateRange } from '../utils/dateRange'
 import { createDocumentsPreviewData } from '../data/documentsPreviewData'
 import './DocumentsPage.css'
 
-const THEME_KEY = 'ethijahath-dashboard-theme'
 
 const DOCUMENT_TYPES = [
   {
@@ -78,14 +73,6 @@ const STATUS_LABELS = {
   void: 'Void',
   active: 'Active',
   cancelled: 'Cancelled',
-}
-
-function initialTheme() {
-  try {
-    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
-  } catch {
-    return 'light'
-  }
 }
 
 function formatDate(value) {
@@ -343,7 +330,7 @@ export default function DocumentsPage({
   onRetry,
 }) {
   const [previewData] = useState(createDocumentsPreviewData)
-  const [theme, setTheme] = useState(initialTheme)
+  const { theme = 'light' } = useOutletContext() ?? {}
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [site, setSite] = useState('all')
@@ -355,14 +342,6 @@ export default function DocumentsPage({
   // Undefined uses the demo. Explicit null represents disconnected data.
   const archive = data === undefined ? previewData : data
   const ready = !loading && !error && Boolean(archive)
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // Theme switching remains available without browser storage.
-    }
-  }, [theme])
 
   // Display filtering is not an authorization boundary.
   // The backend must scope both records and file access to the customer.
@@ -441,40 +420,7 @@ export default function DocumentsPage({
 
   return (
     <div className="dp-page" data-theme={theme}>
-      <CustomerNavbar
-        companyName={archive?.company_name}
-        customerName={archive?.customer_name}
-        unreadCount={archive?.unread_count ?? 0}
-        theme={theme}
-      />
-
       <main className="dp-main">
-        <header className="dp-topbar">
-
-
-          <div className="dp-topbar-actions">
-            {archive?.region_name && (
-              <span className="dp-region">
-                <MapPinIcon size={17} aria-hidden="true" />
-                {archive.region_name}
-              </span>
-            )}
-
-            <button
-              type="button"
-              className="dp-icon-button"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
-              onClick={() =>
-                setTheme(value => value === 'light' ? 'dark' : 'light')
-              }
-            >
-              {theme === 'light'
-                ? <MoonIcon size={20} aria-hidden="true" />
-                : <SunIcon size={20} aria-hidden="true" />}
-            </button>
-          </div>
-        </header>
-
         <div className="dp-content">
           <div className="dp-heading">
             <div>

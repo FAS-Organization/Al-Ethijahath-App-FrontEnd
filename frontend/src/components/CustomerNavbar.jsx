@@ -52,6 +52,7 @@ export default function CustomerNavbar({
   enabledPages = INITIAL_PAGES,
   onSignOut,
   theme = 'light',
+  children,
 }) {
   const [open, setOpen] = useState(false)
   const [signingOut, setSigningOut] = useState(false)
@@ -159,171 +160,172 @@ export default function CustomerNavbar({
     closeSupport()
   }
   return (
-    <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
-      {topbar && createPortal(
-        <span className="ae-nav__toggle-slot" data-theme={theme}>
+    <>
+      <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
+        <div id={menuId} className="ae-nav__body" data-open={expanded}>
+          <div className="ae-nav__header">
+            <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
+              onClick={() => setOpen(false)}>
+              <img
+                src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
+                alt="Al Ethijahath"
+                width="160"
+                height="50"
+              />
+            </NavLink>
+          </div>
+          <div className="ae-nav__identity">
+            <strong>{companyName || 'Customer portal'}</strong>
+            {customerName ? <span>{customerName}</span> : null}
+          </div>
+
+          <nav aria-label="Customer pages">
+            <ul className="ae-nav__links">
+              {CUSTOMER_NAV_ITEMS.map(({ id, label, to, icon: Icon, end }) => {
+                const content = <>
+                  <span className="ae-nav__link-icon" aria-hidden="true">
+                    <Icon size={20} />
+                  </span>
+                  <span className="ae-nav__link-label">{label}</span>
+                  {id === 'notifications' && count > 0 ? (
+                    <span className="ae-nav__badge" aria-label={`${count} unread notifications`}>
+                      {count > 99 ? '99+' : count}
+                    </span>
+                  ) : null}
+                </>
+                return (
+                  <li key={id}>
+                    {enabledPages.includes(id) ? (
+                      <NavLink to={to} end={end} onClick={() => setOpen(false)}
+                        className={({ isActive }) => `ae-nav__link${isActive ? ' is-active' : ''}`}>
+                        {content}
+                      </NavLink>
+                    ) : (
+                      <span className="ae-nav__link ae-nav__link--unavailable" aria-disabled="true"
+                        title="This page is not connected yet">
+                        {content}<span className="ae-nav__sr"> (not available yet)</span>
+                      </span>
+                    )}
+                  </li>
+                )
+              })}
+            </ul>
+          </nav>
+
+          <div className="ae-nav__footer">
+            <button type="button" className="ae-nav__link" onClick={openSupport}
+              aria-haspopup="dialog">
+              <HeadsetIcon size={21} aria-hidden="true" /><span>Support</span>
+            </button>
+            {onSignOut ? (
+              <button type="button" className="ae-nav__link" onClick={signOut}
+                disabled={signingOut} aria-busy={signingOut}>
+                <SignOutIcon size={21} aria-hidden="true" />
+                <span>{signingOut ? 'Signing out…' : 'Sign out'}</span>
+              </button>
+            ) : null}
+            {error ? <p className="ae-nav__error" role="alert">{error}</p> : null}
+          </div>
+        </div>
+        <dialog
+          ref={supportRef}
+          className="ae-support"
+          aria-labelledby="ae-support-title"
+          onCancel={event => { event.preventDefault(); closeSupport() }}
+          onClick={event => { if (event.target === event.currentTarget) closeSupport() }}
+        >
+          <div className="ae-support__panel">
+            <div className="ae-support__head">
+              <h2 id="ae-support-title">Support</h2>
+              <button
+                type="button"
+                className="ae-support__close"
+                onClick={closeSupport}
+                aria-label="Close support"
+              >
+                <XIcon size={18} aria-hidden="true" />
+              </button>
+            </div>
+
+            <button
+              type="button"
+              className="ae-ai"
+              onClick={openSupportChat}
+              aria-haspopup="dialog"
+              aria-controls="portal-chat-dialog"
+            >
+              <svg
+                className="ae-ai__icon"
+                width="22"
+                height="22"
+                viewBox="0 0 256 256"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path className="ae-ai__star ae-ai__star--large" d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144Z" />
+                <path
+                  className="ae-ai__star ae-ai__star--upper"
+                  d="M152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Z"
+                />
+                <path
+                  className="ae-ai__star ae-ai__star--right"
+                  d="M240,80h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"
+                />
+              </svg>
+              <span className="ae-ai__text">
+                <strong>Ask Al Ethijahath Ai</strong>
+                <span>Invoices &amp; service</span>
+              </span>
+            </button>
+
+            <ul className="ae-support__list">
+              <li>
+                <a className="ae-support__item" href={`https://wa.me/${SUPPORT_PHONE_LINK.replace('+', '')}`}
+                  target="_blank" rel="noopener noreferrer">
+                  <span className="ae-support__icon"><WhatsappLogoIcon size={26} weight="fill" aria-hidden="true" /></span>
+                  <span className="ae-support__label">
+                    <strong>WhatsApp</strong>
+                    <span>{SUPPORT_PHONE_DISPLAY}</span>
+                  </span>
+                  <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+                  <span className="ae-nav__sr"> (opens WhatsApp in a new tab)</span>
+                </a>
+              </li>
+              <li>
+                <a className="ae-support__item" href={`mailto:${SUPPORT_EMAIL}`}>
+                  <span className="ae-support__icon"><EnvelopeSimpleIcon size={26} weight="fill" aria-hidden="true" /></span>
+                  <span className="ae-support__label">
+                    <strong>Email</strong>
+                    <span>{SUPPORT_EMAIL}</span>
+                  </span>
+                  <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+                </a>
+              </li>
+              <li>
+                <a className="ae-support__item" href={`tel:${SUPPORT_PHONE_LINK}`}>
+                  <span className="ae-support__icon"><PhoneCallIcon size={26} weight="fill" aria-hidden="true" /></span>
+                  <span className="ae-support__label">
+                    <strong>Call us</strong>
+                    <span>{SUPPORT_PHONE_DISPLAY}</span>
+                  </span>
+                  <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+                </a>
+              </li>
+            </ul>
+          </div>
+        </dialog>
+      </aside>
+      <header className="ed-topbar portal-topbar ae-nav-content" data-theme={theme}>
+        <span className="ae-nav__toggle-slot">
           <button ref={toggleRef} type="button" className="ae-nav__toggle"
             aria-expanded={expanded} aria-controls={menuId}
             aria-label={expanded ? 'Close navigation' : 'Open navigation'}
             onClick={() => { setOpenedAt(location.key); setOpen(!expanded) }}>
             {expanded ? <XIcon size={24} aria-hidden="true" /> : <ListIcon size={24} aria-hidden="true" />}
           </button>
-        </span>,
-        topbar,
-      )}
-
-      <div id={menuId} className="ae-nav__body" data-open={expanded}>
-        <div className="ae-nav__header">
-          <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
-            onClick={() => setOpen(false)}>
-            <img
-              src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
-              alt="Al Ethijahath"
-              width="160"
-              height="50"
-            />
-          </NavLink>
-        </div>
-        <div className="ae-nav__identity">
-          <strong>{companyName || 'Customer portal'}</strong>
-          {customerName ? <span>{customerName}</span> : null}
-        </div>
-
-        <nav aria-label="Customer pages">
-          <ul className="ae-nav__links">
-            {CUSTOMER_NAV_ITEMS.map(({ id, label, to, icon: Icon, end }) => {
-              const content = <>
-                <span className="ae-nav__link-icon" aria-hidden="true">
-                  <Icon size={20} />
-                </span>
-                <span className="ae-nav__link-label">{label}</span>
-                {id === 'notifications' && count > 0 ? (
-                  <span className="ae-nav__badge" aria-label={`${count} unread notifications`}>
-                    {count > 99 ? '99+' : count}
-                  </span>
-                ) : null}
-              </>
-              return (
-                <li key={id}>
-                  {enabledPages.includes(id) ? (
-                    <NavLink to={to} end={end} onClick={() => setOpen(false)}
-                      className={({ isActive }) => `ae-nav__link${isActive ? ' is-active' : ''}`}>
-                      {content}
-                    </NavLink>
-                  ) : (
-                    <span className="ae-nav__link ae-nav__link--unavailable" aria-disabled="true"
-                      title="This page is not connected yet">
-                      {content}<span className="ae-nav__sr"> (not available yet)</span>
-                    </span>
-                  )}
-                </li>
-              )
-            })}
-          </ul>
-        </nav>
-
-        <div className="ae-nav__footer">
-          <button type="button" className="ae-nav__link" onClick={openSupport}
-            aria-haspopup="dialog">
-            <HeadsetIcon size={21} aria-hidden="true" /><span>Support</span>
-          </button>
-          {onSignOut ? (
-            <button type="button" className="ae-nav__link" onClick={signOut}
-              disabled={signingOut} aria-busy={signingOut}>
-              <SignOutIcon size={21} aria-hidden="true" />
-              <span>{signingOut ? 'Signing out…' : 'Sign out'}</span>
-            </button>
-          ) : null}
-          {error ? <p className="ae-nav__error" role="alert">{error}</p> : null}
-        </div>
-      </div>
-      <dialog
-        ref={supportRef}
-        className="ae-support"
-        aria-labelledby="ae-support-title"
-        onCancel={event => { event.preventDefault(); closeSupport() }}
-        onClick={event => { if (event.target === event.currentTarget) closeSupport() }}
-      >
-        <div className="ae-support__panel">
-          <div className="ae-support__head">
-            <h2 id="ae-support-title">Support</h2>
-            <button
-              type="button"
-              className="ae-support__close"
-              onClick={closeSupport}
-              aria-label="Close support"
-            >
-              <XIcon size={18} aria-hidden="true" />
-            </button>
-          </div>
-
-          <button
-            type="button"
-            className="ae-ai"
-            onClick={openSupportChat}
-            aria-haspopup="dialog"
-            aria-controls="portal-chat-dialog"
-          >
-            <svg
-              className="ae-ai__icon"
-              width="22"
-              height="22"
-              viewBox="0 0 256 256"
-              fill="currentColor"
-              aria-hidden="true"
-            >
-              <path className="ae-ai__star ae-ai__star--large" d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144Z" />
-              <path
-                className="ae-ai__star ae-ai__star--upper"
-                d="M152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Z"
-              />
-              <path
-                className="ae-ai__star ae-ai__star--right"
-                d="M240,80h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"
-              />
-            </svg>
-            <span className="ae-ai__text">
-              <strong>Ask Al Ethijahath Ai</strong>
-              <span>Invoices &amp; service</span>
-            </span>
-          </button>
-
-          <ul className="ae-support__list">
-            <li>
-              <a className="ae-support__item" href={`https://wa.me/${SUPPORT_PHONE_LINK.replace('+', '')}`}
-                target="_blank" rel="noopener noreferrer">
-                <span className="ae-support__icon"><WhatsappLogoIcon size={26} weight="fill" aria-hidden="true" /></span>
-                <span className="ae-support__label">
-                  <strong>WhatsApp</strong>
-                  <span>{SUPPORT_PHONE_DISPLAY}</span>
-                </span>
-                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
-                <span className="ae-nav__sr"> (opens WhatsApp in a new tab)</span>
-              </a>
-            </li>
-            <li>
-              <a className="ae-support__item" href={`mailto:${SUPPORT_EMAIL}`}>
-                <span className="ae-support__icon"><EnvelopeSimpleIcon size={26} weight="fill" aria-hidden="true" /></span>
-                <span className="ae-support__label">
-                  <strong>Email</strong>
-                  <span>{SUPPORT_EMAIL}</span>
-                </span>
-                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
-              </a>
-            </li>
-            <li>
-              <a className="ae-support__item" href={`tel:${SUPPORT_PHONE_LINK}`}>
-                <span className="ae-support__icon"><PhoneCallIcon size={26} weight="fill" aria-hidden="true" /></span>
-                <span className="ae-support__label">
-                  <strong>Call us</strong>
-                  <span>{SUPPORT_PHONE_DISPLAY}</span>
-                </span>
-                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
-              </a>
-            </li>
-          </ul>
-        </div>
-      </dialog>
-    </aside>
+        </span>
+        {children}
+      </header>
+    </>
   )
 }
