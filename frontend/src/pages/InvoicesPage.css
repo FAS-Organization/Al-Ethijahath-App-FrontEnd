@@ -18,10 +18,22 @@
 /* Summary cards: amounts shrink to fit the card */
 .iv-summary .sv-summary-item { min-width: 0; }
 .iv-summary .sv-summary-item > div {
+  position: relative;
+  z-index: 1;
   display: block;
   flex: 1 1 0;
   min-width: 0;
   container-type: inline-size;
+}
+
+.iv-summary .sv-summary-corner {
+  transition: transform 240ms var(--sv-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .iv-summary .sv-summary-item:hover .sv-summary-corner {
+    transform: translate(-4px, -4px);
+  }
 }
 .sv-page .iv-values strong {
   font-size: 18px;

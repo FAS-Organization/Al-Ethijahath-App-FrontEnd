@@ -905,6 +905,9 @@ export default function InvoicesPage({
                     <span>Outstanding balance</span>
                     <SummaryValues list={outstanding} fallback="Nothing due" />
                   </div>
+                  <span className="sv-summary-corner" aria-hidden="true">
+                    <WalletIcon size={60} weight="thin" />
+                  </span>
                 </div>
 
                 <div
@@ -917,6 +920,9 @@ export default function InvoicesPage({
                     <span>Overdue</span>
                     <SummaryValues list={overdueTotals} fallback="None" />
                   </div>
+                  <span className="sv-summary-corner" aria-hidden="true">
+                    <WarningCircleIcon size={60} weight="thin" />
+                  </span>
                 </div>
 
                 <div className="sv-summary-item">
@@ -927,6 +933,9 @@ export default function InvoicesPage({
                     <span>Paid to date</span>
                     <SummaryValues list={paidTotals} fallback="Nothing yet" />
                   </div>
+                  <span className="sv-summary-corner" aria-hidden="true">
+                    <CheckCircleIcon size={60} weight="thin" />
+                  </span>
                 </div>
 
                 <div className="sv-summary-item">
@@ -939,6 +948,9 @@ export default function InvoicesPage({
                       <strong style={{ '--len': String(counts.open).length }}>{counts.open}</strong>
                     </div>
                   </div>
+                  <span className="sv-summary-corner" aria-hidden="true">
+                    <ReceiptIcon size={60} weight="thin" />
+                  </span>
                 </div>
               </section>
 
