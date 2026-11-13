@@ -922,3 +922,52 @@
     animation-delay: 0ms;
   }
 }
+
+/* ==========================================
+   MOBILE TOGGLE — BURGUNDY ONLY WHEN OPEN
+========================================== */
+
+@media screen and (max-width: 1023px) {
+  /* Default: transparent button */
+  .ae-nav .ae-nav__toggle {
+    background: transparent;
+    color: var(--ae-text);
+    border: 1px solid var(--ae-line);
+    box-shadow: none;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Burgundy only when sidebar is open (X button) */
+  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
+    background: #8f000d;
+    color: #fff;
+    border-color: #8f000d;
+    box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+  }
+
+  /* Remove blue focus/selection colour */
+  .ae-nav .ae-nav__toggle:focus,
+  .ae-nav .ae-nav__toggle:focus-visible,
+  .ae-nav .ae-nav__toggle:active {
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* No blue background on hover when closed */
+  @media (hover: hover) and (pointer: fine) {
+    .ae-nav .ae-nav__toggle:not([aria-expanded='true']):hover {
+      background: transparent;
+      color: var(--ae-text);
+      border-color: var(--ae-line);
+      box-shadow: none;
+    }
+  }
+}
+
+/* Keep toggle hidden on desktop */
+@media screen and (min-width: 1024px) {
+  .ae-nav .ae-nav__toggle {
+    display: none !important;
+  }
+}
