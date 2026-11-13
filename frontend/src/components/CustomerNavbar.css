@@ -813,10 +813,22 @@
 
   .ae-nav .ae-nav__drawer-close {
     flex: 0 0 44px;
-    border-color: #8f000d;
-    background: #8f000d;
-    color: #fff;
+    border-color: color-mix(in srgb, var(--ae-accent) 24%, var(--ae-line));
+    border-radius: 12px;
+    background: var(--ae-active);
+    color: var(--ae-accent);
+    transition:
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
   }
+
+  .ae-nav .ae-nav__drawer-close svg {
+    width: 20px;
+    height: 20px;
+  }
+
+
 
   .ae-nav .ae-nav__body {
     position: fixed;
@@ -846,6 +858,37 @@
     visibility: visible;
     pointer-events: auto;
     box-shadow: 0 0 0 100vmax rgb(0 0 0 / 42%);
+  }
+}
+
+.ae-nav .ae-nav__body {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ae-nav__identity,
+.ae-nav__footer {
+  flex-shrink: 0;
+}
+
+.ae-nav__body > nav {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.ae-nav__links {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--ae-muted) var(--ae-bg);
+}
+
+@media (min-width: 1024px) {
+  .ae-nav {
+    overflow: hidden;
   }
 }
 
