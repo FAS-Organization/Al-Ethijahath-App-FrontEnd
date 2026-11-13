@@ -4,7 +4,7 @@ import { NavLink, useLocation } from 'react-router-dom'
 import {
   SquaresFourIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
   FileTextIcon, ReceiptIcon, FolderOpenIcon, BellIcon,
-  UserCircleIcon, HeadsetIcon, SignOutIcon, ListIcon, XIcon,
+  UserCircleIcon, HeadsetIcon, SignOutIcon, XIcon,
   WhatsappLogoIcon, EnvelopeSimpleIcon, PhoneCallIcon, ArrowUpRightIcon,
 } from '@phosphor-icons/react'
 import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
@@ -332,7 +332,20 @@ export default function CustomerNavbar({
             aria-expanded={expanded} aria-controls={menuId}
             aria-label={expanded ? 'Close navigation' : 'Open navigation'}
             onClick={() => { setOpenedAt(location.key); setOpen(!expanded) }}>
-            <ListIcon size={24} aria-hidden="true" />
+            <svg
+              width="22"
+              height="22"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 6h16M4 12h12M4 18h8"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+            </svg>
           </button>
         </span>
         {children}
