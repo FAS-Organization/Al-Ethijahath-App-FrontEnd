@@ -173,6 +173,17 @@ export default function CustomerNavbar({
                 height="50"
               />
             </NavLink>
+            <button
+              type="button"
+              className="ae-nav__toggle ae-nav__drawer-close"
+              aria-label="Close navigation"
+              onClick={() => {
+                setOpen(false)
+                toggleRef.current?.focus()
+              }}
+            >
+              <XIcon size={24} aria-hidden="true" />
+            </button>
           </div>
           <div className="ae-nav__identity">
             <strong>{companyName || 'Customer portal'}</strong>
@@ -321,7 +332,7 @@ export default function CustomerNavbar({
             aria-expanded={expanded} aria-controls={menuId}
             aria-label={expanded ? 'Close navigation' : 'Open navigation'}
             onClick={() => { setOpenedAt(location.key); setOpen(!expanded) }}>
-            {expanded ? <XIcon size={24} aria-hidden="true" /> : <ListIcon size={24} aria-hidden="true" />}
+            <ListIcon size={24} aria-hidden="true" />
           </button>
         </span>
         {children}

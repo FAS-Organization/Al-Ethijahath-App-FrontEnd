@@ -1,0 +1,2127 @@
+diff --git a/frontend/src/App.jsx b/frontend/src/App.jsx
+index 64d0c63..056f9a4 100644
+--- a/frontend/src/App.jsx
++++ b/frontend/src/App.jsx
+@@ -1,7 +1,6 @@
+ 
+ import {
+   BrowserRouter,
+-  Outlet,
+   Routes,
+   Route,
+   useLocation,
+@@ -11,7 +10,7 @@ import { useState } from 'react'
+ 
+ import ErrorBoundary from './components/ErrorBoundary'
+ import ErrorPage, { ErrorPreviewPage } from './components/ErrorPage'
+-import PortalChat from './components/PortalChat'
++import CustomerPortalLayout from './components/CustomerPortalLayout'
+ 
+ import NotificationsPage from './pages/NotificationsPage'
+ import {
+@@ -38,14 +37,7 @@ function AppRoutes() {
+       <Routes>
+         <Route path="/" element={<SignupPage />} />
+ 
+-        <Route
+-          element={
+-            <>
+-              <Outlet />
+-              <PortalChat />
+-            </>
+-          }
+-        >
++        <Route element={<CustomerPortalLayout />}>
+           <Route path="/dashboard" element={<DashboardPage />} />
+           <Route path="/equipment" element={<EquipmentPage />} />
+           <Route path="/services" element={<ServicesPage />} />
+diff --git a/frontend/src/components/CustomerNavbar.css b/frontend/src/components/CustomerNavbar.css
+index cb65360..785b747 100644
+--- a/frontend/src/components/CustomerNavbar.css
++++ b/frontend/src/components/CustomerNavbar.css
+@@ -30,7 +30,13 @@
+ .ae-nav ::selection { background: var(--ae-active); color: var(--ae-accent); }
+ .ae-nav :focus-visible { outline: 3px solid var(--ae-accent); outline-offset: 3px; }
+ .ae-nav :where(a, button) { touch-action: manipulation; }
+-.ae-nav__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 20px; }
++.ae-nav__header {
++  display: flex;
++  align-items: center;
++  flex-shrink: 0;
++  margin-inline: -16px;
++  padding: 24px 20px 8px;
++}
+ .ae-nav .ae-nav__brand { display: inline-flex; padding: 4px 8px; border-radius: 6px; }
+ .ae-nav__brand img { display: block; width: 152px; height: 48px; object-fit: contain; }
+ .ae-nav[data-theme='dark'] .ae-nav__brand { background: transparent; }
+@@ -161,7 +167,6 @@
+ .ae-nav .ae-nav__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+ @media (min-width: 1024px) {
+   .ae-nav { position: fixed; inset-block: 0; inset-inline-start: 0; z-index: 40; width: 252px; height: 100dvh; overflow-y: auto; overscroll-behavior: contain; border-block-end: 0; border-inline-end: 1px solid var(--ae-line); display: flex; flex-direction: column; scrollbar-width: thin; scrollbar-color: var(--ae-muted) var(--ae-bg); }
+-  .ae-nav__header { padding: 24px 20px 8px; }
+   .ae-nav__toggle { display: none; }
+   .ae-nav__body { display: flex; flex-direction: column; flex: 1; }
+   /* Apply to your page wrapper when using this fixed desktop sidebar. */
+@@ -378,7 +383,7 @@
+ }
+ 
+ /* Phones and tablets: the menu is a top bar, so the panel uses the full width. */
+-@media (max-width: 1023px) {
++@media (width < 1024px) {
+   .ae-support {
+     width: 100%;
+     max-height: 92dvh;
+@@ -760,214 +765,80 @@
+   }
+ }
+ 
++.ae-nav__toggle-slot { display: none; }
+ 
+-/* ==========================================
+-   MOBILE & TABLET NAVBAR
+-   Left slide-out navigation
+-   ========================================== */
+-
+-@media screen and (max-width: 1023px) {
+-
+-  /* Main navbar */
++/* Mobile and tablet navigation */
++@media (width < 1024px) {
+   .ae-nav {
++    --ae-drawer-width: min(252px, 100vw);
++    --ae-drawer-duration: 550ms;
+     position: relative;
+     z-index: 10000;
+-    width: 100%;
+-  }
+-
+-  /* Header: toggle left, logo right */
+-  .ae-nav .ae-nav__header {
+-    display: flex;
+-    flex-direction: row;
+-    align-items: center;
+-    justify-content: space-between;
+-    min-height: 80px;
+-    padding: 12px 20px;
+-    position: relative;
+-    z-index: 1002;
+-  }
+-
+-  /* Toggle on the left */
+-  .ae-nav .ae-nav__toggle {
+-    order: 1;
+-    display: grid;
+-    flex-shrink: 0;
+-    margin-right: auto;
+-  }
+-
+-  /* Company logo on the right */
+-  .ae-nav .ae-nav__brand {
+-    order: 2;
+-    margin-left: auto;
+-  }
+-
+-  /* Sidebar: hidden outside the screen */
+-.ae-nav .ae-nav__body {
+-  position: fixed;
+-  top: 0;
+-  left: 0;
+-  bottom: 0;
+-  z-index: 1001;
+-
+-  display: flex;
+-  flex-direction: column;
+-  width: min(320px, 86vw);
+-  height: 100dvh;
+-  max-height: 100dvh;
+-
+-  padding: 16px 16px 24px;
+-  overflow-y: auto;
+-  overscroll-behavior: contain;
+-
+-  background: var(--ae-bg);
+-  border-right: 1px solid var(--ae-line);
+-
+-  transform: translateX(-100%);
+-  visibility: hidden;
+-  pointer-events: none;
+-
+-  transition:
+-    transform 320ms cubic-bezier(0.16, 1, 0.3, 1),
+-    visibility 320ms;
+-}
+-
+-  /* Sidebar when toggle is clicked */
+-  .ae-nav .ae-nav__body[data-open='true'] {
+-    display: flex;
+-    transform: translateX(0);
+-    visibility: visible;
+-    pointer-events: auto;
+-
+-    box-shadow: 0 0 0 100vmax rgb(0 0 0 / 42%);
++    background: transparent;
++    border: 0;
+   }
+ 
+-  /* Sidebar contents */
+-  .ae-nav .ae-nav__identity {
+-    padding: 16px 12px 24px;
++  .ae-nav__toggle-slot {
++    display: inline-flex;
++    flex: 0 0 44px;
++    height: 44px;
++    margin-inline-end: auto;
+   }
+ 
+-  .ae-nav .ae-nav__links {
+-    gap: 6px;
++  .ae-nav__toggle-slot .ae-nav__toggle {
++    box-sizing: border-box;
++    border-color: #e8e1d9;
++    color: #282321;
+   }
+ 
+-  .ae-nav .ae-nav__links .ae-nav__link {
+-    min-height: 46px;
++  .portal-topbar[data-theme='dark'] .ae-nav__toggle-slot .ae-nav__toggle {
++    border-color: #3a3033;
++    color: #f1e9e5;
+   }
+-}
+-
+-/* Reduced motion accessibility */
+-/* ==========================================
+-   SIDEBAR TOGGLE — MOVE WITH THE DRAWER
+-========================================== */
+-
+-/* ==========================================
+-   MOBILE SIDEBAR — CLOSE BUTTON TIMING
+-========================================== */
+ 
+-/* ==========================================
+-   MOBILE SIDEBAR — CLOSE BUTTON TIMING
+-========================================== */
+-
+-@media screen and (max-width: 1023px) {
+-
+-  .ae-nav {
+-    --ae-sidebar-width: min(320px, 86vw);
+-    --ae-sidebar-duration: 550ms;
+-    --ae-sidebar-easing: cubic-bezier(0.16, 1, 0.3, 1);
++  .ae-nav__toggle-slot .ae-nav__toggle[aria-expanded='true'] {
++    position: fixed;
++    z-index: 10003;
++    inset-inline-start: calc(min(252px, 100vw) - 56px);
++    inset-block-start: 24px;
++    border-color: #8f000d;
++    background: #8f000d;
++    color: #fff;
+   }
+ 
+-  /* Keep the existing sidebar slide animation */
+   .ae-nav .ae-nav__body {
+-    transition:
+-      transform var(--ae-sidebar-duration) var(--ae-sidebar-easing),
+-      visibility var(--ae-sidebar-duration);
+-  }
+-
+-  /* Close button position */
+-  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
+     position: fixed;
+-    top: 16px;
+-    left: calc(var(--ae-sidebar-width) - 56px);
+-    z-index: 1003;
+-
+-    /* Hide X while the sidebar is moving */
+-    opacity: 0;
++    inset-block: 0;
++    inset-inline-start: 0;
++    z-index: 1001;
++    display: flex;
++    flex-direction: column;
++    width: var(--ae-drawer-width);
++    height: 100dvh;
++    overflow-y: auto;
++    overscroll-behavior: contain;
++    scrollbar-width: thin;
++    scrollbar-color: var(--ae-muted) var(--ae-bg);
++    background: var(--ae-bg);
++    border-inline-end: 1px solid var(--ae-line);
++    transform: translateX(-100%);
+     visibility: hidden;
+-
+-    /* Show X after the sidebar finishes */
+-    animation: ae-sidebar-close-button-appear
+-      1ms linear var(--ae-sidebar-duration) forwards;
++    pointer-events: none;
++    transition:
++      transform var(--ae-drawer-duration) cubic-bezier(0.16, 1, 0.3, 1),
++      visibility var(--ae-drawer-duration);
+   }
+ 
+-  @keyframes ae-sidebar-close-button-appear {
+-    from {
+-      opacity: 0;
+-      visibility: hidden;
+-    }
+-
+-    to {
+-      opacity: 1;
+-      visibility: visible;
+-    }
++  .ae-nav .ae-nav__body[data-open='true'] {
++    transform: translateX(0);
++    visibility: visible;
++    pointer-events: auto;
++    box-shadow: 0 0 0 100vmax rgb(0 0 0 / 42%);
+   }
+ }
+ 
+-/* Respect reduced-motion settings */
+ @media (prefers-reduced-motion: reduce) {
+   .ae-nav .ae-nav__body {
+-    transition: none !important;
+-  }
+-
+-  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
+-    animation-delay: 0ms;
+-  }
+-}
+-
+-/* ==========================================
+-   MOBILE TOGGLE — BURGUNDY ONLY WHEN OPEN
+-========================================== */
+-
+-@media screen and (max-width: 1023px) {
+-  /* Default: transparent button */
+-  .ae-nav .ae-nav__toggle {
+-    background: transparent;
+-    color: var(--ae-text);
+-    border: 1px solid var(--ae-line);
+-    box-shadow: none;
+-    outline: none;
+-    -webkit-tap-highlight-color: transparent;
+-  }
+-
+-  /* Burgundy only when sidebar is open (X button) */
+-  .ae-nav .ae-nav__toggle[aria-expanded='true'] {
+-    background: #8f000d;
+-    color: #fff;
+-    border-color: #8f000d;
+-    box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+-  }
+-
+-  /* Remove blue focus/selection colour */
+-  .ae-nav .ae-nav__toggle:focus,
+-  .ae-nav .ae-nav__toggle:focus-visible,
+-  .ae-nav .ae-nav__toggle:active {
+-    outline: none;
+-    -webkit-tap-highlight-color: transparent;
+-  }
+-
+-  /* No blue background on hover when closed */
+-  @media (hover: hover) and (pointer: fine) {
+-    .ae-nav .ae-nav__toggle:not([aria-expanded='true']):hover {
+-      background: transparent;
+-      color: var(--ae-text);
+-      border-color: var(--ae-line);
+-      box-shadow: none;
+-    }
++    transition: none;
+   }
+ }
+-
+-/* Keep toggle hidden on desktop */
+-@media screen and (min-width: 1024px) {
+-  .ae-nav .ae-nav__toggle {
+-    display: none !important;
+-  }
+-}
+\ No newline at end of file
+diff --git a/frontend/src/components/CustomerNavbar.jsx b/frontend/src/components/CustomerNavbar.jsx
+index 8cdf867..07669b1 100644
+--- a/frontend/src/components/CustomerNavbar.jsx
++++ b/frontend/src/components/CustomerNavbar.jsx
+@@ -51,6 +51,7 @@ export default function CustomerNavbar({
+   enabledPages = INITIAL_PAGES,
+   onSignOut,
+   theme = 'light',
++  children,
+ }) {
+   const [open, setOpen] = useState(false)
+   const [signingOut, setSigningOut] = useState(false)
+@@ -74,7 +75,12 @@ export default function CustomerNavbar({
+   useEffect(() => {
+     if (!expanded) return
+     function dismiss(event) {
+-      if (!rootRef.current?.contains(event.target)) setOpen(false)
++      if (
++        !rootRef.current?.contains(event.target) &&
++        !toggleRef.current?.contains(event.target)
++      ) {
++        setOpen(false)
++      }
+     }
+     function escape(event) {
+       if (event.key === 'Escape') {
+@@ -143,166 +149,172 @@ export default function CustomerNavbar({
+     closeSupport()
+   }
+   return (
+-    <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
+-      <div className="ae-nav__header">
+-        <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
+-          onClick={() => setOpen(false)}>
+-          <img
+-            src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
+-            alt="Al Ethijahath"
+-            width="160"
+-            height="50"
+-          />
+-        </NavLink>
+-        <button ref={toggleRef} type="button" className="ae-nav__toggle"
+-          aria-expanded={expanded} aria-controls={menuId}
+-          aria-label={expanded ? 'Close navigation' : 'Open navigation'}
+-          onClick={() => { setOpenedAt(location.key); setOpen(!expanded) }}>
+-          {expanded ? <XIcon size={24} aria-hidden="true" /> : <ListIcon size={24} aria-hidden="true" />}
+-        </button>
+-      </div>
+-
+-      <div id={menuId} className="ae-nav__body" data-open={expanded}>
+-        <div className="ae-nav__identity">
+-          <strong>{companyName || 'Customer portal'}</strong>
+-          {customerName ? <span>{customerName}</span> : null}
+-        </div>
++    <>
++      <aside ref={rootRef} className="ae-nav" data-theme={theme} aria-label="Customer portal navigation">
++        <div id={menuId} className="ae-nav__body" data-open={expanded}>
++          <div className="ae-nav__header">
++            <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
++              onClick={() => setOpen(false)}>
++              <img
++                src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
++                alt="Al Ethijahath"
++                width="160"
++                height="50"
++              />
++            </NavLink>
++          </div>
++          <div className="ae-nav__identity">
++            <strong>{companyName || 'Customer portal'}</strong>
++            {customerName ? <span>{customerName}</span> : null}
++          </div>
+ 
+-        <nav aria-label="Customer pages">
+-          <ul className="ae-nav__links">
+-            {CUSTOMER_NAV_ITEMS.map(({ id, label, to, icon: Icon, end }) => {
+-              const content = <>
+-                <span className="ae-nav__link-icon" aria-hidden="true">
+-                  <Icon size={20} />
+-                </span>
+-                <span className="ae-nav__link-label">{label}</span>
+-                {id === 'notifications' && count > 0 ? (
+-                  <span className="ae-nav__badge" aria-label={`${count} unread notifications`}>
+-                    {count > 99 ? '99+' : count}
++          <nav aria-label="Customer pages">
++            <ul className="ae-nav__links">
++              {CUSTOMER_NAV_ITEMS.map(({ id, label, to, icon: Icon, end }) => {
++                const content = <>
++                  <span className="ae-nav__link-icon" aria-hidden="true">
++                    <Icon size={20} />
+                   </span>
+-                ) : null}
+-              </>
+-              return (
+-                <li key={id}>
+-                  {enabledPages.includes(id) ? (
+-                    <NavLink to={to} end={end} onClick={() => setOpen(false)}
+-                      className={({ isActive }) => `ae-nav__link${isActive ? ' is-active' : ''}`}>
+-                      {content}
+-                    </NavLink>
+-                  ) : (
+-                    <span className="ae-nav__link ae-nav__link--unavailable" aria-disabled="true"
+-                      title="This page is not connected yet">
+-                      {content}<span className="ae-nav__sr"> (not available yet)</span>
++                  <span className="ae-nav__link-label">{label}</span>
++                  {id === 'notifications' && count > 0 ? (
++                    <span className="ae-nav__badge" aria-label={`${count} unread notifications`}>
++                      {count > 99 ? '99+' : count}
+                     </span>
+-                  )}
+-                </li>
+-              )
+-            })}
+-          </ul>
+-        </nav>
++                  ) : null}
++                </>
++                return (
++                  <li key={id}>
++                    {enabledPages.includes(id) ? (
++                      <NavLink to={to} end={end} onClick={() => setOpen(false)}
++                        className={({ isActive }) => `ae-nav__link${isActive ? ' is-active' : ''}`}>
++                        {content}
++                      </NavLink>
++                    ) : (
++                      <span className="ae-nav__link ae-nav__link--unavailable" aria-disabled="true"
++                        title="This page is not connected yet">
++                        {content}<span className="ae-nav__sr"> (not available yet)</span>
++                      </span>
++                    )}
++                  </li>
++                )
++              })}
++            </ul>
++          </nav>
+ 
+-        <div className="ae-nav__footer">
+-          <button type="button" className="ae-nav__link" onClick={openSupport}
+-            aria-haspopup="dialog">
+-            <HeadsetIcon size={21} aria-hidden="true" /><span>Support</span>
+-          </button>
+-          {onSignOut ? (
+-            <button type="button" className="ae-nav__link" onClick={signOut}
+-              disabled={signingOut} aria-busy={signingOut}>
+-              <SignOutIcon size={21} aria-hidden="true" />
+-              <span>{signingOut ? 'Signing out…' : 'Sign out'}</span>
++          <div className="ae-nav__footer">
++            <button type="button" className="ae-nav__link" onClick={openSupport}
++              aria-haspopup="dialog">
++              <HeadsetIcon size={21} aria-hidden="true" /><span>Support</span>
+             </button>
+-          ) : null}
+-          {error ? <p className="ae-nav__error" role="alert">{error}</p> : null}
++            {onSignOut ? (
++              <button type="button" className="ae-nav__link" onClick={signOut}
++                disabled={signingOut} aria-busy={signingOut}>
++                <SignOutIcon size={21} aria-hidden="true" />
++                <span>{signingOut ? 'Signing out…' : 'Sign out'}</span>
++              </button>
++            ) : null}
++            {error ? <p className="ae-nav__error" role="alert">{error}</p> : null}
++          </div>
+         </div>
+-      </div>
+-      <dialog
+-        ref={supportRef}
+-        className="ae-support"
+-        aria-labelledby="ae-support-title"
+-        onCancel={event => { event.preventDefault(); closeSupport() }}
+-        onClick={event => { if (event.target === event.currentTarget) closeSupport() }}
+-      >
+-        <div className="ae-support__panel">
+-          <div className="ae-support__head">
+-            <h2 id="ae-support-title">Support</h2>
++        <dialog
++          ref={supportRef}
++          className="ae-support"
++          aria-labelledby="ae-support-title"
++          onCancel={event => { event.preventDefault(); closeSupport() }}
++          onClick={event => { if (event.target === event.currentTarget) closeSupport() }}
++        >
++          <div className="ae-support__panel">
++            <div className="ae-support__head">
++              <h2 id="ae-support-title">Support</h2>
++              <button
++                type="button"
++                className="ae-support__close"
++                onClick={closeSupport}
++                aria-label="Close support"
++              >
++                <XIcon size={18} aria-hidden="true" />
++              </button>
++            </div>
++
+             <button
+               type="button"
+-              className="ae-support__close"
+-              onClick={closeSupport}
+-              aria-label="Close support"
++              className="ae-ai"
++              onClick={openSupportChat}
++              aria-haspopup="dialog"
++              aria-controls="portal-chat-dialog"
+             >
+-              <XIcon size={18} aria-hidden="true" />
++              <svg
++                className="ae-ai__icon"
++                width="22"
++                height="22"
++                viewBox="0 0 256 256"
++                fill="currentColor"
++                aria-hidden="true"
++              >
++                <path className="ae-ai__star ae-ai__star--large" d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144Z" />
++                <path
++                  className="ae-ai__star ae-ai__star--upper"
++                  d="M152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Z"
++                />
++                <path
++                  className="ae-ai__star ae-ai__star--right"
++                  d="M240,80h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"
++                />
++              </svg>
++              <span className="ae-ai__text">
++                <strong>Ask Al Ethijahath Ai</strong>
++                <span>Invoices &amp; service</span>
++              </span>
+             </button>
+-          </div>
+ 
+-          <button
+-            type="button"
+-            className="ae-ai"
+-            onClick={openSupportChat}
+-            aria-haspopup="dialog"
+-            aria-controls="portal-chat-dialog"
+-          >
+-            <svg
+-              className="ae-ai__icon"
+-              width="22"
+-              height="22"
+-              viewBox="0 0 256 256"
+-              fill="currentColor"
+-              aria-hidden="true"
+-            >
+-              <path className="ae-ai__star ae-ai__star--large" d="M208,144a15.78,15.78,0,0,1-10.42,14.94L146,178l-19,51.62a15.92,15.92,0,0,1-29.88,0L78,178l-51.62-19a15.92,15.92,0,0,1,0-29.88L78,110l19-51.62a15.92,15.92,0,0,1,29.88,0L146,110l51.62,19A15.78,15.78,0,0,1,208,144Z" />
+-              <path
+-                className="ae-ai__star ae-ai__star--upper"
+-                d="M152,48h16V64a8,8,0,0,0,16,0V48h16a8,8,0,0,0,0-16H184V16a8,8,0,0,0-16,0V32H152a8,8,0,0,0,0,16Z"
+-              />
+-              <path
+-                className="ae-ai__star ae-ai__star--right"
+-                d="M240,80h-8V72a8,8,0,0,0-16,0v8h-8a8,8,0,0,0,0,16h8v8a8,8,0,0,0,16,0V96h8a8,8,0,0,0,0-16Z"
+-              />
+-            </svg>
+-            <span className="ae-ai__text">
+-              <strong>Ask Al Ethijahath Ai</strong>
+-              <span>Invoices &amp; service</span>
+-            </span>
++            <ul className="ae-support__list">
++              <li>
++                <a className="ae-support__item" href={`https://wa.me/${SUPPORT_PHONE_LINK.replace('+', '')}`}
++                  target="_blank" rel="noopener noreferrer">
++                  <span className="ae-support__icon"><WhatsappLogoIcon size={26} weight="fill" aria-hidden="true" /></span>
++                  <span className="ae-support__label">
++                    <strong>WhatsApp</strong>
++                    <span>{SUPPORT_PHONE_DISPLAY}</span>
++                  </span>
++                  <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
++                  <span className="ae-nav__sr"> (opens WhatsApp in a new tab)</span>
++                </a>
++              </li>
++              <li>
++                <a className="ae-support__item" href={`mailto:${SUPPORT_EMAIL}`}>
++                  <span className="ae-support__icon"><EnvelopeSimpleIcon size={26} weight="fill" aria-hidden="true" /></span>
++                  <span className="ae-support__label">
++                    <strong>Email</strong>
++                    <span>{SUPPORT_EMAIL}</span>
++                  </span>
++                  <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
++                </a>
++              </li>
++              <li>
++                <a className="ae-support__item" href={`tel:${SUPPORT_PHONE_LINK}`}>
++                  <span className="ae-support__icon"><PhoneCallIcon size={26} weight="fill" aria-hidden="true" /></span>
++                  <span className="ae-support__label">
++                    <strong>Call us</strong>
++                    <span>{SUPPORT_PHONE_DISPLAY}</span>
++                  </span>
++                  <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
++                </a>
++              </li>
++            </ul>
++          </div>
++        </dialog>
++      </aside>
++      <header className="ed-topbar portal-topbar ae-nav-content" data-theme={theme}>
++        <span className="ae-nav__toggle-slot">
++          <button ref={toggleRef} type="button" className="ae-nav__toggle"
++            aria-expanded={expanded} aria-controls={menuId}
++            aria-label={expanded ? 'Close navigation' : 'Open navigation'}
++            onClick={() => { setOpenedAt(location.key); setOpen(!expanded) }}>
++            {expanded ? <XIcon size={24} aria-hidden="true" /> : <ListIcon size={24} aria-hidden="true" />}
+           </button>
+-
+-          <ul className="ae-support__list">
+-            <li>
+-              <a className="ae-support__item" href={`https://wa.me/${SUPPORT_PHONE_LINK.replace('+', '')}`}
+-                target="_blank" rel="noopener noreferrer">
+-                <span className="ae-support__icon"><WhatsappLogoIcon size={26} weight="fill" aria-hidden="true" /></span>
+-                <span className="ae-support__label">
+-                  <strong>WhatsApp</strong>
+-                  <span>{SUPPORT_PHONE_DISPLAY}</span>
+-                </span>
+-                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+-                <span className="ae-nav__sr"> (opens WhatsApp in a new tab)</span>
+-              </a>
+-            </li>
+-            <li>
+-              <a className="ae-support__item" href={`mailto:${SUPPORT_EMAIL}`}>
+-                <span className="ae-support__icon"><EnvelopeSimpleIcon size={26} weight="fill" aria-hidden="true" /></span>
+-                <span className="ae-support__label">
+-                  <strong>Email</strong>
+-                  <span>{SUPPORT_EMAIL}</span>
+-                </span>
+-                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+-              </a>
+-            </li>
+-            <li>
+-              <a className="ae-support__item" href={`tel:${SUPPORT_PHONE_LINK}`}>
+-                <span className="ae-support__icon"><PhoneCallIcon size={26} weight="fill" aria-hidden="true" /></span>
+-                <span className="ae-support__label">
+-                  <strong>Call us</strong>
+-                  <span>{SUPPORT_PHONE_DISPLAY}</span>
+-                </span>
+-                <ArrowUpRightIcon className="ae-support__arrow" size={18} aria-hidden="true" />
+-              </a>
+-            </li>
+-          </ul>
+-        </div>
+-      </dialog>
+-    </aside>
++        </span>
++        {children}
++      </header>
++    </>
+   )
+-}
+\ No newline at end of file
++}
+diff --git a/frontend/src/components/CustomerPortalLayout.jsx b/frontend/src/components/CustomerPortalLayout.jsx
+new file mode 100644
+index 0000000..5d1bdcd
+--- /dev/null
++++ b/frontend/src/components/CustomerPortalLayout.jsx
+@@ -0,0 +1,81 @@
++import { useContext, useEffect, useState } from 'react'
++import { Link, Outlet } from 'react-router-dom'
++import { BellIcon, LightningIcon, MoonIcon, SunIcon } from '@phosphor-icons/react'
++import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
++import CustomerNavbar from './CustomerNavbar'
++import PortalChat from './PortalChat'
++
++const THEME_KEY = 'ethijahath-dashboard-theme'
++
++function initialTheme() {
++  try {
++    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
++  } catch {
++    return 'light'
++  }
++}
++
++export default function CustomerPortalLayout() {
++  const [theme, setTheme] = useState(initialTheme)
++  const notifications = useContext(NotificationsPreviewContext)?.data
++  const unread = notifications?.items.filter(item => !item.read_at).length ?? 0
++
++  useEffect(() => {
++    try {
++      localStorage.setItem(THEME_KEY, theme)
++    } catch {
++      // Theme switching also works without storage.
++    }
++  }, [theme])
++
++  return (
++    <>
++      <CustomerNavbar
++        companyName={notifications?.company_name}
++        customerName={notifications?.customer_name}
++        theme={theme}
++      >
++        <div className="ed-top-actions">
++          <a
++            className="ed-dispatch"
++            href="https://www.alethijahath.com/#dispatch-form"
++            target="_blank"
++            rel="noopener noreferrer"
++          >
++            <LightningIcon size={17} weight="fill" aria-hidden="true" />
++            Emergency dispatch
++            <span className="ed-sr-only"> (opens in a new tab)</span>
++          </a>
++
++          <Link
++            className="ed-icon-button"
++            to="/notifications"
++            aria-label={`Notifications, ${unread} unread`}
++          >
++            <BellIcon size={21} aria-hidden="true" />
++            {unread > 0 && (
++              <span className="ed-notification-count">{unread > 99 ? '99+' : unread}</span>
++            )}
++          </Link>
++
++          <button
++            type="button"
++            className="ed-icon-button"
++            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
++            onClick={() => setTheme(current => current === 'light' ? 'dark' : 'light')}
++          >
++            {theme === 'light'
++              ? <MoonIcon size={21} aria-hidden="true" />
++              : <SunIcon size={21} aria-hidden="true" />}
++          </button>
++        </div>
++      </CustomerNavbar>
++
++      <div className="ae-nav-content">
++        <Outlet context={{ theme }} />
++      </div>
++
++      <PortalChat />
++    </>
++  )
++}
+diff --git a/frontend/src/pages/AccountPage.jsx b/frontend/src/pages/AccountPage.jsx
+index d873c5f..4edc32a 100644
+--- a/frontend/src/pages/AccountPage.jsx
++++ b/frontend/src/pages/AccountPage.jsx
+@@ -1,5 +1,5 @@
+ import { useEffect, useId, useRef, useState } from 'react'
+-import { Link, useSearchParams } from 'react-router-dom'
++import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
+ import {
+   ArrowRightIcon,
+   BellRingingIcon,
+@@ -14,14 +14,12 @@ import {
+   LockKeyIcon,
+   LockSimpleIcon,
+   MapPinIcon,
+-  MoonIcon,
+   PencilSimpleIcon,
+   PhoneIcon,
+   PlusIcon,
+   ReceiptIcon,
+   SignOutIcon,
+   StorefrontIcon,
+-  SunIcon,
+   TreeStructureIcon,
+   TruckIcon,
+   UserCircleIcon,
+@@ -33,7 +31,6 @@ import {
+   XIcon,
+ } from '@phosphor-icons/react'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
+ import CompanyAvatar from '../components/CompanyAvatar'
+ import { ACCOUNT_PREVIEW_DATA } from '../data/accountPreviewData'
+ import './ServicesPage.css'
+@@ -86,7 +83,6 @@ import './AccountPage.css'
+ // the login and is not editable here.
+ // =========================================================
+ 
+-const THEME_KEY = 'ethijahath-dashboard-theme'
+ 
+ const STATUSES = {
+   active: { label: 'Active', tone: 'green' },
+@@ -147,18 +143,6 @@ const TOPICS = [
+   },
+ ]
+ 
+-function initialTheme() {
+-  try {
+-    const saved = localStorage.getItem(THEME_KEY)
+-
+-    if (saved === 'light' || saved === 'dark') return saved
+-  } catch {
+-    // Theme persistence is optional.
+-  }
+-
+-  return 'light'
+-}
+-
+ function formatDate(value) {
+   if (!value) return 'Not recorded'
+ 
+@@ -1240,7 +1224,7 @@ export default function AccountPage({
+   onSignOut,
+ }) {
+   const idBase = useId()
+-  const [theme, setTheme] = useState(initialTheme)
++  const { theme = 'light' } = useOutletContext() ?? {}
+   const [source, setSource] = useState(data)
+   const [account, setAccount] = useState(data?.account ?? null)
+   const [searchParams] = useSearchParams()
+@@ -1257,14 +1241,6 @@ export default function AccountPage({
+     setAccount(data?.account ?? null)
+   }
+ 
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem(THEME_KEY, theme)
+-    } catch {
+-      // The page remains usable without storage.
+-    }
+-  }, [theme])
+-
+   const ready = !loading && !error && Boolean(account)
+   const isDemo = Boolean(data?.is_demo)
+ 
+@@ -1391,36 +1367,7 @@ export default function AccountPage({
+ 
+   return (
+     <div className="sv-page ac-page" data-theme={theme}>
+-      <CustomerNavbar
+-        companyName={company?.name || 'Customer portal'}
+-        customerName={account?.contact.full_name || 'Customer account'}
+-        unreadCount={2}
+-        theme={theme}
+-        onSignOut={onSignOut}
+-      />
+-
+       <div className="sv-main">
+-        <header className="sv-topbar">
+-          <span>
+-            Customer portal / <strong>My account</strong>
+-          </span>
+-
+-          <button
+-            className="sv-theme-button"
+-            type="button"
+-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+-            onClick={() =>
+-              setTheme(value => (value === 'light' ? 'dark' : 'light'))
+-            }
+-          >
+-            {theme === 'light' ? (
+-              <MoonIcon size={21} aria-hidden="true" />
+-            ) : (
+-              <SunIcon size={21} aria-hidden="true" />
+-            )}
+-          </button>
+-        </header>
+-
+         <main
+           className="sv-content"
+           id="account-content"
+diff --git a/frontend/src/pages/AmcSchedulePage.css b/frontend/src/pages/AmcSchedulePage.css
+index 8d08dad..9711aa3 100644
+--- a/frontend/src/pages/AmcSchedulePage.css
++++ b/frontend/src/pages/AmcSchedulePage.css
+@@ -68,7 +68,6 @@ body:has(.sc-page) {
+ 
+ .sc-main {
+   min-width: 0;
+-  margin-left: 252px;
+ }
+ 
+ .sc-main :where(h1, h2, h3, h4, h5, p) {
+@@ -1741,12 +1740,6 @@ body:has(.sc-page) {
+   }
+ }
+ 
+-@media (width < 1024px) {
+-  .sc-main {
+-    margin-left: 0;
+-  }
+-}
+-
+ @media (max-width: 639px) {
+   .sc-content {
+     padding: 24px 16px;
+diff --git a/frontend/src/pages/AmcSchedulePage.jsx b/frontend/src/pages/AmcSchedulePage.jsx
+index 48ae330..217527d 100644
+--- a/frontend/src/pages/AmcSchedulePage.jsx
++++ b/frontend/src/pages/AmcSchedulePage.jsx
+@@ -1,5 +1,5 @@
+ import { useEffect, useId, useMemo, useRef, useState } from 'react'
+-import { useNavigate } from 'react-router-dom'
++import { useNavigate, useOutletContext } from 'react-router-dom'
+ import {
+   ArrowRightIcon,
+   ArrowsClockwiseIcon,
+@@ -8,14 +8,11 @@ import {
+   FilePdfIcon,
+   FileTextIcon,
+   MagnifyingGlassIcon,
+-  MoonIcon,
+-  SunIcon,
+   TruckIcon,
+   WarningCircleIcon,
+   XIcon,
+ } from '@phosphor-icons/react'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
+ import {
+   MAINTENANCE_PREVIEW_DATA,
+   ALTERNATIVE_PREVIEW,
+@@ -1593,22 +1590,10 @@ function ScheduleContent({ data, handlers }) {
+ // AMC & SERVICE SCHEDULE PAGE
+ // =========================================================
+ 
+-function initialTheme() {
+-  try {
+-    const saved = localStorage.getItem('ethijahath-dashboard-theme')
+-    if (saved === 'light' || saved === 'dark') return saved
+-  } catch {
+-    // Theme persistence is optional.
+-  }
+-  return 'light'
+-}
+-
+ export default function AmcSchedulePage({
+   data = MAINTENANCE_PREVIEW_DATA,
+   loading = false,
+   error = '',
+-  unreadCount = 2,
+-  onSignOut,
+   onOpenEquipment,
+   onOpenServiceHistory,
+   onOpenAppointment,
+@@ -1616,15 +1601,7 @@ export default function AmcSchedulePage({
+   onOpenCompletion,
+ }) {
+   const navigate = useNavigate()
+-  const [theme, setTheme] = useState(initialTheme)
+-
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem('ethijahath-dashboard-theme', theme)
+-    } catch {
+-      // The page remains usable without storage.
+-    }
+-  }, [theme])
++  const { theme = 'light' } = useOutletContext() ?? {}
+ 
+   const ready = !loading && !error && Boolean(data)
+ 
+@@ -1639,30 +1616,7 @@ export default function AmcSchedulePage({
+ 
+   return (
+     <div className="sc-page" data-theme={theme}>
+-      <CustomerNavbar
+-        companyName="Demo Customer Company"
+-        customerName="Customer account"
+-        unreadCount={unreadCount}
+-        theme={theme}
+-        onSignOut={onSignOut}
+-      />
+-
+       <div className="sc-main">
+-        <header className="sc-topbar">
+-          <span>
+-            Customer portal / <strong>AMC &amp; service schedule</strong>
+-          </span>
+-
+-          <button
+-            className="sc-theme-button"
+-            type="button"
+-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+-            onClick={() => setTheme(value => (value === 'light' ? 'dark' : 'light'))}
+-          >
+-            {theme === 'light' ? <MoonIcon size={21} aria-hidden="true" /> : <SunIcon size={21} aria-hidden="true" />}
+-          </button>
+-        </header>
+-
+         <main className="sc-content" id="schedule-content" tabIndex={-1} aria-busy={loading}>
+           <div className="sc-heading">
+             <h1>AMC &amp; service schedule</h1>
+diff --git a/frontend/src/pages/DashboardPage.css b/frontend/src/pages/DashboardPage.css
+index 3594444..5d04ff0 100644
+--- a/frontend/src/pages/DashboardPage.css
++++ b/frontend/src/pages/DashboardPage.css
+@@ -87,7 +87,6 @@ body:has(.ed-dashboard) {
+ 
+ .ed-main {
+   min-width: 0;
+-  margin-left: 252px;
+ }
+ 
+ .ed-main :where(h1, h2, h3, p) {
+@@ -183,30 +182,13 @@ body:has(.ed-dashboard) {
+   border-bottom: 1px solid var(--ed-line);
+ }
+ 
+-.ed-breadcrumb {
+-  display: flex;
+-  align-items: center;
+-  gap: 10px;
+-  font-size: 12px;
+-  color: var(--ed-muted);
+-}
+-
+-.ed-breadcrumb strong {
+-  color: var(--ed-text);
+-  font-weight: 600;
+-}
+-
+-.ed-breadcrumb > span {
+-  opacity: 0.5;
+-}
+-
+ .ed-top-actions {
+   display: flex;
+   align-items: center;
+   gap: 10px;
+ }
+ 
+-.ed-main .ed-dispatch {
++.portal-topbar .ed-dispatch {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+@@ -221,7 +203,7 @@ body:has(.ed-dashboard) {
+   transition: background-color 180ms ease;
+ }
+ 
+-.ed-main .ed-dispatch:hover {
++.portal-topbar .ed-dispatch:hover {
+   background: #8f000d;
+ }
+ 
+@@ -1742,16 +1724,6 @@ body:has(.ed-dashboard) {
+   }
+ }
+ 
+-/* =========================================================
+-   TABLETS: MATCH CUSTOMER NAVBAR BREAKPOINT
+-   ========================================================= */
+-
+-@media (width < 1024px) {
+-  .ed-main {
+-    margin-left: 0;
+-  }
+-}
+-
+ @media (max-width: 767px) {
+   .ed-chart-grid,
+   .ed-document-grid {
+@@ -1773,18 +1745,6 @@ body:has(.ed-dashboard) {
+     align-self: center;
+   }
+ 
+-  .ed-breadcrumb {
+-    display: none;
+-  }
+-
+-  .ed-top-actions {
+-    width: 100%;
+-  }
+-
+-  .ed-dispatch {
+-    margin-right: auto;
+-  }
+-
+   .ed-section-heading {
+     flex-wrap: wrap;
+   }
+@@ -1816,7 +1776,7 @@ body:has(.ed-dashboard) {
+     gap: 7px;
+   }
+ 
+-  .ed-main .ed-dispatch {
++  .portal-topbar .ed-dispatch {
+     gap: 6px;
+     padding-inline: 10px;
+     font-size: 10px;
+@@ -2679,8 +2639,8 @@ html:has(.ed-dashboard) {
+    ========================================================= */
+ 
+ .ed-dashboard .ed-button,
+-.ed-dashboard .ed-dispatch,
+-.ed-dashboard .ed-icon-button {
++.portal-topbar .ed-dispatch,
++.portal-topbar .ed-icon-button {
+   transition:
+     background-color 220ms ease,
+     border-color 220ms ease,
+@@ -2692,7 +2652,7 @@ html:has(.ed-dashboard) {
+ .ed-dashboard .ed-button > svg,
+ .ed-dashboard .ed-inline-link > svg,
+ .ed-dashboard .ed-heading-link > svg,
+-.ed-dashboard .ed-icon-button > svg {
++.portal-topbar .ed-icon-button > svg {
+   transition: transform 280ms var(--ed-ease-out);
+ }
+ 
+@@ -2706,19 +2666,19 @@ html:has(.ed-dashboard) {
+     transform: translateY(3px);
+   }
+ 
+-  .ed-dashboard .ed-dispatch:hover {
++  .portal-topbar .ed-dispatch:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 7px 18px rgb(178 34 34 / 18%);
+   }
+ 
+-  .ed-dashboard .ed-icon-button:hover > svg {
++  .portal-topbar .ed-icon-button:hover > svg {
+     transform: rotate(-8deg);
+   }
+ }
+ 
+ .ed-dashboard .ed-button:not(:disabled):active,
+-.ed-dashboard .ed-dispatch:active,
+-.ed-dashboard .ed-icon-button:active {
++.portal-topbar .ed-dispatch:active,
++.portal-topbar .ed-icon-button:active {
+   transform: scale(0.97);
+ }
+ 
+@@ -2918,6 +2878,45 @@ html:has(.ed-dashboard) {
+   color: var(--ed-muted);
+   font-size: 12px;
+ }
++.portal-topbar {
++  --ed-bg: #fbfaf1;
++  --ed-surface: #fffdfd;
++  --ed-text: #282321;
++  --ed-line: #e8e1d9;
++  --ed-accent: #8f000d;
++  --ed-accent-soft: #f6e8e5;
++  --ed-button: #b22222;
++  --ed-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
++  box-sizing: border-box;
++  background: var(--ed-bg);
++  color: var(--ed-text);
++  font: 14px/1.6 Arial, Helvetica, sans-serif;
++}
++
++.portal-topbar[data-theme='dark'] {
++  --ed-bg: #171415;
++  --ed-surface: #211d1e;
++  --ed-text: #f1e9e5;
++  --ed-line: #44363a;
++  --ed-accent: #ed9299;
++  --ed-accent-soft: #3b252b;
++  color-scheme: dark;
++}
++
++.portal-topbar .ed-top-actions {
++  margin-inline-start: auto;
++}
++
++.portal-topbar .ed-top-actions > :is(a, button) {
++  box-sizing: border-box;
++  text-decoration: none;
++}
++
++@media (max-width: 479px) {
++  .portal-topbar {
++    gap: 8px;
++  }
++}
+ 
+ /* =========================================================
+    UPCOMING MAINTENANCE — SECTION HEADING
+@@ -3000,4 +2999,4 @@ html:has(.ed-dashboard) {
+     height: 38px;
+     background-size: 21px;
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/frontend/src/pages/DashboardPage.jsx b/frontend/src/pages/DashboardPage.jsx
+index d61cad5..a16be5e 100644
+--- a/frontend/src/pages/DashboardPage.jsx
++++ b/frontend/src/pages/DashboardPage.jsx
+@@ -7,10 +7,7 @@ import {
+   CheckCircleIcon,
+   FilePdfIcon,
+   FileTextIcon,
+-  LightningIcon,
+-  MoonIcon,
+   ReceiptIcon,
+-  SunIcon,
+   TruckIcon,
+   WrenchIcon,
+ } from '@phosphor-icons/react'
+@@ -27,7 +24,7 @@ import {
+   YAxis,
+ } from 'recharts'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
++import { useOutletContext } from 'react-router-dom'
+ import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
+ import { DASHBOARD_PREVIEW_DATA } from '../data/dashboardPreviewData'
+ import './DashboardPage.css'
+@@ -252,20 +249,6 @@ function AnimatedValue({
+   )
+ }
+ 
+-function initialTheme() {
+-  try {
+-    const saved = localStorage.getItem('ethijahath-dashboard-theme')
+-
+-    if (saved === 'light' || saved === 'dark') {
+-      return saved
+-    }
+-  } catch {
+-    // The theme still works without browser storage.
+-  }
+-
+-  return 'light'
+-}
+-
+ function Status({ children, tone = 'neutral' }) {
+   return (
+     <span className={`ed-status ed-status--${tone}`}>
+@@ -369,22 +352,13 @@ export default function DashboardPage({
+   onReviewQuotation,
+   onReschedule,
+   onOpenEquipment,
+-  onSignOut,
+ }) {
+   const dashboardRef = useRef(null)
+-  const [theme, setTheme] = useState(initialTheme)
++  const { theme = 'light' } = useOutletContext() ?? {}
+   const [period, setPeriod] = useState('6')
+   const [query, setQuery] = useState('')
+   const reducedMotion = false
+ 
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem('ethijahath-dashboard-theme', theme)
+-    } catch {
+-      // Storage is optional.
+-    }
+-  }, [theme])
+-
+ 
+   const ready = !loading && !error && Boolean(data)
+   useDashboardMotion(dashboardRef, ready, reducedMotion)
+@@ -491,60 +465,7 @@ export default function DashboardPage({
+     >
+ 
+ 
+-      <CustomerNavbar
+-        companyName="Demo Customer Company"
+-        customerName="Customer account"
+-        unreadCount={2}
+-        theme={theme}
+-      />
+-
+       <div className="ed-main">
+-        {/* DASHBOARD TOPBAR */}
+-        <header className="ed-topbar">
+-          <div className="ed-breadcrumb">
+-            Customer portal <span>/</span> <strong>Overview</strong>
+-          </div>
+-
+-          <div className="ed-top-actions">
+-            <a
+-              className="ed-dispatch"
+-              href="https://www.alethijahath.com/#dispatch-form"
+-              target="_blank"
+-              rel="noopener noreferrer"
+-            >
+-              <LightningIcon size={17} weight="fill" aria-hidden="true" />
+-              Emergency dispatch
+-              <span className="ed-sr-only"> (opens in a new tab)</span>
+-            </a>
+-
+-            <a
+-              className="ed-icon-button"
+-              href="#notifications"
+-              aria-label={`Notifications, ${unread} unread`}
+-            >
+-              <BellIcon size={21} aria-hidden="true" />
+-              {unread > 0 && (
+-                <span className="ed-notification-count">{unread}</span>
+-              )}
+-            </a>
+-
+-            <button
+-              type="button"
+-              className="ed-icon-button"
+-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+-              onClick={() =>
+-                setTheme(current => current === 'light' ? 'dark' : 'light')
+-              }
+-            >
+-              {theme === 'light' ? (
+-                <MoonIcon size={21} aria-hidden="true" />
+-              ) : (
+-                <SunIcon size={21} aria-hidden="true" />
+-              )}
+-            </button>
+-          </div>
+-        </header>
+-
+         <main
+           className="ed-content"
+           id="overview"
+diff --git a/frontend/src/pages/DocumentsPage.css b/frontend/src/pages/DocumentsPage.css
+index f2a977c..7c865de 100644
+--- a/frontend/src/pages/DocumentsPage.css
++++ b/frontend/src/pages/DocumentsPage.css
+@@ -76,7 +76,6 @@ body:has(.dp-page) {
+ 
+ .dp-main {
+   min-width: 0;
+-  margin-left: 252px;
+ }
+ 
+ .dp-main :where(h1, h2, h3, p) {
+@@ -1008,10 +1007,6 @@ body:has(.dp-page) {
+ }
+ 
+ @media (width < 1024px) {
+-  .dp-main {
+-    margin-left: 0;
+-  }
+-
+   .dp-topbar {
+     padding-inline: 24px;
+   }
+diff --git a/frontend/src/pages/DocumentsPage.jsx b/frontend/src/pages/DocumentsPage.jsx
+index 6d4eda1..eb7d7c4 100644
+--- a/frontend/src/pages/DocumentsPage.jsx
++++ b/frontend/src/pages/DocumentsPage.jsx
+@@ -1,5 +1,5 @@
+-import { useEffect, useRef, useState } from 'react'
+-import { Link } from 'react-router-dom'
++import { useRef, useState } from 'react'
++import { Link, useOutletContext } from 'react-router-dom'
+ import {
+   DownloadSimpleIcon,
+   ArrowUpRightIcon,
+@@ -9,21 +9,16 @@ import {
+   FileTextIcon,
+   FolderOpenIcon,
+   MagnifyingGlassIcon,
+-  MapPinIcon,
+-  MoonIcon,
+   PaperclipIcon,
+   ReceiptIcon,
+-  SunIcon,
+   XIcon,
+ } from '@phosphor-icons/react'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
+ import DateRangeFilter from '../components/DateRangeFilter'
+ import { inDateRange } from '../utils/dateRange'
+ import { createDocumentsPreviewData } from '../data/documentsPreviewData'
+ import './DocumentsPage.css'
+ 
+-const THEME_KEY = 'ethijahath-dashboard-theme'
+ 
+ const DOCUMENT_TYPES = [
+   {
+@@ -80,14 +75,6 @@ const STATUS_LABELS = {
+   cancelled: 'Cancelled',
+ }
+ 
+-function initialTheme() {
+-  try {
+-    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
+-  } catch {
+-    return 'light'
+-  }
+-}
+-
+ function formatDate(value) {
+   if (!value) return 'Not recorded'
+ 
+@@ -343,7 +330,7 @@ export default function DocumentsPage({
+   onRetry,
+ }) {
+   const [previewData] = useState(createDocumentsPreviewData)
+-  const [theme, setTheme] = useState(initialTheme)
++  const { theme = 'light' } = useOutletContext() ?? {}
+   const [query, setQuery] = useState('')
+   const [category, setCategory] = useState('all')
+   const [site, setSite] = useState('all')
+@@ -356,14 +343,6 @@ export default function DocumentsPage({
+   const archive = data === undefined ? previewData : data
+   const ready = !loading && !error && Boolean(archive)
+ 
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem(THEME_KEY, theme)
+-    } catch {
+-      // Theme switching remains available without browser storage.
+-    }
+-  }, [theme])
+-
+   // Display filtering is not an authorization boundary.
+   // The backend must scope both records and file access to the customer.
+   const documents = ready
+@@ -441,44 +420,7 @@ export default function DocumentsPage({
+ 
+   return (
+     <div className="dp-page" data-theme={theme}>
+-      <CustomerNavbar
+-        companyName={archive?.company_name}
+-        customerName={archive?.customer_name}
+-        unreadCount={archive?.unread_count ?? 0}
+-        theme={theme}
+-      />
+-
+       <main className="dp-main">
+-        <header className="dp-topbar">
+-          <div className="dp-breadcrumb">
+-            <span>Customer portal</span>
+-            <span aria-hidden="true">/</span>
+-            <strong>Reports &amp; documents</strong>
+-          </div>
+-
+-          <div className="dp-topbar-actions">
+-            {archive?.region_name && (
+-              <span className="dp-region">
+-                <MapPinIcon size={17} aria-hidden="true" />
+-                {archive.region_name}
+-              </span>
+-            )}
+-
+-            <button
+-              type="button"
+-              className="dp-icon-button"
+-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+-              onClick={() =>
+-                setTheme(value => value === 'light' ? 'dark' : 'light')
+-              }
+-            >
+-              {theme === 'light'
+-                ? <MoonIcon size={20} aria-hidden="true" />
+-                : <SunIcon size={20} aria-hidden="true" />}
+-            </button>
+-          </div>
+-        </header>
+-
+         <div className="dp-content">
+           <div className="dp-heading">
+             <div>
+diff --git a/frontend/src/pages/EquipmentPage.css b/frontend/src/pages/EquipmentPage.css
+index 4c0a92f..da6ff5e 100644
+--- a/frontend/src/pages/EquipmentPage.css
++++ b/frontend/src/pages/EquipmentPage.css
+@@ -66,7 +66,6 @@ body:has(.eq-page) {
+ 
+ .eq-main {
+   min-width: 0;
+-  margin-left: 252px;
+ }
+ 
+ .eq-main :where(h1, h2, h3, p) {
+@@ -1090,12 +1089,6 @@ body:has(.eq-page) {
+   }
+ }
+ 
+-@media (width < 1024px) {
+-  .eq-main {
+-    margin-left: 0;
+-  }
+-}
+-
+ @media (max-width: 639px) {
+   .eq-content {
+     padding: 24px 16px;
+diff --git a/frontend/src/pages/EquipmentPage.jsx b/frontend/src/pages/EquipmentPage.jsx
+index b8e1e19..5983518 100644
+--- a/frontend/src/pages/EquipmentPage.jsx
++++ b/frontend/src/pages/EquipmentPage.jsx
+@@ -5,14 +5,12 @@ import {
+   CalendarBlankIcon,
+   CheckCircleIcon,
+   MagnifyingGlassIcon,
+-  MoonIcon,
+-  SunIcon,
+   TruckIcon,
+   WrenchIcon,
+   XIcon,
+ } from '@phosphor-icons/react'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
++import { useOutletContext } from 'react-router-dom'
+ import { EQUIPMENT_PREVIEW_DATA } from '../data/equipmentPreviewData'
+ import './EquipmentPage.css'
+ 
+@@ -94,20 +92,6 @@ const SERVICE_STATUSES = {
+   cancelled: 'Cancelled',
+ }
+ 
+-function initialTheme() {
+-  try {
+-    const saved = localStorage.getItem('ethijahath-dashboard-theme')
+-
+-    if (saved === 'light' || saved === 'dark') {
+-      return saved
+-    }
+-  } catch {
+-    // Theme persistence is optional.
+-  }
+-
+-  return 'light'
+-}
+-
+ function formatDate(value) {
+   if (!value) return 'Not recorded'
+ 
+@@ -732,7 +716,6 @@ export default function EquipmentPage({
+   data = EQUIPMENT_PREVIEW_DATA,
+   loading = false,
+   error = '',
+-  onSignOut,
+   onOpenService,
+   onOpenCoverage,
+   onOpenAppointment,
+@@ -740,21 +723,13 @@ export default function EquipmentPage({
+   onRequestService,
+ }) {
+ 
+-  const [theme, setTheme] = useState(initialTheme)
++  const { theme = 'light' } = useOutletContext() ?? {}
+   const [query, setQuery] = useState('')
+   const [site, setSite] = useState('all')
+   const [coverageFilter, setCoverageFilter] = useState('all')
+   const [recordFilter, setRecordFilter] = useState('current')
+   const [activityFilter, setActivityFilter] = useState('all')
+ 
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem('ethijahath-dashboard-theme', theme)
+-    } catch {
+-      // The page remains usable without storage.
+-    }
+-  }, [theme])
+-
+   const ready = !loading && !error && Boolean(data)
+   const equipment = ready ? data.equipment : []
+ 
+@@ -837,33 +812,7 @@ export default function EquipmentPage({
+     <div className="eq-page" data-theme={theme}>
+ 
+ 
+-      <CustomerNavbar
+-        companyName="Demo Customer Company"
+-        customerName="Customer account"
+-        unreadCount={2}
+-        theme={theme}
+-      />
+-
+       <div className="eq-main">
+-        <header className="eq-topbar">
+-          <span>Customer portal / <strong>My equipment</strong></span>
+-
+-          <button
+-            className="eq-theme-button"
+-            type="button"
+-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+-            onClick={() =>
+-              setTheme(value => value === 'light' ? 'dark' : 'light')
+-            }
+-          >
+-            {theme === 'light' ? (
+-              <MoonIcon size={21} aria-hidden="true" />
+-            ) : (
+-              <SunIcon size={21} aria-hidden="true" />
+-            )}
+-          </button>
+-        </header>
+-
+         <main
+           className="eq-content"
+           id="equipment-content"
+diff --git a/frontend/src/pages/InvoicesPage.jsx b/frontend/src/pages/InvoicesPage.jsx
+index 0bc3a24..c65f767 100644
+--- a/frontend/src/pages/InvoicesPage.jsx
++++ b/frontend/src/pages/InvoicesPage.jsx
+@@ -7,15 +7,13 @@ import {
+   DownloadSimpleIcon,
+   MagnifyingGlassIcon,
+   MapPinIcon,
+-  MoonIcon,
+   ReceiptIcon,
+-  SunIcon,
+   WalletIcon,
+   WarningCircleIcon,
+   XIcon,
+ } from '@phosphor-icons/react'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
++import { useOutletContext } from 'react-router-dom'
+ import DateRangeFilter from '../components/DateRangeFilter'
+ import { inDateRange } from '../utils/dateRange'
+ import { INVOICES_PREVIEW_DATA } from '../data/invoicesPreviewData'
+@@ -69,7 +67,6 @@ import './InvoicesPage.css'
+ // - Customers cannot pay or edit here. Our team records payments.
+ // =========================================================
+ 
+-const THEME_KEY = 'ethijahath-dashboard-theme'
+ 
+ const JOB_TYPES = { amc: 'AMC', service: 'Service', general: 'General' }
+ 
+@@ -95,20 +92,6 @@ const TABS = [
+   { value: 'all', label: 'All invoices' },
+ ]
+ 
+-function initialTheme() {
+-  try {
+-    const saved = localStorage.getItem(THEME_KEY)
+-
+-    if (saved === 'light' || saved === 'dark') {
+-      return saved
+-    }
+-  } catch {
+-    // Theme persistence is optional.
+-  }
+-
+-  return 'light'
+-}
+-
+ const toMinor = value => Math.round(Number(value || 0) * 100)
+ 
+ function formatMoney(value, currency) {
+@@ -769,7 +752,7 @@ export default function InvoicesPage({
+   onDownloadInvoice,
+   onDownloadStatement,
+ }) {
+-  const [theme, setTheme] = useState(initialTheme)
++  const { theme = 'light' } = useOutletContext() ?? {}
+   const [tab, setTab] = useState('open')
+   const [query, setQuery] = useState('')
+   const [site, setSite] = useState('all')
+@@ -777,14 +760,6 @@ export default function InvoicesPage({
+   const [dateTo, setDateTo] = useState('')
+   const [selected, setSelected] = useState(null)
+ 
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem(THEME_KEY, theme)
+-    } catch {
+-      // The page remains usable without storage.
+-    }
+-  }, [theme])
+-
+   const ready = !loading && !error && Boolean(data)
+   const invoices = ready ? data.invoices : []
+   const issued = invoices.filter(invoice => invoice.status === 'issued')
+@@ -872,35 +847,7 @@ export default function InvoicesPage({
+     <div className="sv-page" data-theme={theme}>
+ 
+ 
+-      <CustomerNavbar
+-        companyName="Demo Customer Company"
+-        customerName="Customer account"
+-        unreadCount={2}
+-        theme={theme}
+-      />
+-
+       <div className="sv-main">
+-        <header className="sv-topbar">
+-          <span>
+-            Customer portal / <strong>Invoices &amp; payments</strong>
+-          </span>
+-
+-          <button
+-            className="sv-theme-button"
+-            type="button"
+-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+-            onClick={() =>
+-              setTheme(value => (value === 'light' ? 'dark' : 'light'))
+-            }
+-          >
+-            {theme === 'light' ? (
+-              <MoonIcon size={21} aria-hidden="true" />
+-            ) : (
+-              <SunIcon size={21} aria-hidden="true" />
+-            )}
+-          </button>
+-        </header>
+-
+         <main
+           className="sv-content"
+           id="invoices-content"
+diff --git a/frontend/src/pages/NotificationsPage.css b/frontend/src/pages/NotificationsPage.css
+index d90062c..d699576 100644
+--- a/frontend/src/pages/NotificationsPage.css
++++ b/frontend/src/pages/NotificationsPage.css
+@@ -63,7 +63,6 @@ body:has(.np-page) {
+ 
+ .np-main {
+   min-width: 0;
+-  margin-left: 252px;
+ }
+ 
+ .np-main *,
+@@ -792,10 +791,6 @@ body:has(.np-page) {
+ }
+ 
+ @media (width < 1024px) {
+-  .np-main {
+-    margin-left: 0;
+-  }
+-
+   .np-content,
+   .np-topbar {
+     padding-inline: 20px;
+diff --git a/frontend/src/pages/NotificationsPage.jsx b/frontend/src/pages/NotificationsPage.jsx
+index 81e2f13..8dfec7b 100644
+--- a/frontend/src/pages/NotificationsPage.jsx
++++ b/frontend/src/pages/NotificationsPage.jsx
+@@ -1,5 +1,5 @@
+ import { useContext, useEffect, useId, useRef, useState } from 'react'
+-import { Link } from 'react-router-dom'
++import { Link, useOutletContext } from 'react-router-dom'
+ import {
+   ArrowUpRightIcon,
+   BellIcon,
+@@ -9,20 +9,15 @@ import {
+   FileTextIcon,
+   LightningIcon,
+   MagnifyingGlassIcon,
+-  MapPinIcon,
+-  MoonIcon,
+   ReceiptIcon,
+-  SunIcon,
+   WrenchIcon,
+ } from '@phosphor-icons/react'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
+ import DateRangeFilter from '../components/DateRangeFilter'
+ import { inDateRange } from '../utils/dateRange'
+ import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
+ import './NotificationsPage.css'
+ 
+-const THEME_KEY = 'ethijahath-dashboard-theme'
+ const PAGE_SIZE = 8
+ 
+ const CATEGORIES = {
+@@ -54,14 +49,6 @@ const dateTime = new Intl.DateTimeFormat('en-GB', {
+   minute: '2-digit',
+ })
+ 
+-function initialTheme() {
+-  try {
+-    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
+-  } catch {
+-    return 'light'
+-  }
+-}
+-
+ const relativeTime = new Intl.RelativeTimeFormat('en', {
+   numeric: 'always',
+   style: 'short',
+@@ -164,7 +151,7 @@ function NotificationCard({ item, onRead, now }) {
+ 
+ export default function NotificationsPage() {
+   const store = useContext(NotificationsPreviewContext)
+-  const [theme, setTheme] = useState(initialTheme)
++  const { theme = 'light' } = useOutletContext() ?? {}
+   const [filters, setFilters] = useState(INITIAL_FILTERS)
+   const [limit, setLimit] = useState(PAGE_SIZE)
+   const [announcement, setAnnouncement] = useState('')
+@@ -176,14 +163,6 @@ export default function NotificationsPage() {
+     return () => window.clearInterval(timer)
+   }, [])
+ 
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem(THEME_KEY, theme)
+-    } catch {
+-      // Theme still works when browser storage is unavailable.
+-    }
+-  }, [theme])
+-
+   if (!store) {
+     return <main><h1>Notification preview is unavailable</h1></main>
+   }
+@@ -294,39 +273,7 @@ export default function NotificationsPage() {
+ 
+   return (
+     <div className="np-page" data-theme={theme}>
+-      <CustomerNavbar
+-        companyName={data.company_name}
+-        customerName={data.customer_name}
+-        theme={theme}
+-      />
+-
+       <main className="np-main">
+-        <header className="np-topbar">
+-          <div className="np-breadcrumb">
+-            <span>Customer portal</span>
+-            <span aria-hidden="true">/</span>
+-            <strong>Notifications</strong>
+-          </div>
+-
+-          <div className="np-topbar-actions">
+-            <span className="np-region">
+-              <MapPinIcon size={17} aria-hidden="true" />
+-              {data.region_name}
+-            </span>
+-
+-            <button
+-              type="button"
+-              className="np-icon-button"
+-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} theme`}
+-              onClick={() => setTheme(value => value === 'light' ? 'dark' : 'light')}
+-            >
+-              {theme === 'light'
+-                ? <MoonIcon size={20} aria-hidden="true" />
+-                : <SunIcon size={20} aria-hidden="true" />}
+-            </button>
+-          </div>
+-        </header>
+-
+         <div className="np-content">
+           <div className="np-heading">
+             <div>
+diff --git a/frontend/src/pages/QuotationsPage.css b/frontend/src/pages/QuotationsPage.css
+index 226d232..b03db47 100644
+--- a/frontend/src/pages/QuotationsPage.css
++++ b/frontend/src/pages/QuotationsPage.css
+@@ -85,7 +85,6 @@ body:has(.qt-page) {
+ 
+ .qt-main {
+   min-width: 0;
+-  margin-left: 252px;
+ }
+ 
+ .qt-main :where(h1, h2, h3, p) {
+@@ -1338,10 +1337,6 @@ body:has(.qt-page) {
+ }
+ 
+ @media (width < 1024px) {
+-  .qt-main {
+-    margin-left: 0;
+-  }
+-
+   .qt-topbar {
+     padding-inline: 24px;
+   }
+diff --git a/frontend/src/pages/QuotationsPage.jsx b/frontend/src/pages/QuotationsPage.jsx
+index 944f5ca..b231afb 100644
+--- a/frontend/src/pages/QuotationsPage.jsx
++++ b/frontend/src/pages/QuotationsPage.jsx
+@@ -1,5 +1,5 @@
+ import { useEffect, useRef, useState } from 'react'
+-import { useNavigate } from 'react-router-dom'
++import { useNavigate, useOutletContext } from 'react-router-dom'
+ import {
+   ArrowCounterClockwiseIcon,
+   ArrowUpRightIcon,
+@@ -8,19 +8,14 @@ import {
+   DownloadSimpleIcon,
+   FileTextIcon,
+   MagnifyingGlassIcon,
+-  MapPinIcon,
+-  MoonIcon,
+-  SunIcon,
+   XIcon,
+ } from '@phosphor-icons/react'
+-import CustomerNavbar from '../components/CustomerNavbar'
+ import DateRangeFilter from '../components/DateRangeFilter'
+ import { inDateRange } from '../utils/dateRange'
+ import { createDemoQuotations } from '../data/quotationsPreviewData'
+ import { INSPECTIONS_PREVIEW_DATA } from '../data/inspectionsPreviewData'
+ import './QuotationsPage.css'
+ 
+-const THEME_KEY = 'ethijahath-dashboard-theme'
+ 
+ const STATUS_LABELS = {
+   sent: 'Awaiting approval',
+@@ -847,21 +842,7 @@ export default function QuotationsPage({
+   const [dateTo, setDateTo] = useState('')
+   const [selectedId, setSelectedId] = useState(null)
+ 
+-  const [theme, setTheme] = useState(() => {
+-    try {
+-      return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
+-    } catch {
+-      return 'light'
+-    }
+-  })
+-
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem(THEME_KEY, theme)
+-    } catch {
+-      // The page still works if browser storage is unavailable.
+-    }
+-  }, [theme])
++  const { theme = 'light' } = useOutletContext() ?? {}
+ 
+   useEffect(() => {
+     const timer = window.setInterval(() => setNow(Date.now()), 30000)
+@@ -1014,45 +995,7 @@ export default function QuotationsPage({
+     <div className="qt-page" data-theme={theme}>
+ 
+ 
+-      <CustomerNavbar
+-        companyName="Demo Customer Company"
+-        customerName="Customer account"
+-        unreadCount={2}
+-        theme={theme}
+-      />
+       <main className="qt-main" id="qt-main" tabIndex={-1}>
+-        <header className="qt-topbar">
+-          <div className="qt-breadcrumb">
+-            <span>Customer portal</span>
+-            <span aria-hidden="true">/</span>
+-            <strong>Inspections &amp; quotations</strong>
+-          </div>
+-
+-          <div className="qt-topbar-actions">
+-            <span className="qt-region">
+-              <MapPinIcon size={17} aria-hidden="true" />
+-              Riyadh
+-            </span>
+-
+-            <button
+-              type="button"
+-              className="qt-icon-button"
+-              onClick={() =>
+-                setTheme(current => (current === 'light' ? 'dark' : 'light'))
+-              }
+-              aria-label={`Switch to ${
+-                theme === 'light' ? 'dark' : 'light'
+-              } theme`}
+-            >
+-              {theme === 'light' ? (
+-                <MoonIcon size={20} aria-hidden="true" />
+-              ) : (
+-                <SunIcon size={20} aria-hidden="true" />
+-              )}
+-            </button>
+-          </div>
+-        </header>
+-
+         <div className="qt-content">
+           <div className="qt-page-heading">
+             <div>
+diff --git a/frontend/src/pages/ServicesPage.css b/frontend/src/pages/ServicesPage.css
+index 9ee0b90..3d2acf5 100644
+--- a/frontend/src/pages/ServicesPage.css
++++ b/frontend/src/pages/ServicesPage.css
+@@ -66,7 +66,6 @@ body:has(.sv-page) {
+ 
+ .sv-main {
+   min-width: 0;
+-  margin-left: 252px;
+ }
+ 
+ .sv-main :where(h1, h2, h3, p, dl, dd, ol) {
+@@ -1256,12 +1255,6 @@ body:has(.sv-page) {
+   }
+ }
+ 
+-@media (width < 1024px) {
+-  .sv-main {
+-    margin-left: 0;
+-  }
+-}
+-
+ @media (max-width: 639px) {
+   .sv-content {
+     padding: 24px 16px;
+diff --git a/frontend/src/pages/ServicesPage.jsx b/frontend/src/pages/ServicesPage.jsx
+index 4ea431e..d9417c5 100644
+--- a/frontend/src/pages/ServicesPage.jsx
++++ b/frontend/src/pages/ServicesPage.jsx
+@@ -1,5 +1,5 @@
+ import { useEffect, useId, useRef, useState } from 'react'
+-import { useSearchParams } from 'react-router-dom'
++import { useSearchParams, useOutletContext } from 'react-router-dom'
+ import { Link } from 'react-router-dom'
+ import {
+   ArrowRightIcon,
+@@ -11,16 +11,13 @@ import {
+   FileTextIcon,
+   MagnifyingGlassIcon,
+   MapPinIcon,
+-  MoonIcon,
+   PlusIcon,
+-  SunIcon,
+   UserIcon,
+   WarningCircleIcon,
+   WrenchIcon,
+   XIcon,
+ } from '@phosphor-icons/react'
+ 
+-import CustomerNavbar from '../components/CustomerNavbar'
+ import DateRangeFilter from '../components/DateRangeFilter'
+ import { inDateRange } from '../utils/dateRange'
+ import { SERVICES_PREVIEW_DATA } from '../data/servicesPreviewData'
+@@ -77,7 +74,6 @@ import './ServicesPage.css'
+ // This page expects the complete collection, not one API page.
+ // =========================================================
+ 
+-const THEME_KEY = 'ethijahath-dashboard-theme'
+ 
+ const JOB_TYPES = {
+   amc: 'AMC',
+@@ -159,20 +155,6 @@ const TABS = [
+ 
+ const ACTIVE_JOB_STATUSES = ['enquiry', 'open', 'in_progress']
+ 
+-function initialTheme() {
+-  try {
+-    const saved = localStorage.getItem(THEME_KEY)
+-
+-    if (saved === 'light' || saved === 'dark') {
+-      return saved
+-    }
+-  } catch {
+-    // Theme persistence is optional.
+-  }
+-
+-  return 'light'
+-}
+-
+ function formatDate(value, includeTime = false) {
+   if (!value) return 'Not recorded'
+ 
+@@ -918,7 +900,7 @@ export default function ServicesPage({
+   const [searchParams] = useSearchParams()
+   const initialServiceReference = searchParams.get('service') || ''
+ 
+-  const [theme, setTheme] = useState(initialTheme)
++  const { theme = 'light' } = useOutletContext() ?? {}
+   const [tab, setTab] = useState(
+     initialServiceReference ? 'all' : 'active',
+   )
+@@ -929,14 +911,6 @@ export default function ServicesPage({
+   const [dateTo, setDateTo] = useState('')
+   const [requestOpen, setRequestOpen] = useState(false)
+ 
+-  useEffect(() => {
+-    try {
+-      localStorage.setItem(THEME_KEY, theme)
+-    } catch {
+-      // The page remains usable without storage.
+-    }
+-  }, [theme])
+-
+   const ready = !loading && !error && Boolean(data)
+   const jobs = ready ? data.jobs : []
+ 
+@@ -1008,35 +982,7 @@ export default function ServicesPage({
+     <div className="sv-page" data-theme={theme}>
+ 
+ 
+-      <CustomerNavbar
+-        companyName="Demo Customer Company"
+-        customerName="Customer account"
+-        unreadCount={2}
+-        theme={theme}
+-      />
+-
+       <div className="sv-main">
+-        <header className="sv-topbar">
+-          <span>
+-            Customer portal / <strong>Service jobs</strong>
+-          </span>
+-
+-          <button
+-            className="sv-theme-button"
+-            type="button"
+-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+-            onClick={() =>
+-              setTheme(value => (value === 'light' ? 'dark' : 'light'))
+-            }
+-          >
+-            {theme === 'light' ? (
+-              <MoonIcon size={21} aria-hidden="true" />
+-            ) : (
+-              <SunIcon size={21} aria-hidden="true" />
+-            )}
+-          </button>
+-        </header>
+-
+         <main
+           className="sv-content"
+           id="services-content"

@@ -770,7 +770,7 @@
 /* Mobile and tablet navigation */
 @media (width < 1024px) {
   .ae-nav {
-    --ae-drawer-width: min(252px, 100vw);
+    --ae-drawer-width: min(280px, 100vw);
     --ae-drawer-duration: 550ms;
     position: relative;
     z-index: 10000;
@@ -796,11 +796,23 @@
     color: #f1e9e5;
   }
 
-  .ae-nav__toggle-slot .ae-nav__toggle[aria-expanded='true'] {
-    position: fixed;
-    z-index: 10003;
-    inset-inline-start: calc(min(252px, 100vw) - 56px);
-    inset-block-start: 24px;
+  .ae-nav .ae-nav__header {
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 12px 8px;
+  }
+
+  .ae-nav .ae-nav__brand {
+    padding: 0;
+  }
+
+  .ae-nav .ae-nav__brand img {
+    width: 124px;
+    height: auto;
+  }
+
+  .ae-nav .ae-nav__drawer-close {
+    flex: 0 0 44px;
     border-color: #8f000d;
     background: #8f000d;
     color: #fff;
