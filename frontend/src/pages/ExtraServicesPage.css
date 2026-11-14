@@ -576,33 +576,6 @@
 .xs-history-bar .xs-chips { margin: 0; }
 .xs-history-bar .sv-date-filters { width: 100%; }
 
-.xs-history-bar .drf-quick > button:not(.drf-clear) {
-  padding-inline: 12px;
-  border-radius: 8px;
-  background: var(--sv-soft);
-  white-space: nowrap;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .xs-history-bar .drf-quick > button:not(.drf-clear):hover {
-    border-color: var(--sv-accent);
-    background: var(--sv-accent-soft);
-    color: var(--sv-accent);
-  }
-}
-
-.xs-history-bar .sv-date-filters > summary {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  list-style: none;
-}
-
-.xs-history-bar .sv-date-filters > summary::-webkit-details-marker {
-  display: none;
-}
-
 .xs-chips i,
 .xs-pill::before { width: 8px; height: 8px; border-radius: 50%; background: var(--xs-tone, var(--sv-muted)); }
 

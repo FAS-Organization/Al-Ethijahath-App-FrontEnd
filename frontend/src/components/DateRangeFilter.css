@@ -105,3 +105,29 @@
 .drf-wrap {
   padding: 0 24px 8px;
 }
+
+:is(.sv-date-filters, .dp-date-filters) > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+}
+
+:is(.sv-date-filters, .dp-date-filters) > summary::-webkit-details-marker {
+  display: none;
+}
+
+.drf-quick > button:not(.drf-clear) {
+  padding-inline: 12px;
+  border-radius: 8px;
+  background: var(--sv-soft, var(--qt-soft, var(--dp-soft, var(--np-soft))));
+  white-space: nowrap;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .drf-quick > button:not(.drf-clear):hover {
+    background: var(--sv-accent-soft, var(--qt-accent-soft, var(--dp-accent-soft,
+      color-mix(in srgb, var(--qt-accent) 12%, var(--qt-surface)))));
+  }
+}

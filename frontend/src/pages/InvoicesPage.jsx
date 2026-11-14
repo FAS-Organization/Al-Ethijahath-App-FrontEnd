@@ -1018,7 +1018,8 @@ export default function InvoicesPage({
                 </div>
                 <details className="sv-date-filters">
                   <summary>
-                    Filter by date{(dateFrom || dateTo) && ' · Active'}
+                    <CalendarBlankIcon size={15} aria-hidden="true" />
+                    <span>Filter by date{(dateFrom || dateTo) && ' · Active'}</span>
                   </summary>
 
                   <div className="sv-date-filters-body">

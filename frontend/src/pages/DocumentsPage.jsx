@@ -584,7 +584,8 @@ export default function DocumentsPage({
 
                   <details className="dp-date-filters">
                     <summary>
-                      Filter by date{(dateFrom || dateTo) && ' · Active'}
+                      <CalendarBlankIcon size={15} aria-hidden="true" />
+                      <span>Filter by date{(dateFrom || dateTo) && ' · Active'}</span>
                     </summary>
 
                     <div className="dp-date-filters-body">
