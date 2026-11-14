@@ -1187,7 +1187,15 @@ export default function QuotationsPage({
             </div>
 
             <details className="qt-filter-disclosure">
-              <summary>Filter quotations</summary>
+              <summary>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+                  <path d="M3 5h9m6 0h3M3 12h3m6 0h9M3 19h9m6 0h3" />
+                  <circle cx="15" cy="5" r="3" />
+                  <circle cx="9" cy="12" r="3" />
+                  <circle cx="15" cy="19" r="3" />
+                </svg>
+                Filter quotations
+              </summary>
 
               <div className="qt-filters" aria-label="Filter quotations by status">
                 {FILTERS.map(filter => (

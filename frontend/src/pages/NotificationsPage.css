@@ -538,12 +538,31 @@ body:has(.np-page) {
 }
 
 .np-more-filters summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
   width: fit-content;
   padding-block: 5px;
   color: var(--np-accent);
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.np-more-filters summary::-webkit-details-marker {
+  display: none;
+}
+
+.np-more-filters > summary {
+  padding-inline: 10px;
+  border-radius: 8px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.np-more-filters[open] > summary {
+  background: var(--np-accent);
+  color: var(--np-surface);
 }
 
 .np-more-fields {

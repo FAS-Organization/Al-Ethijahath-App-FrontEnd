@@ -379,8 +379,16 @@ export default function NotificationsPage() {
 
               <details className="np-more-filters">
                 <summary>
-                  Filter by site or date
-                  {(filters.site !== 'all' || filters.from || filters.to) && ' · Active'}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" aria-hidden="true">
+                    <path d="M3 5h9m6 0h3M3 12h3m6 0h9M3 19h9m6 0h3" />
+                    <circle cx="15" cy="5" r="3" />
+                    <circle cx="9" cy="12" r="3" />
+                    <circle cx="15" cy="19" r="3" />
+                  </svg>
+                  <span>
+                    Filter by site or date
+                    {(filters.site !== 'all' || filters.from || filters.to) && ' · Active'}
+                  </span>
                 </summary>
                 <div className="np-more-fields">
                   <label className="np-select">

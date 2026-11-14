@@ -522,6 +522,10 @@ body:has(.qt-page) {
 }
 
 .qt-filter-disclosure > summary {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
   width: fit-content;
   margin: 0 24px 12px;
   padding: 7px 12px;
@@ -531,6 +535,10 @@ body:has(.qt-page) {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+}
+
+.qt-filter-disclosure > summary::-webkit-details-marker {
+  display: none;
 }
 
 .qt-filter-disclosure > summary:hover,
