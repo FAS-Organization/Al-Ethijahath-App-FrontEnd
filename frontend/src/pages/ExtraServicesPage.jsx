@@ -607,7 +607,10 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
                     />
 
                     <details className="sv-date-filters">
-                      <summary>Filter by date{(dateFrom || dateTo) && ' · Active'}</summary>
+                      <summary>
+                        <CalendarBlankIcon size={15} aria-hidden="true" />
+                        <span>Filter by date{(dateFrom || dateTo) && ' · Active'}</span>
+                      </summary>
                       <div className="sv-date-filters-body">
                         <DateRangeFilter
                           label="Order date"
