@@ -254,22 +254,67 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
   const [upcomingOpen, setUpcomingOpen] = useState(false)
   const servicesRef = useRef(null)
   const stackOriginRef = useRef(null)
+  const upcomingTriggerRef = useRef(null)
+  const closingRef = useRef(false)
+  const lastLockedService = SERVICES.findLast(item => item.locked)
 
-  function toggleUpcoming(event) {
+  async function toggleUpcoming(event) {
+    if (closingRef.current) return
+
     if (!upcomingOpen) {
       stackOriginRef.current = event.currentTarget.getBoundingClientRect()
+      setUpcomingOpen(true)
+      return
     }
 
-    setUpcomingOpen(open => !open)
+    closingRef.current = true
+
+    const cards = Array.from(servicesRef.current.querySelectorAll('.xs-locked-card'))
+    const currentRects = cards.map(card => card.getBoundingClientRect())
+
+    cards.forEach(card => card.getAnimations().forEach(animation => animation.cancel()))
+
+    const rests = cards.map(card => card.getBoundingClientRect())
+    const origin = rests[0]
+
+    const animations = cards.map((card, index) => {
+      const current = currentRects[index]
+      const rest = rests[index]
+      const x = origin.left - rest.left + Math.min(index, 2) * 5
+      const y = origin.top - rest.top
+
+      return card.animate(
+        [
+          { transform: `translate(${current.left - rest.left}px, ${current.top - rest.top}px)` },
+          { transform: `translate(${x}px, ${y}px)` },
+        ],
+        {
+          duration: 420,
+          delay: (cards.length - 1 - index) * 45,
+          easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+          fill: 'both',
+        },
+      )
+    })
+
+    await Promise.allSettled(animations.map(animation => animation.finished))
+    if (servicesRef.current) setUpcomingOpen(false)
   }
 
   useLayoutEffect(() => {
-    const origin = stackOriginRef.current
-    if (!upcomingOpen || !origin) return
+    if (!upcomingOpen) {
+      if (closingRef.current) {
+        closingRef.current = false
+        upcomingTriggerRef.current?.focus({ preventScroll: true })
+      }
+      return
+    }
 
+    const origin = stackOriginRef.current
+    if (!origin) return
     stackOriginRef.current = null
 
-    const cards = servicesRef.current.querySelectorAll('.xs-service:disabled')
+    const cards = Array.from(servicesRef.current.querySelectorAll('.xs-locked-card'))
     const offsets = Array.from(cards, (card, index) => {
       const target = card.getBoundingClientRect()
 
@@ -374,36 +419,57 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
 
           <div className="xs-service-picker" ref={servicesRef}>
             <div className="xs-services" role="tablist" aria-label="Extra services">
-              {SERVICES.filter(item => upcomingOpen || !item.locked).map(({ id, title, text, icon: Icon, locked }) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  className="xs-service"
-                  aria-selected={service === id}
-                  aria-disabled={locked || undefined}
-                  disabled={locked}
-                  onClick={() => setService(id)}
-                >
-                  <span className="xs-service-icon"><Icon size={22} aria-hidden="true" /></span>
-                  <span className="xs-service-text">
-                    <strong>{title}</strong>
-                    <small>{locked ? 'Coming soon' : text}</small>
-                  </span>
-                  {locked && <LockSimpleIcon className="xs-service-lock" size={16} aria-hidden="true" />}
-                </button>
-              ))}
+              {SERVICES.filter(item => upcomingOpen || !item.locked).map(({ id, title, text, icon: Icon, locked }) => {
+                const card = (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    className="xs-service"
+                    aria-selected={service === id}
+                    aria-disabled={locked || undefined}
+                    disabled={locked}
+                    onClick={() => setService(id)}
+                  >
+                    <span className="xs-service-icon"><Icon size={22} aria-hidden="true" /></span>
+                    <span className="xs-service-text">
+                      <strong>{title}</strong>
+                      <small>{locked ? 'Coming soon' : text}</small>
+                    </span>
+                    {locked && <LockSimpleIcon className="xs-service-lock" size={16} aria-hidden="true" />}
+                  </button>
+                )
+
+                if (!locked) return card
+
+                return (
+                  <div className="xs-locked-card" key={id}>
+                    {card}
+                    {id === lastLockedService?.id && (
+                      <button
+                        type="button"
+                        className="xs-upcoming-arrow xs-upcoming-close"
+                        aria-label="Collapse upcoming services"
+                        onClick={toggleUpcoming}
+                      />
+                    )}
+                  </div>
+                )
+              })}
             </div>
 
-            <button
-              type="button"
-              className="xs-upcoming-trigger"
-              aria-expanded={upcomingOpen}
-              onClick={toggleUpcoming}
-            >
-              {upcomingOpen ? 'Collapse upcoming services' : 'Upcoming Services'}
-              <span className="xs-upcoming-arrow" aria-hidden="true" />
-            </button>
+            {!upcomingOpen && (
+              <button
+                ref={upcomingTriggerRef}
+                type="button"
+                className="xs-upcoming-trigger"
+                aria-expanded={false}
+                onClick={toggleUpcoming}
+              >
+                Upcoming Services
+                <span className="xs-upcoming-arrow" aria-hidden="true" />
+              </button>
+            )}
           </div>
 
           {service === 'rentals' && (

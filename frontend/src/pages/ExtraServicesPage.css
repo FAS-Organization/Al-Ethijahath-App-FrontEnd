@@ -88,9 +88,9 @@
   min-height: 70px;
   min-width: 0;
   padding: 10px 12px;
-  border: 1px solid var(--sv-line);
+  border: 1px dashed var(--sv-line);
   border-radius: 14px;
-  background: var(--sv-surface);
+  background: transparent;
   color: var(--sv-heading);
   font-size: 14px;
   font-weight: 600;
@@ -98,26 +98,26 @@
   cursor: pointer;
 }
 
-.xs-upcoming-trigger[aria-expanded='false']::before,
-.xs-upcoming-trigger[aria-expanded='false']::after {
+.xs-upcoming-trigger::before,
+.xs-upcoming-trigger::after {
   content: '';
   position: absolute;
-  width: 12px;
-  border: 1px solid var(--sv-line);
-  border-radius: 0 12px 12px 0;
+  inset: -1px;
+  border: 1px dashed var(--sv-muted);
+  border-radius: inherit;
+  background: transparent;
+  clip-path: inset(0 0 0 calc(100% - 5px));
   pointer-events: none;
 }
 
-.xs-upcoming-trigger[aria-expanded='false']::before {
-  z-index: -1;
-  inset: 5px -5px 5px auto;
-  background: var(--sv-soft);
+.xs-upcoming-trigger::before {
+  transform: translateX(5px);
+  opacity: 0.65;
 }
 
-.xs-upcoming-trigger[aria-expanded='false']::after {
-  z-index: -2;
-  inset: 10px -10px 10px auto;
-  background: var(--sv-accent-soft);
+.xs-upcoming-trigger::after {
+  transform: translateX(10px);
+  opacity: 0.35;
 }
 
 .xs-upcoming-arrow {
@@ -139,13 +139,33 @@
   transform: rotate(45deg);
 }
 
-.xs-upcoming-trigger[aria-expanded='true'] {
-  grid-column: 1 / -1;
-  justify-self: start;
-  min-height: 44px;
+.xs-locked-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
 }
 
-.xs-upcoming-trigger[aria-expanded='true'] .xs-upcoming-arrow::before {
+.xs-locked-card:has(.xs-upcoming-close) .xs-service {
+  padding-inline-end: 46px;
+}
+
+.xs-locked-card:has(.xs-upcoming-close) .xs-service-lock {
+  display: none;
+}
+
+.xs-upcoming-close {
+  position: absolute;
+  inset-inline-end: 5px;
+  top: 50%;
+  width: 36px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.xs-upcoming-close::before {
   transform: rotate(-135deg);
 }
 
