@@ -19,70 +19,124 @@
   --chat-close-hover: #3b252b;
 }
 
-.portal-chat__launcher {
+.portal-chat__robot-launcher {
+  --robot-size: 88px;
+
   position: fixed;
-  right: var(--chat-right);
-  bottom: calc(var(--chat-bottom) + 16px);
+  right: env(safe-area-inset-right, 0px);
+  bottom: calc(var(--chat-bottom) + 12px);
   z-index: 35;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 54px;
-  padding: 0 18px 0 10px;
-  border: 1px solid #8f000d;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0);
-  color: #8f000d;
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 55%),
-    0 6px 20px rgb(28 59 120 / 26%);
-  -webkit-backdrop-filter: blur(2px) saturate(140%);
-  backdrop-filter: blur(2px) saturate(140%);
-  font: 700 15px/1 Arial, Helvetica, sans-serif;
+  width: calc(var(--robot-size) - 18px);
+  height: calc(var(--robot-size) + 16px);
+  padding: 0;
+  border: 0;
+  border-radius: 22px 0 0 22px;
+  background: transparent;
+  clip-path: inset(-16px 0 -16px -24px);
   cursor: pointer;
-  transition: background-color 160ms ease, box-shadow 160ms ease;
+  touch-action: manipulation;
 }
 
-.portal-chat__launcher:hover {
-  background-color: rgb(213 228 255 / 72%);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 55%),
-    0 8px 24px rgb(28 59 120 / 36%);
+.portal-chat__robot-launcher:focus-visible {
+  outline: 2px solid var(--chat-focus);
+  outline-offset: -2px;
 }
 
-#root:has(.ae-nav[data-theme='dark']) .portal-chat__launcher {
-  border-color: #ed9299;
-  background-color: rgb(0 0 0 / 0%);
-  color: #ed9299;
+.portal-chat__robot-launcher > svg {
+  position: absolute;
+  top: 8px;
+  left: 3px;
+  display: block;
+  width: var(--robot-size);
+  height: var(--robot-size);
+  overflow: visible;
+  filter: drop-shadow(0 5px 7px rgb(47 15 30 / 30%));
+  transform: rotate(-25deg);
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-#root:has(.ae-nav[data-theme='dark']) .portal-chat__launcher:hover {
-  background-color: rgb(18 36 77 / 88%);
+.portal-chat__robot-body {
+  animation: portal-chat-robot-float 3.8s ease-in-out infinite;
 }
 
-.portal-chat__launcher > svg {
-  box-sizing: border-box;
-  flex: none;
-  width: 34px;
-  height: 34px;
-  padding: 7px;
-  border-radius: 50%;
-  background: #8f000d;
-  color: #d5e4ff;
+.portal-chat__robot-look {
+  transform: translate(var(--robot-look-x, 0px), var(--robot-look-y, 0px));
+  transition: transform 120ms ease-out;
+}
+
+.portal-chat__robot-blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: portal-chat-robot-blink 4.8s ease-in-out infinite;
+}
+
+.portal-chat__robot-arm {
+  transform-origin: 66px 66px;
+}
+
+.portal-chat__robot-small-smile,
+.portal-chat__robot-grin {
+  transition: opacity 140ms ease;
+}
+
+.portal-chat__robot-grin {
+  opacity: 0;
+}
+
+.portal-chat__robot-launcher:is(:focus-visible, :active) .portal-chat__robot-grin {
+  opacity: 1;
+}
+
+.portal-chat__robot-launcher:is(:focus-visible, :active) .portal-chat__robot-small-smile {
+  opacity: 0;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .portal-chat__robot-launcher:hover > svg {
+    transform: translate(-11px, -4px) rotate(-8deg) scale(1.05);
+  }
+
+  .portal-chat__robot-launcher:hover .portal-chat__robot-arm {
+    animation: portal-chat-robot-wave 620ms ease-in-out 2;
+  }
+
+  .portal-chat__robot-launcher:hover .portal-chat__robot-grin {
+    opacity: 1;
+  }
+
+  .portal-chat__robot-launcher:hover .portal-chat__robot-small-smile {
+    opacity: 0;
+  }
+}
+
+.portal-chat__robot-launcher:active > svg {
+  transform: translate(-4px, 3px) rotate(-16deg) scale(0.94);
+}
+
+.portal-chat__robot-launcher:active .portal-chat__robot-blink:first-child {
+  animation: none;
+  transform: scaleY(0.13);
+}
+
+@keyframes portal-chat-robot-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes portal-chat-robot-blink {
+  0%, 86%, 94%, 100% { transform: scaleY(1); }
+  90% { transform: scaleY(0.12); }
+}
+
+@keyframes portal-chat-robot-wave {
+  0%, 100% { transform: rotate(0); }
+  33% { transform: rotate(-24deg); }
+  67% { transform: rotate(10deg); }
 }
 
 @media (width < 425px) {
-  .portal-chat__launcher {
-    gap: 7px;
-    min-height: 46px;
-    padding: 0 12px 0 7px;
-    font-size: 13px;
-  }
-
-  .portal-chat__launcher > svg {
-    width: 28px;
-    height: 28px;
-    padding: 5px;
+  .portal-chat__robot-launcher {
+    --robot-size: 74px;
   }
 }
 
