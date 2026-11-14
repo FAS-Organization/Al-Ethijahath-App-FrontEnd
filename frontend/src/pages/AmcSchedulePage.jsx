@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import {
   ArrowRightIcon,
@@ -762,6 +762,28 @@ function ScheduleContent({ data, handlers }) {
   const [contractStatus, setContractStatus] = useState('all')
   const [contractSite, setContractSite] = useState('all')
   const [view, setView] = useState('upcoming')
+  const visitSegmentsRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const segments = visitSegmentsRef.current
+    const selected = segments?.querySelector('.sc-segment[aria-pressed="true"]')
+    if (!selected) return
+
+    function positionHighlight() {
+      segments.style.setProperty('--sc-visit-x', `${selected.offsetLeft}px`)
+      segments.style.setProperty('--sc-visit-y', `${selected.offsetTop}px`)
+      segments.style.setProperty('--sc-visit-width', `${selected.offsetWidth}px`)
+      segments.style.setProperty('--sc-visit-height', `${selected.offsetHeight}px`)
+      segments.dataset.glideReady = 'true'
+    }
+
+    positionHighlight()
+
+    const observer = new ResizeObserver(positionHighlight)
+    observer.observe(segments)
+    segments.querySelectorAll('.sc-segment').forEach(button => observer.observe(button))
+    return () => observer.disconnect()
+  }, [tab, view])
   const [siteFilter, setSiteFilter] = useState('all')
   const [equipmentFilter, setEquipmentFilter] = useState('all')
   const [purposeFilter, setPurposeFilter] = useState('all')
@@ -1314,7 +1336,7 @@ function ScheduleContent({ data, handlers }) {
       {tab === 'schedule' && (
         <section id="sc-panel-schedule" role="tabpanel" aria-labelledby="sc-tab-schedule" className="sc-panel">
           <div className="sc-toolbar">
-            <div className="sc-segments" role="group" aria-label="Show visits">
+            <div ref={visitSegmentsRef} className="sc-segments" role="group" aria-label="Show visits">
               {[
                 ['upcoming', 'Upcoming'],
                 ['past', 'Past'],

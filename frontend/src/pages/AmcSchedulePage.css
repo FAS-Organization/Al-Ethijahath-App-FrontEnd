@@ -614,6 +614,7 @@ body:has(.sc-page) {
 }
 
 .sc-segments {
+  position: relative;
   display: inline-flex;
   padding: 4px;
   gap: 4px;
@@ -623,6 +624,7 @@ body:has(.sc-page) {
 }
 
 .sc-segment {
+  position: relative;
   min-height: 40px;
   padding: 0 20px;
   border: 0;
@@ -639,6 +641,29 @@ body:has(.sc-page) {
   background: var(--sc-button);
   color: #fff;
   box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+}
+
+.sc-segments[data-glide-ready='true']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--sc-visit-width);
+  height: var(--sc-visit-height);
+  border-radius: 7px;
+  background: var(--sc-button);
+  box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+  pointer-events: none;
+  transform: translate(var(--sc-visit-x), var(--sc-visit-y));
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sc-segments[data-glide-ready='true'] .sc-segment[aria-pressed='true'] {
+  background: transparent;
+  box-shadow: none;
 }
 
 /* ---------- Sections on the contracts tab ---------- */
@@ -1876,7 +1901,7 @@ body:has(.sc-page) {
   }
 
   .sc-main *:not(.sc-summary-item, .sc-summary-icon),
-  .sc-main *::before,
+  .sc-main :not(.sc-segments)::before,
   .sc-main *::after,
   .sc-dialog,
   .sc-dialog::backdrop {
