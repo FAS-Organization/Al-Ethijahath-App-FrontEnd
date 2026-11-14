@@ -15,6 +15,7 @@ import {
 
 import { useOutletContext } from 'react-router-dom'
 import DateRangeFilter from '../components/DateRangeFilter'
+import useServiceFilterGlide from '../components/useServiceFilterGlide'
 import { inDateRange } from '../utils/dateRange'
 import { INVOICES_PREVIEW_DATA } from '../data/invoicesPreviewData'
 // Shared page shell, summary cards, tabs, search, dialog and button styles.
@@ -761,6 +762,7 @@ export default function InvoicesPage({
   const [selected, setSelected] = useState(null)
 
   const ready = !loading && !error && Boolean(data)
+  const filterTabsRef = useServiceFilterGlide(tab, ready)
   const invoices = ready ? data.invoices : []
   const issued = invoices.filter(invoice => invoice.status === 'issued')
   const openInvoices = invoices.filter(isOpen)
@@ -972,7 +974,7 @@ export default function InvoicesPage({
                 </div>
               )}
 
-              <div className="sv-tabs" role="group" aria-label="Invoice filter">
+              <div ref={filterTabsRef} className="sv-tabs" role="group" aria-label="Invoice filter">
                 {TABS.map(item => (
                   <button
                     key={item.value}

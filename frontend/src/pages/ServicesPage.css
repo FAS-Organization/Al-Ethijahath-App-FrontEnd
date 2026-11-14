@@ -413,22 +413,30 @@ body:has(.sv-page) {
    ========================================================= */
 
 .sv-tabs {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  gap: 4px;
   margin-bottom: 16px;
+  padding: 4px;
+  border: 1px solid var(--sv-line);
+  border-radius: 10px;
+  background: var(--sv-soft);
 }
 
 .sv-tab {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 9px;
-  min-height: 44px;
-  padding: 9px 14px;
-  border: 1px solid var(--sv-line);
-  border-radius: 8px;
-  background: var(--sv-surface);
-  color: var(--sv-text);
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--sv-muted);
   font-size: 13px;
   cursor: pointer;
   transition:
@@ -454,9 +462,44 @@ body:has(.sv-page) {
 }
 
 .sv-tab[aria-pressed='true'] {
-  border-color: var(--sv-accent);
-  background: var(--sv-accent-soft);
-  color: var(--sv-accent);
+  background: var(--sv-button);
+  color: #fff;
+  box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+}
+
+.sv-tab[aria-pressed='true'] .sv-tab-count {
+  background: rgb(255 255 255 / 18%);
+  color: inherit;
+}
+
+.sv-tabs[data-glide-ready='true']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--sv-tab-width);
+  height: var(--sv-tab-height);
+  border-radius: 7px;
+  background: var(--sv-button);
+  box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+  pointer-events: none;
+  transform: translate(var(--sv-tab-x), var(--sv-tab-y));
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sv-tabs[data-glide-ready='true'] .sv-tab[aria-pressed='true'] {
+  background: transparent;
+  box-shadow: none;
+}
+
+@media (forced-colors: active) {
+  .sv-tab[aria-pressed='true'] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
 }
 
 
@@ -1302,8 +1345,6 @@ body:has(.sv-page) {
 
   .sv-tabs {
     flex-wrap: nowrap;
-    margin-inline: -16px;
-    padding-inline: 16px;
     overflow-x: auto;
     scrollbar-width: none;
   }

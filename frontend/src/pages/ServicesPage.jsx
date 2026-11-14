@@ -19,6 +19,7 @@ import {
 } from '@phosphor-icons/react'
 
 import DateRangeFilter from '../components/DateRangeFilter'
+import useServiceFilterGlide from '../components/useServiceFilterGlide'
 import { inDateRange } from '../utils/dateRange'
 import { SERVICES_PREVIEW_DATA } from '../data/servicesPreviewData'
 import './ServicesPage.css'
@@ -912,6 +913,7 @@ export default function ServicesPage({
   const [requestOpen, setRequestOpen] = useState(false)
 
   const ready = !loading && !error && Boolean(data)
+  const filterTabsRef = useServiceFilterGlide(tab, ready)
   const jobs = ready ? data.jobs : []
 
   const sites = Array.from(
@@ -1095,7 +1097,7 @@ export default function ServicesPage({
                 </div>
               )}
 
-              <div className="sv-tabs" role="group" aria-label="Job filter">
+              <div ref={filterTabsRef} className="sv-tabs" role="group" aria-label="Job filter">
                 {TABS.map(item => (
                   <button
                     key={item.value}
