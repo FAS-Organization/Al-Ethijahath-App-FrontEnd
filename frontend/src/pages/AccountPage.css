@@ -261,6 +261,31 @@
   animation: ac-rise 520ms var(--sv-ease) 80ms both;
 }
 
+.ac-tabs[data-highlight='ready']::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--ac-highlight-width);
+  height: var(--ac-highlight-height);
+  border-radius: 9px;
+  background: var(--sv-accent-soft);
+  pointer-events: none;
+  transform: translate(var(--ac-highlight-x), var(--ac-highlight-y));
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ac-tabs[data-highlight='ready'] .ac-tab[aria-selected='true'] {
+  background: transparent;
+}
+
+.ac-tabs[data-highlight='ready'] .ac-tab::before {
+  display: none;
+}
+
 .ac-tab {
   position: relative;
   display: flex;
@@ -984,7 +1009,6 @@
   .ac-tab:hover:not([aria-selected='true']) {
     background: var(--sv-soft);
     color: var(--sv-text);
-    transform: translateX(4px);
   }
 
   .ac-row:not(.is-editing):hover,
@@ -1070,7 +1094,7 @@
   }
 
   .ac-tabs {
-    position: static;
+    position: relative;
     display: flex;
     gap: 6px;
     overflow-x: auto;
@@ -1214,6 +1238,18 @@
   .ac-page .sv-main *,
   .ac-page .sv-dialog * {
     transition-duration: 0.01ms !important;
+  }
+
+  .ac-page .ac-switch .ac-switch-track {
+    transition: background-color 240ms ease !important;
+  }
+
+  .ac-page .ac-switch .ac-switch-track > span {
+    transition: transform 300ms var(--sv-ease) !important;
+  }
+
+  .ac-page .ac-switch .ac-switch-icon {
+    transition: background-color 220ms ease, color 220ms ease !important;
   }
 
   .ac-site:hover,

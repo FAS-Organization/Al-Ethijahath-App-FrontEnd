@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useSearchParams, useOutletContext } from 'react-router-dom'
 import {
   ArrowRightIcon,
@@ -1233,6 +1233,7 @@ export default function AccountPage({
   )
   const [siteDialog, setSiteDialog] = useState(null)
   const [passwordOpen, setPasswordOpen] = useState(false)
+  const tabListRef = useRef(null)
   const tabRefs = useRef({})
 
   // A new data object from the API replaces what is shown.
@@ -1243,6 +1244,29 @@ export default function AccountPage({
 
   const ready = !loading && !error && Boolean(account)
   const isDemo = Boolean(data?.is_demo)
+
+  useLayoutEffect(() => {
+    const track = tabListRef.current
+    const selected = tabRefs.current[section]
+    if (!track || !selected) return
+
+    function positionHighlight() {
+      track.style.setProperty('--ac-highlight-x', `${selected.offsetLeft}px`)
+      track.style.setProperty('--ac-highlight-y', `${selected.offsetTop}px`)
+      track.style.setProperty('--ac-highlight-width', `${selected.offsetWidth}px`)
+      track.style.setProperty('--ac-highlight-height', `${selected.offsetHeight}px`)
+      track.dataset.highlight = 'ready'
+    }
+
+    positionHighlight()
+
+    const observer = new ResizeObserver(positionHighlight)
+    observer.observe(track)
+    Object.values(tabRefs.current).forEach(tab => {
+      if (tab) observer.observe(tab)
+    })
+    return () => observer.disconnect()
+  }, [ready, section])
 
   // Runs the real handler, or pretends to save in preview mode.
   async function persist(handler, payload, fallbackWait = 700) {
@@ -1487,6 +1511,7 @@ export default function AccountPage({
 
               <div className="ac-layout">
                 <div
+                  ref={tabListRef}
                   className="ac-tabs"
                   role="tablist"
                   aria-label="Account sections"
