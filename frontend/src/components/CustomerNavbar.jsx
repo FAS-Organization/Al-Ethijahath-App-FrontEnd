@@ -1,7 +1,7 @@
 import { useContext, useEffect, useId, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
-  SquaresFourIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
+  SquaresFourIcon, ToolboxIcon, TruckIcon, WrenchIcon, CalendarBlankIcon,
   FileTextIcon, ReceiptIcon, FolderOpenIcon, BellIcon,
   UserCircleIcon, HeadsetIcon, SignOutIcon, XIcon,
   WhatsappLogoIcon, EnvelopeSimpleIcon, PhoneCallIcon, ArrowUpRightIcon,
@@ -19,6 +19,7 @@ export const CUSTOMER_NAV_ITEMS = [
   { id: 'maintenance', label: 'AMC & service', to: '/maintenance', icon: CalendarBlankIcon },
   { id: 'quotations', label: 'Inspections & quotations', to: '/quotations', icon: FileTextIcon },
   { id: 'billing', label: 'Invoices & payments', to: '/billing', icon: ReceiptIcon },
+  { id: 'extras', label: 'Extra services', to: '/extras', icon: ToolboxIcon },
   { id: 'documents', label: 'Reports & documents', to: '/documents', icon: FolderOpenIcon },
   { id: 'notifications', label: 'Notifications', to: '/notifications', icon: BellIcon },
   { id: 'account', label: 'My account', to: '/account', icon: UserCircleIcon },
@@ -30,6 +31,7 @@ const INITIAL_PAGES = [
   'services',
   'maintenance',
   'billing',
+  'extras',
   'documents',
   'notifications',
   'account',
