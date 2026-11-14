@@ -221,6 +221,9 @@
 }
 
 .xs-chips {
+  --xs-status-fill: #514752;
+  position: relative;
+  isolation: isolate;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 4px;
@@ -230,6 +233,42 @@
   border: 1px solid var(--sv-line);
   border-radius: 10px;
   background: var(--sv-soft);
+}
+
+.xs-chips::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 0 auto auto 0;
+  width: var(--xs-selection-width, 0px);
+  height: var(--xs-selection-height, 0px);
+  transform: translate(var(--xs-selection-x, 0px), var(--xs-selection-y, 0px));
+  border-radius: 7px;
+  background: var(--xs-status-fill);
+  pointer-events: none;
+}
+
+.xs-chips[data-glide='true']::before {
+  transition:
+    transform 240ms var(--sv-ease),
+    width 240ms var(--sv-ease),
+    height 240ms var(--sv-ease),
+    background-color 160ms ease;
+}
+
+.xs-chips[data-selected-status='processing'],
+.xs-chips button[data-status='processing'] {
+  --xs-status-fill: #865015;
+}
+
+.xs-chips[data-selected-status='confirmed'],
+.xs-chips button[data-status='confirmed'] {
+  --xs-status-fill: #256845;
+}
+
+.xs-chips[data-selected-status='rejected'],
+.xs-chips button[data-status='rejected'] {
+  --xs-status-fill: #a22e36;
 }
 
 .xs-chips button {
@@ -250,7 +289,6 @@
 }
 
 .xs-chips button[aria-pressed='true'] {
-  background: var(--sv-button);
   color: #fff;
 }
 
@@ -258,7 +296,7 @@
   min-width: 20px;
   padding: 2px 5px;
   border-radius: 6px;
-  background: var(--sv-line);
+  background: color-mix(in srgb, var(--xs-status-fill) 16%, var(--sv-surface));
   color: var(--sv-text);
   font-size: 11px;
   line-height: 1.2;
@@ -274,6 +312,13 @@
   .xs-chips button:hover:not([aria-pressed='true']) {
     background: var(--sv-accent-soft);
     color: var(--sv-accent);
+  }
+}
+
+@media (forced-colors: active) {
+  .xs-chips button[aria-pressed='true'] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
   }
 }
 

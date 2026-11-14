@@ -164,7 +164,7 @@ function ConfirmDialog({ order, onClose, onHistory }) {
   )
 }
 
-function CategorySegments({ categories, category, onChange }) {
+function useSegmentGlide(options, selected) {
   const trackRef = useRef(null)
 
   useLayoutEffect(() => {
@@ -174,15 +174,24 @@ function CategorySegments({ categories, category, onChange }) {
 
     function positionIndicator() {
       track.style.setProperty('--xs-selection-x', `${active.offsetLeft}px`)
+      track.style.setProperty('--xs-selection-y', `${active.offsetTop}px`)
       track.style.setProperty('--xs-selection-width', `${active.offsetWidth}px`)
+      track.style.setProperty('--xs-selection-height', `${active.offsetHeight}px`)
     }
 
     positionIndicator()
 
     const observer = new ResizeObserver(positionIndicator)
+    observer.observe(track)
     track.querySelectorAll('button').forEach(button => observer.observe(button))
     return () => observer.disconnect()
-  }, [categories, category])
+  }, [options, selected])
+
+  return trackRef
+}
+
+function CategorySegments({ categories, category, onChange }) {
+  const trackRef = useSegmentGlide(categories, category)
 
   return (
     <div className="xs-category-scroll">
@@ -206,6 +215,35 @@ function CategorySegments({ categories, category, onChange }) {
           </button>
         ))}
       </div>
+    </div>
+  )
+}
+
+function OrderStatusSegments({ statusFilter, counts, onChange }) {
+  const trackRef = useSegmentGlide(STATUS_FILTERS, statusFilter)
+
+  return (
+    <div
+      ref={trackRef}
+      className="xs-chips"
+      role="group"
+      aria-label="Order status"
+      data-selected-status={statusFilter}
+    >
+      {STATUS_FILTERS.map(item => (
+        <button
+          key={item.value}
+          type="button"
+          data-status={item.value}
+          aria-pressed={statusFilter === item.value}
+          onClick={event => {
+            trackRef.current.dataset.glide = String(event.detail > 0)
+            onChange(item.value)
+          }}
+        >
+          {item.label} <span>{counts[item.value]}</span>
+        </button>
+      ))}
     </div>
   )
 }
@@ -397,19 +435,11 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
               ) : (
                 <div className="xs-history">
                   <div className="xs-history-bar">
-                    <div className="xs-chips" role="group" aria-label="Order status">
-                      {STATUS_FILTERS.map(item => (
-                        <button
-                          key={item.value}
-                          type="button"
-                          data-status={item.value}
-                          aria-pressed={statusFilter === item.value}
-                          onClick={() => setStatusFilter(item.value)}
-                        >
-                          {item.label} <span>{counts[item.value]}</span>
-                        </button>
-                      ))}
-                    </div>
+                    <OrderStatusSegments
+                      statusFilter={statusFilter}
+                      counts={counts}
+                      onChange={setStatusFilter}
+                    />
 
                     <details className="sv-date-filters">
                       <summary>Filter by date{(dateFrom || dateTo) && ' · Active'}</summary>
