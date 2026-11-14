@@ -88,7 +88,7 @@
   min-height: 70px;
   min-width: 0;
   padding: 10px 12px;
-  border: 1px dashed var(--sv-line);
+  border: 1px solid var(--sv-line);
   border-radius: 14px;
   background: transparent;
   color: var(--sv-heading);
@@ -98,26 +98,15 @@
   cursor: pointer;
 }
 
-.xs-upcoming-trigger::before,
-.xs-upcoming-trigger::after {
+.xs-upcoming-trigger::before {
   content: '';
   position: absolute;
   inset: -1px;
-  border: 1px dashed var(--sv-muted);
+  border: 1px solid var(--sv-line);
   border-radius: inherit;
-  background: transparent;
-  clip-path: inset(0 0 0 calc(100% - 5px));
+  clip-path: inset(0 0 0 calc(100% - 16px));
+  transform: translateX(6px);
   pointer-events: none;
-}
-
-.xs-upcoming-trigger::before {
-  transform: translateX(5px);
-  opacity: 0.65;
-}
-
-.xs-upcoming-trigger::after {
-  transform: translateX(10px);
-  opacity: 0.35;
 }
 
 .xs-upcoming-arrow {
