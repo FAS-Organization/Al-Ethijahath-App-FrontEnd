@@ -1,4 +1,4 @@
-import { useContext, useEffect, useId, useRef, useState } from 'react'
+import { useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
 import { Link, useOutletContext } from 'react-router-dom'
 import {
   ArrowUpRightIcon,
@@ -156,7 +156,30 @@ export default function NotificationsPage() {
   const [limit, setLimit] = useState(PAGE_SIZE)
   const [announcement, setAnnouncement] = useState('')
   const resultsRef = useRef(null)
-    const [now, setNow] = useState(Date.now)
+  const tabsRef = useRef(null)
+  const [now, setNow] = useState(Date.now)
+  const hasStore = Boolean(store)
+
+  useLayoutEffect(() => {
+    const tabs = tabsRef.current
+    const selected = tabs?.querySelector('.np-tab[aria-pressed="true"]')
+    if (!selected) return
+
+    function positionHighlight() {
+      tabs.style.setProperty('--np-highlight-x', `${selected.offsetLeft}px`)
+      tabs.style.setProperty('--np-highlight-y', `${selected.offsetTop}px`)
+      tabs.style.setProperty('--np-highlight-width', `${selected.offsetWidth}px`)
+      tabs.style.setProperty('--np-highlight-height', `${selected.offsetHeight}px`)
+      tabs.dataset.highlight = 'ready'
+    }
+
+    positionHighlight()
+
+    const observer = new ResizeObserver(positionHighlight)
+    observer.observe(tabs)
+    tabs.querySelectorAll('.np-tab').forEach(tab => observer.observe(tab))
+    return () => observer.disconnect()
+  }, [filters.view, hasStore])
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 60000)
@@ -322,7 +345,7 @@ export default function NotificationsPage() {
           <section className="np-inbox" aria-labelledby="np-inbox-title">
             <h2 id="np-inbox-title" className="np-sr-only">Your updates</h2>
 
-            <div className="np-tabs" role="group" aria-label="Read status and actions">
+            <div ref={tabsRef} className="np-tabs" role="group" aria-label="Read status and actions">
               {views.map(({ id, label, count, icon: Icon }) => (
                 <button
                   type="button"
