@@ -256,6 +256,7 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
   const stackOriginRef = useRef(null)
   const upcomingTriggerRef = useRef(null)
   const closingRef = useRef(false)
+  const panelTopRef = useRef(0)
   const lastLockedService = SERVICES.findLast(item => item.locked)
 
   async function toggleUpcoming(event) {
@@ -285,27 +286,52 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
 
       return card.animate(
         [
-          { transform: `translate(${current.left - rest.left}px, ${current.top - rest.top}px)` },
-          { transform: `translate(${x}px, ${y}px)` },
+          {
+            transform: `translate(${current.left - rest.left}px, ${current.top - rest.top}px)`,
+            opacity: 1,
+          },
+          { offset: 0.72, opacity: 1 },
+          { transform: `translate(${x}px, ${y}px)`, opacity: 0.25 },
         ],
         {
-          duration: 420,
-          delay: (cards.length - 1 - index) * 45,
-          easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+          duration: 540,
+          delay: (cards.length - 1 - index) * 32,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
           fill: 'both',
         },
       )
     })
 
     await Promise.allSettled(animations.map(animation => animation.finished))
-    if (servicesRef.current) setUpcomingOpen(false)
+
+    const panel = servicesRef.current?.nextElementSibling
+    if (!panel) return
+
+    panelTopRef.current = panel.getBoundingClientRect().top
+    setUpcomingOpen(false)
   }
 
   useLayoutEffect(() => {
     if (!upcomingOpen) {
       if (closingRef.current) {
         closingRef.current = false
-        upcomingTriggerRef.current?.focus({ preventScroll: true })
+
+        const panel = servicesRef.current.nextElementSibling
+        const distance = panelTopRef.current - panel.getBoundingClientRect().top
+
+        if (distance) {
+          panel.animate(
+            [{ transform: `translateY(${distance}px)` }, { transform: 'translateY(0)' }],
+            { duration: 240, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
+          )
+        }
+
+        const trigger = upcomingTriggerRef.current
+        trigger?.animate(
+          [{ opacity: 0.25 }, { opacity: 1 }],
+          { duration: 160, easing: 'ease-out' },
+        )
+        trigger?.focus({ preventScroll: true })
       }
       return
     }

@@ -71,7 +71,7 @@
     minmax(max(170px, calc((100% - 48px) / 5)), 1fr)
   );
   gap: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .xs-service-picker > .xs-services {
