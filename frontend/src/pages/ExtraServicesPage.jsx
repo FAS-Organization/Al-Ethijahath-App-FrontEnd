@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import {
   BroomIcon,
@@ -164,6 +164,52 @@ function ConfirmDialog({ order, onClose, onHistory }) {
   )
 }
 
+function CategorySegments({ categories, category, onChange }) {
+  const trackRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const track = trackRef.current
+    const active = track.querySelector('[aria-pressed="true"]')
+    if (!active) return
+
+    function positionIndicator() {
+      track.style.setProperty('--xs-selection-x', `${active.offsetLeft}px`)
+      track.style.setProperty('--xs-selection-width', `${active.offsetWidth}px`)
+    }
+
+    positionIndicator()
+
+    const observer = new ResizeObserver(positionIndicator)
+    track.querySelectorAll('button').forEach(button => observer.observe(button))
+    return () => observer.disconnect()
+  }, [categories, category])
+
+  return (
+    <div className="xs-category-scroll">
+      <div
+        ref={trackRef}
+        className="xs-category-segments"
+        role="group"
+        aria-label="Category"
+      >
+        {categories.map(name => (
+          <button
+            key={name}
+            type="button"
+            aria-pressed={category === name}
+            onClick={event => {
+              trackRef.current.dataset.glide = String(event.detail > 0)
+              onChange(name)
+            }}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders = RENTAL_ORDERS_PREVIEW }) {
   const { theme = 'light' } = useOutletContext() ?? {}
   const [service, setService] = useState('rentals')
@@ -186,7 +232,10 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
     })
   }
 
-  const categories = ['All', ...Array.from(new Set(items.map(item => item.category)))]
+  const categories = useMemo(
+    () => ['All', ...new Set(items.map(item => item.category))],
+    [items],
+  )
   const selected = items.filter(item => cart[item.id] > 0)
   const totalQuantity = selected.reduce((sum, item) => sum + cart[item.id], 0)
 
@@ -289,13 +338,11 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
                       />
                     </label>
 
-                    <div className="xs-chips" role="group" aria-label="Category">
-                      {categories.map(name => (
-                        <button key={name} type="button" aria-pressed={category === name} onClick={() => setCategory(name)}>
-                          {name}
-                        </button>
-                      ))}
-                    </div>
+                    <CategorySegments
+                      categories={categories}
+                      category={category}
+                      onChange={setCategory}
+                    />
 
                     {shown.length ? (
                       <ul className="xs-items">
