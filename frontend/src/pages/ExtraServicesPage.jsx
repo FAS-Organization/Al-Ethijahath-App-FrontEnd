@@ -32,7 +32,7 @@ import './ExtraServicesPage.css'
 
 // Only Rentals is open for now. Remove `locked` to open another service later.
 const SERVICES = [
-  { id: 'rentals', title: 'Rentals', text: 'Tools and site equipment', icon: PackageIcon },
+  { id: 'rentals', title: 'Rentals', text: 'Tools & equipments', icon: PackageIcon },
   { id: 'transport', title: 'Transport', text: 'Move equipment', icon: TruckIcon, locked: true },
   { id: 'parts', title: 'Spare parts', text: 'Genuine parts', icon: WrenchIcon, locked: true },
   { id: 'cleaning', title: 'Site cleaning', text: 'After service work', icon: BroomIcon, locked: true },
