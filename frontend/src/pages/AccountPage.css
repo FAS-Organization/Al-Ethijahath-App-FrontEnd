@@ -919,7 +919,7 @@
 }
 
 .ac-switch input:checked + .ac-switch-track {
-  background: var(--sv-green);
+  background: var(--sv-accent);
 }
 
 .ac-switch input:checked + .ac-switch-track span {
@@ -927,8 +927,8 @@
 }
 
 .ac-switch:has(input:checked) .ac-switch-icon {
-  background: var(--sv-green-bg);
-  color: var(--sv-green);
+  background: var(--sv-accent-soft);
+  color: var(--sv-accent);
 }
 
 .ac-switch input:focus-visible + .ac-switch-track {
