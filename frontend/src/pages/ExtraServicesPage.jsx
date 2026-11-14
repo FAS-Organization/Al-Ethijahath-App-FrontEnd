@@ -169,7 +169,7 @@ function useSegmentGlide(options, selected) {
 
   useLayoutEffect(() => {
     const track = trackRef.current
-    const active = track.querySelector('[aria-pressed="true"]')
+    const active = track?.querySelector('[aria-pressed="true"]')
     if (!active) return
 
     function positionIndicator() {
@@ -384,6 +384,7 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
     return () => animations.forEach(animation => animation.cancel())
   }, [upcomingOpen])
   const [view, setView] = useState('rent')
+  const rentalsViewRef = useSegmentGlide(service, view)
   const [cart, setCart] = useState({})
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('All')
@@ -521,7 +522,7 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
                   <p>Rent power tools and site equipment. Our team confirms every order.</p>
                 </div>
 
-                <div className="xs-switch" role="group" aria-label="Rentals view">
+                <div ref={rentalsViewRef} className="xs-switch" role="group" aria-label="Rentals view">
                   <button type="button" aria-pressed={view === 'rent'} onClick={() => setView('rent')}>
                     <PackageIcon size={17} aria-hidden="true" /> Rent items
                   </button>
