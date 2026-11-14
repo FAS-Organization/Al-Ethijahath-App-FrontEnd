@@ -52,16 +52,16 @@ const ICONS = {
 
 // The backend moves an order from 'processing' to 'confirmed' or 'rejected'.
 const STATUS = {
-  processing: { label: 'On process', note: 'Our team is checking that these items are available. We will confirm shortly.' },
+  processing: { label: 'Pending', note: 'Our team is checking that these items are available. We will confirm shortly.' },
   confirmed: { label: 'Confirmed', note: 'Confirmed. These items are ready for you. Our team will contact you about delivery.' },
-  rejected: { label: 'Rejected', note: '' },
+  rejected: { label: 'Declined', note: '' },
 }
 
 const STATUS_FILTERS = [
+  { value: 'processing', label: STATUS.processing.label },
+  { value: 'confirmed', label: STATUS.confirmed.label },
+  { value: 'rejected', label: STATUS.rejected.label },
   { value: 'all', label: 'All' },
-  { value: 'processing', label: 'On process' },
-  { value: 'confirmed', label: 'Confirmed' },
-  { value: 'rejected', label: 'Rejected' },
 ]
 
 function formatDate(value) {
@@ -219,9 +219,14 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
   const [category, setCategory] = useState('All')
   const [orders, setOrders] = useState(initialOrders)
   const [placed, setPlaced] = useState(null)
-  const [statusFilter, setStatusFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('processing')
   const [dateFrom, setDateFrom] = useState('')
   const [dateTo, setDateTo] = useState('')
+
+  function openOrders() {
+    setStatusFilter('processing')
+    setView('history')
+  }
 
   function setQuantity(id, quantity) {
     setCart(current => {
@@ -317,7 +322,7 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
                   <button type="button" aria-pressed={view === 'rent'} onClick={() => setView('rent')}>
                     <PackageIcon size={17} aria-hidden="true" /> Rent items
                   </button>
-                  <button type="button" aria-pressed={view === 'history'} onClick={() => setView('history')}>
+                  <button type="button" aria-pressed={view === 'history'} onClick={openOrders}>
                     <ClipboardTextIcon size={17} aria-hidden="true" /> Orders
                     <span>{orders.length}</span>
                   </button>
@@ -401,7 +406,6 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
                           aria-pressed={statusFilter === item.value}
                           onClick={() => setStatusFilter(item.value)}
                         >
-                          {item.value !== 'all' && <i aria-hidden="true" />}
                           {item.label} <span>{counts[item.value]}</span>
                         </button>
                       ))}
@@ -450,7 +454,7 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
 
                             <p className="xs-order-note">
                               {order.status === 'rejected'
-                                ? `Rejected. ${order.reason || 'Please contact our team.'}`
+                                ? order.reason || 'Please contact our team.'
                                 : STATUS[order.status].note}
                             </p>
                           </div>
@@ -472,7 +476,7 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
         </main>
 
         {placed && (
-          <ConfirmDialog order={placed} onClose={() => setPlaced(null)} onHistory={() => setView('history')} />
+          <ConfirmDialog order={placed} onClose={() => setPlaced(null)} onHistory={openOrders} />
         )}
       </div>
     </div>
