@@ -256,7 +256,8 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
   const stackOriginRef = useRef(null)
   const upcomingTriggerRef = useRef(null)
   const closingRef = useRef(false)
-  const panelTopRef = useRef(0)
+  const panelTopRef = useRef(null)
+  const panelAnimationRef = useRef(null)
   const lastLockedService = SERVICES.findLast(item => item.locked)
 
   async function toggleUpcoming(event) {
@@ -264,6 +265,8 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
 
     if (!upcomingOpen) {
       stackOriginRef.current = event.currentTarget.getBoundingClientRect()
+      const panel = servicesRef.current?.nextElementSibling
+      panelTopRef.current = panel?.getBoundingClientRect().top ?? null
       setUpcomingOpen(true)
       return
     }
@@ -312,19 +315,31 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
   }
 
   useLayoutEffect(() => {
+    const previousTop = panelTopRef.current
+    panelTopRef.current = null
+
+    const panel = servicesRef.current?.nextElementSibling
+    if (panel && previousTop !== null) {
+      panelAnimationRef.current?.cancel()
+      const distance = previousTop - panel.getBoundingClientRect().top
+
+      if (distance) {
+        panelAnimationRef.current = panel.animate(
+          [{ transform: `translateY(${distance}px)` }, { transform: 'translateY(0)' }],
+          {
+            duration: upcomingOpen ? 360 : 420,
+            easing: upcomingOpen
+              ? 'cubic-bezier(0.23, 1, 0.32, 1)'
+              : 'cubic-bezier(0.4, 0, 0.2, 1)',
+            fill: 'backwards',
+          },
+        )
+      }
+    }
+
     if (!upcomingOpen) {
       if (closingRef.current) {
         closingRef.current = false
-
-        const panel = servicesRef.current.nextElementSibling
-        const distance = panelTopRef.current - panel.getBoundingClientRect().top
-
-        if (distance) {
-          panel.animate(
-            [{ transform: `translateY(${distance}px)` }, { transform: 'translateY(0)' }],
-            { duration: 240, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' },
-          )
-        }
 
         const trigger = upcomingTriggerRef.current
         trigger?.animate(

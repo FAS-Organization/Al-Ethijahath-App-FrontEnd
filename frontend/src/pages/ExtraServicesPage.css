@@ -152,10 +152,6 @@
   padding-inline-end: 46px;
 }
 
-.xs-locked-card:has(.xs-upcoming-close) .xs-service-lock {
-  display: none;
-}
-
 .xs-upcoming-close {
   position: absolute;
   inset-inline-end: 5px;
