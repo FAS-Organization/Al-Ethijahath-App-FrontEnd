@@ -251,6 +251,52 @@ function OrderStatusSegments({ statusFilter, counts, onChange }) {
 export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders = RENTAL_ORDERS_PREVIEW }) {
   const { theme = 'light' } = useOutletContext() ?? {}
   const [service, setService] = useState('rentals')
+  const [upcomingOpen, setUpcomingOpen] = useState(false)
+  const servicesRef = useRef(null)
+  const stackOriginRef = useRef(null)
+
+  function toggleUpcoming(event) {
+    if (!upcomingOpen) {
+      stackOriginRef.current = event.currentTarget.getBoundingClientRect()
+    }
+
+    setUpcomingOpen(open => !open)
+  }
+
+  useLayoutEffect(() => {
+    const origin = stackOriginRef.current
+    if (!upcomingOpen || !origin) return
+
+    stackOriginRef.current = null
+
+    const cards = servicesRef.current.querySelectorAll('.xs-service:disabled')
+    const offsets = Array.from(cards, (card, index) => {
+      const target = card.getBoundingClientRect()
+
+      return {
+        card,
+        x: origin.left - target.left + Math.min(index, 2) * 5,
+        y: origin.top - target.top,
+      }
+    })
+
+    const animations = offsets.map(({ card, x, y }, index) =>
+      card.animate(
+        [
+          { transform: `translate(${x}px, ${y}px)` },
+          { transform: 'translate(0px, 0px)' },
+        ],
+        {
+          duration: 900,
+          delay: index * 120,
+          easing: 'cubic-bezier(0.23, 1, 0.32, 1)',
+          fill: 'backwards',
+        },
+      ),
+    )
+
+    return () => animations.forEach(animation => animation.cancel())
+  }, [upcomingOpen])
   const [view, setView] = useState('rent')
   const [cart, setCart] = useState({})
   const [query, setQuery] = useState('')
@@ -326,26 +372,38 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
             </div>
           </div>
 
-          <div className="xs-services" role="tablist" aria-label="Extra services">
-            {SERVICES.map(({ id, title, text, icon: Icon, locked }) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                className="xs-service"
-                aria-selected={service === id}
-                aria-disabled={locked || undefined}
-                disabled={locked}
-                onClick={() => setService(id)}
-              >
-                <span className="xs-service-icon"><Icon size={22} aria-hidden="true" /></span>
-                <span className="xs-service-text">
-                  <strong>{title}</strong>
-                  <small>{locked ? 'Coming soon' : text}</small>
-                </span>
-                {locked && <LockSimpleIcon className="xs-service-lock" size={16} aria-hidden="true" />}
-              </button>
-            ))}
+          <div className="xs-service-picker" ref={servicesRef}>
+            <div className="xs-services" role="tablist" aria-label="Extra services">
+              {SERVICES.filter(item => upcomingOpen || !item.locked).map(({ id, title, text, icon: Icon, locked }) => (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  className="xs-service"
+                  aria-selected={service === id}
+                  aria-disabled={locked || undefined}
+                  disabled={locked}
+                  onClick={() => setService(id)}
+                >
+                  <span className="xs-service-icon"><Icon size={22} aria-hidden="true" /></span>
+                  <span className="xs-service-text">
+                    <strong>{title}</strong>
+                    <small>{locked ? 'Coming soon' : text}</small>
+                  </span>
+                  {locked && <LockSimpleIcon className="xs-service-lock" size={16} aria-hidden="true" />}
+                </button>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="xs-upcoming-trigger"
+              aria-expanded={upcomingOpen}
+              onClick={toggleUpcoming}
+            >
+              {upcomingOpen ? 'Collapse upcoming services' : 'Upcoming Services'}
+              <span className="xs-upcoming-arrow" aria-hidden="true" />
+            </button>
           </div>
 
           {service === 'rentals' && (
