@@ -454,8 +454,8 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
         <main className="sv-content" id="extras-content" tabIndex={-1}>
           <div className="sv-heading">
             <div>
-              <h1>Extra services.</h1>
-              <p>Choose a service. Rentals are open now, the others are coming soon.</p>
+              <h1>Rentals & Other Services</h1>
+              <p>Rentals are open now, the others are coming soon.</p>
             </div>
           </div>
 

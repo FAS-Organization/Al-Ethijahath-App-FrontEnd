@@ -906,6 +906,75 @@
   }
 }
 
+/* Photo upload field: matches the other inputs in the request dialog */
+.sv-upload {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
+.sv-upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sv-field .sv-upload-pick {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 46px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--sv-line);
+  border-radius: 8px;
+  background: var(--sv-soft);
+  color: var(--sv-muted);
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: border-color 220ms ease, background-color 220ms ease, color 220ms ease;
+}
+
+.sv-upload-pick span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sv-upload-pick svg { color: var(--sv-accent); }
+.sv-upload[data-filled='true'] .sv-upload-pick { color: var(--sv-text); }
+
+.sv-upload-pick:hover { border-color: var(--sv-accent); }
+
+.sv-upload:has(.sv-upload-input:focus-visible) .sv-upload-pick {
+  border-color: var(--sv-accent);
+  background-color: var(--sv-surface);
+}
+
+.sv-upload:has([aria-invalid='true']) .sv-upload-pick { border-color: var(--sv-accent); }
+.sv-upload:has(:disabled) .sv-upload-pick { opacity: 0.65; cursor: not-allowed; }
+
+.sv-upload-remove {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--sv-line);
+  border-radius: 8px;
+  background: var(--sv-soft);
+  color: var(--sv-accent);
+  cursor: pointer;
+  transition: border-color 220ms ease, background-color 220ms ease;
+}
+
+.sv-upload-remove:hover:not(:disabled) { border-color: var(--sv-accent); background: var(--sv-accent-soft); }
 
 

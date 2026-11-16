@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import {
   ArrowRightIcon,
   CalendarBlankIcon,
+  CameraIcon,
   CaretDownIcon,
   CheckCircleIcon,
   CheckIcon,
@@ -12,6 +13,7 @@ import {
   MagnifyingGlassIcon,
   MapPinIcon,
   PlusIcon,
+  TrashIcon,
   UserIcon,
   WarningCircleIcon,
   WrenchIcon,
@@ -644,6 +646,7 @@ function RequestDialog({ options, isDemo, onSubmit, onClose }) {
   const [equipmentIds, setEquipmentIds] = useState([])
   const [description, setDescription] = useState('')
   const [date, setDate] = useState('')
+  const [photo, setPhoto] = useState(null)
   const [errors, setErrors] = useState({})
   const [phase, setPhase] = useState('form')
   const [failure, setFailure] = useState('')
@@ -670,6 +673,29 @@ function RequestDialog({ options, isDemo, onSubmit, onClose }) {
       old.includes(id) ? old.filter(item => item !== id) : [...old, id]
     )
     setErrors(old => ({ ...old, equipment: '' }))
+  }
+
+  function choosePhoto(event) {
+    const file = event.target.files?.[0]
+
+    event.target.value = ''
+
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      setPhoto(null)
+      setErrors(old => ({ ...old, photo: 'Choose an image file (JPG, PNG or WebP).' }))
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setPhoto(null)
+      setErrors(old => ({ ...old, photo: 'The photo must be 5 MB or smaller.' }))
+      return
+    }
+
+    setPhoto(file)
+    setErrors(old => ({ ...old, photo: '' }))
   }
 
   function closeDialog() {
@@ -714,6 +740,7 @@ function RequestDialog({ options, isDemo, onSubmit, onClose }) {
       equipment_ids: equipmentIds,
       description: description.trim(),
       preferred_date: date || null,
+      photo, // File or null. Send as multipart/form-data when the API is connected.
     }
 
     setPhase('sending')
@@ -885,6 +912,40 @@ function RequestDialog({ options, isDemo, onSubmit, onClose }) {
                 We will confirm the final date after reviewing your request.
               </p>
               {errors.date && <p className="sv-error">{errors.date}</p>}
+            </div>
+              
+            <div className="sv-field">
+              <label htmlFor="sv-photo">
+                Photo <span>(optional)</span>
+              </label>
+              <div className="sv-upload" data-filled={Boolean(photo)}>
+                <label className="sv-upload-pick" htmlFor="sv-photo">
+                  <CameraIcon size={20} aria-hidden="true" />
+                  <span>{photo ? photo.name : 'Upload a photo of the problem'}</span>
+                </label>
+                <input
+                  id="sv-photo"
+                  data-field="photo"
+                  className="sv-upload-input"
+                  type="file"
+                  accept="image/*"
+                  disabled={sending}
+                  aria-invalid={Boolean(errors.photo)}
+                  onChange={choosePhoto}
+                />
+                {photo && (
+                  <button
+                    className="sv-upload-remove"
+                    type="button"
+                    aria-label="Remove photo"
+                    disabled={sending}
+                    onClick={() => setPhoto(null)}
+                  >
+                    <TrashIcon size={18} aria-hidden="true" />
+                  </button>
+                )}
+              </div>
+              {errors.photo && <p className="sv-error">{errors.photo}</p>}
             </div>
 
             {failure && (
