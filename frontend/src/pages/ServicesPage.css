@@ -901,9 +901,104 @@ body:has(.sv-page) {
   display: none;
 }
 
-.sv-step--done::before,
-.sv-step--current::before {
+.sv-step--done:not(:first-child)::after,
+.sv-step--current:not(:first-child)::after {
+  content: '';
+  position: absolute;
+  top: 13px;
+  right: calc(50% + 14px);
+  width: calc(100% - 28px);
+  height: 2px;
   background: var(--sv-green);
+  transform-origin: left center;
+  animation: sv-step-fill 280ms linear
+    calc(var(--sv-step-delay) - 280ms) both;
+}
+
+.sv-step-ring {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  width: 28px;
+  height: 28px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--sv-green);
+  stroke-width: 2;
+  pointer-events: none;
+}
+
+.sv-step-ring path {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: sv-step-trace 260ms linear var(--sv-step-delay) both;
+}
+
+.sv-step--done .sv-step-dot {
+  animation: sv-step-complete 120ms linear
+    calc(var(--sv-step-delay) + 260ms) both;
+}
+
+.sv-step--done .sv-step-dot > svg:not(.sv-step-ring) {
+  animation: sv-step-check 120ms linear
+    calc(var(--sv-step-delay) + 260ms) both;
+}
+
+.sv-step--current .sv-step-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border: 1px solid var(--sv-accent);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  animation: sv-step-pulse 1.2s ease-out
+    calc(var(--sv-step-delay) + 260ms) 2;
+}
+
+.sv-steps:not([data-in-view]) .sv-step::after,
+.sv-steps:not([data-in-view]) .sv-step-dot,
+.sv-steps:not([data-in-view]) .sv-step-dot > svg,
+.sv-steps:not([data-in-view]) .sv-step-ring path,
+.sv-steps:not([data-in-view]) .sv-step-dot::after {
+  animation-play-state: paused;
+}
+
+@keyframes sv-step-trace {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes sv-step-complete {
+  from {
+    border-color: var(--sv-line);
+    background-color: var(--sv-surface);
+  }
+
+  to {
+    border-color: var(--sv-green);
+    background-color: var(--sv-green);
+  }
+}
+
+@keyframes sv-step-fill {
+  from { scale: 0 1; }
+  to { scale: 1 1; }
+}
+
+@keyframes sv-step-fill-vertical {
+  from { scale: 1 0; }
+  to { scale: 1 1; }
+}
+
+@keyframes sv-step-check {
+  from { opacity: 0; transform: scale(0.65); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes sv-step-pulse {
+  0% { opacity: 0; transform: scale(1); }
+  25% { opacity: 0.45; }
+  100% { opacity: 0; transform: scale(1.45); }
 }
 
 .sv-step-dot {
@@ -1275,7 +1370,11 @@ body:has(.sv-page) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sv-main * {
+  .sv-main *:not(
+    .sv-step--done .sv-step-dot,
+    .sv-step--done .sv-step-dot > svg,
+    .sv-step-ring path
+  ) {
     animation: none !important;
   }
 
@@ -1388,12 +1487,25 @@ body:has(.sv-page) {
     padding-bottom: 0;
   }
 
-  .sv-step::before {
+  .sv-step::before,
+  .sv-step--done:not(:first-child)::after,
+  .sv-step--current:not(:first-child)::after {
     top: -14px;
     right: auto;
     left: 13px;
     width: 2px;
     height: 100%;
+  }
+
+  .sv-step--done:not(:first-child)::after,
+  .sv-step--current:not(:first-child)::after {
+    height: 14px;
+    transform-origin: center top;
+    animation-name: sv-step-fill-vertical;
+  }
+
+  .sv-step-ring {
+    transform: rotate(90deg);
   }
 
   .sv-step-label {

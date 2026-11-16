@@ -264,6 +264,23 @@ function ActionButton({ children, available, onClick, title }) {
 }
 
 function Progress({ status }) {
+  const progressRef = useRef(null)
+
+  useEffect(() => {
+    const progress = progressRef.current
+    if (!progress) return
+
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || entry.intersectionRatio < 0.25) return
+
+      progress.dataset.inView = 'true'
+      observer.disconnect()
+    }, { threshold: 0.25 })
+
+    observer.observe(progress)
+    return () => observer.disconnect()
+  }, [status])
+
   if (status === 'cancelled') {
     return <p className="sv-cancelled">This service was cancelled.</p>
   }
@@ -275,7 +292,7 @@ function Progress({ status }) {
   const finished = status === 'completed'
 
   return (
-    <ol className="sv-steps" aria-label="Service progress">
+    <ol key={status} ref={progressRef} className="sv-steps" aria-label="Service progress">
       {STEPS.map((label, index) => {
         const state =
           finished || index < current
@@ -288,9 +305,16 @@ function Progress({ status }) {
           <li
             key={label}
             className={`sv-step sv-step--${state}`}
+            style={{ '--sv-step-delay': `${index * 540}ms` }}
             aria-current={state === 'current' ? 'step' : undefined}
           >
             <span className="sv-step-dot" aria-hidden="true">
+              {state !== 'todo' && (
+                <svg className="sv-step-ring" viewBox="0 0 28 28">
+                  <path d="M1 14a13 13 0 0 1 26 0" pathLength="100" />
+                  <path d="M1 14a13 13 0 0 0 26 0" pathLength="100" />
+                </svg>
+              )}
               {state === 'done' ? <CheckIcon size={12} weight="bold" /> : index + 1}
             </span>
             <span className="sv-step-label">
