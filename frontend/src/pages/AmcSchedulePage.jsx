@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useOutletContext } from 'react-router-dom'
 import {
   ArrowRightIcon,
@@ -10,6 +10,7 @@ import {
   MagnifyingGlassIcon,
   TruckIcon,
   WarningCircleIcon,
+  WrenchIcon,
   XIcon,
 } from '@phosphor-icons/react'
 
@@ -22,7 +23,13 @@ import './AmcSchedulePage.css'
 const TZ = 'Asia/Riyadh'
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 const OPEN_REQUEST = ['pending', 'alternative_proposed']
-const SUMMARIES_SHOWN = 3
+const PENDING_STATUSES = ['planned', 'confirmed', 'in_progress']
+const MONTH_SHORT = Array.from({ length: 12 }, (_, i) =>
+  new Intl.DateTimeFormat('en-GB', { month: 'short', timeZone: 'UTC' }).format(new Date(Date.UTC(2000, i, 1)))
+)
+const MONTH_LONG = Array.from({ length: 12 }, (_, i) =>
+  new Intl.DateTimeFormat('en-GB', { month: 'long', timeZone: 'UTC' }).format(new Date(Date.UTC(2000, i, 1)))
+)
 
 const APPOINTMENT_STATUS = {
   planned: 'Planned',
@@ -118,6 +125,87 @@ function fmtMonth(value) {
 function dayKey(value) {
   const date = value instanceof Date ? value : parse(value)
   return new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(date)
+}
+
+// "YYYY-MM" for a date-only string or a timestamp (Saudi time)
+function monthKey(value) {
+  if (!value || !parse(value)) return ''
+  return DATE_ONLY.test(value) ? value.slice(0, 7) : dayKey(value).slice(0, 7)
+}
+
+function fmtMoney(value) {
+  return new Intl.NumberFormat('en-GB', { style: 'currency', currency: 'SAR', maximumFractionDigits: 0 }).format(
+    value || 0
+  )
+}
+
+// Dummy records, built relative to today. Used only when the data has no such arrays.
+function buildDummyMonthly(today) {
+  const y = Number(today.slice(0, 4))
+  const m = Number(today.slice(5, 7))
+  const d = (offset, day) => new Date(Date.UTC(y, m - 1 + offset, day)).toISOString().slice(0, 10)
+  const make = (prefix, offset, rows, build) =>
+    rows.map((row, i) => ({ id: `${prefix}-${offset}-${i}`, reference: `${prefix}-${offset === 0 ? 'C' : offset === -1 ? 'P' : 'O'}${i + 1}`, ...build(row, i, offset) }))
+
+  const invoices = [
+    ...make('INV', 0, [[12500, 12500], [8400, 3000], [5200, 0]], ([total, paid], i, o) => ({ date: d(o, 3 + i * 6), total, paid })),
+    ...make('INV', -1, [[9800, 9800], [6100, 2000]], ([total, paid], i, o) => ({ date: d(o, 5 + i * 8), total, paid })),
+    ...make('INV', -2, [[7300, 7300]], ([total, paid], i, o) => ({ date: d(o, 9), total, paid })),
+  ]
+  const quotations = [
+    ...make('QUO', 0, [['approved', 4200], ['pending', 6800], ['pending', 2300], ['rejected', 1500]], ([status, amount], i, o) => ({ date: d(o, 2 + i * 4), status, amount })),
+    ...make('QUO', -1, [['approved', 3900], ['approved', 5100], ['pending', 2700]], ([status, amount], i, o) => ({ date: d(o, 4 + i * 7), status, amount })),
+    ...make('QUO', -2, [['approved', 4800]], ([status, amount], i, o) => ({ date: d(o, 11), status, amount })),
+  ]
+  const inspections = [
+    ...make('INS', 0, ['completed', 'completed', 'pending', 'in_progress', 'overdue'], (status, i, o) => ({ date: d(o, 2 + i * 5), status })),
+    ...make('INS', -1, ['completed', 'completed', 'completed', 'pending'], (status, i, o) => ({ date: d(o, 3 + i * 6), status })),
+  ]
+  const job_cards = [
+    ...make('JOB', 0, ['completed', 'completed', 'in_progress', 'in_progress', 'pending', 'on_hold'], (status, i, o) => ({ date: d(o, 1 + i * 4), status })),
+    ...make('JOB', -1, ['completed', 'completed', 'completed', 'completed', 'pending'], (status, i, o) => ({ date: d(o, 2 + i * 5), status })),
+  ]
+  return { invoices, quotations, inspections, job_cards }
+}
+
+function computeMonthly(source, key) {
+  const inMonth = list => [...new Map(list.filter(r => monthKey(r.date) === key).map(r => [r.id, r])).values()]
+  const tally = list => list.reduce((acc, r) => ({ ...acc, [r.status]: (acc[r.status] || 0) + 1 }), {})
+
+  const invoices = inMonth(source.invoices)
+  const total = invoices.reduce((sum, i) => sum + i.total, 0)
+  const paid = invoices.reduce((sum, i) => sum + Math.min(i.paid, i.total), 0)
+  const quotations = inMonth(source.quotations)
+  const inspections = inMonth(source.inspections)
+  const jobs = inMonth(source.job_cards)
+
+  return {
+    pay: {
+      count: invoices.length,
+      total,
+      paid,
+      outstanding: total - paid,
+      pendingInvoices: invoices.filter(i => i.paid < i.total).length,
+    },
+    quo: {
+      count: quotations.length,
+      ...tally(quotations),
+      amount: quotations.reduce((sum, q) => sum + q.amount, 0),
+      pendingAmount: quotations.filter(q => q.status === 'pending').reduce((sum, q) => sum + q.amount, 0),
+    },
+    ins: { count: inspections.length, ...tally(inspections) },
+    job: { count: jobs.length, ...tally(jobs) },
+    any: invoices.length + quotations.length + inspections.length + jobs.length > 0,
+  }
+}
+
+function GroupRow({ label, value, alert }) {
+  return (
+    <div className={alert ? 'sc-month-row sc-month-row--alert' : 'sc-month-row'}>
+      <dt>{label}</dt>
+      <dd>{value}</dd>
+    </div>
+  )
 }
 
 function tileParts(value) {
@@ -420,6 +508,7 @@ function CurrentContract({ contract, rows, stats, handlers }) {
     </article>
   )
 }
+
 // ---------- Previous contracts (compact cards + popup) ----------
 
 function ContractCard({ contract, count, onView }) {
@@ -746,6 +835,388 @@ function RescheduleForm({ appointment, equipment, site, minDate, today, onSubmit
   )
 }
 
+// ---------- Monthly report ----------
+
+function MonthlyReport({ appointments, equipmentById, siteById, summaries, relatedServices, today, handlers, source }) {
+  // Initial state = current month/year, every time the tab opens.
+  const [year, setYear] = useState(() => Number(today.slice(0, 4)))
+  const [month, setMonth] = useState(() => Number(today.slice(5, 7)))
+  const [filter, setFilter] = useState('all')
+  const [openId, setOpenId] = useState(null)
+  const key = `${year}-${String(month).padStart(2, '0')}`
+
+  // Use real arrays when the data has them, otherwise dummy records.
+  const extra = useMemo(() => {
+    const dummy = buildDummyMonthly(today)
+    const pick = name => (Array.isArray(source?.[name]) ? source[name] : dummy[name])
+    return {
+      demo: ['invoices', 'quotations', 'inspections', 'job_cards'].some(name => !Array.isArray(source?.[name])),
+      invoices: pick('invoices'),
+      quotations: pick('quotations'),
+      inspections: pick('inspections'),
+      job_cards: pick('job_cards'),
+    }
+  }, [source, today])
+  const monthly = useMemo(() => computeMonthly(extra, key), [extra, key])
+
+  const years = [
+    Number(today.slice(0, 4)),
+    ...appointments.map(a => Number(monthKey(a.scheduled_start).slice(0, 4))),
+    ...summaries.map(s => Number(monthKey(s.month_start).slice(0, 4))),
+  ].filter(Boolean)
+  const minYear = Math.min(...years)
+  const maxYear = Math.max(...years)
+
+  const rows = useMemo(
+    () =>
+      appointments
+        .filter(a => monthKey(a.scheduled_start) === key)
+        .sort((a, b) => parse(a.scheduled_start) - parse(b.scheduled_start)),
+    [appointments, key]
+  )
+  const notes = summaries.filter(entry => monthKey(entry.month_start) === key)
+
+  const completed = rows.filter(a => a.status === 'completed')
+  const stats = [
+    { label: 'Machines serviced', value: new Set(completed.map(a => a.equipment_id)).size, icon: TruckIcon },
+    { label: 'Completed services', value: completed.length, icon: CheckCircleIcon },
+    { label: 'Pending services', value: rows.filter(a => PENDING_STATUSES.includes(a.status)).length, icon: CalendarBlankIcon },
+    { label: 'Outside AMC', value: rows.filter(a => !a.is_amc && a.status !== 'cancelled').length, icon: WarningCircleIcon },
+    { label: 'Repairs completed', value: completed.filter(a => a.purpose === 'repair').length, icon: WrenchIcon },
+  ]
+
+  const shown = rows.filter(a => {
+    if (filter === 'outside') return !a.is_amc
+    if (filter === 'repair') return a.purpose === 'repair'
+    return true
+  })
+
+  function pick(nextMonth, nextYear = year) {
+    setMonth(nextMonth)
+    setYear(nextYear)
+    setOpenId(null)
+  }
+
+  return (
+    <section id="sc-panel-monthly" role="tabpanel" aria-labelledby="sc-tab-monthly" className="sc-panel">
+      <div className="sc-report-head">
+        <div>
+          <h2>Monthly summaries</h2>
+          <p className="sc-muted">Services, repairs and notes for the month you select.</p>
+        </div>
+        <div className="sc-year" role="group" aria-label="Year">
+          <button
+            type="button"
+            className="sc-action"
+            aria-label="Previous year"
+            disabled={year <= minYear}
+            onClick={() => pick(month, year - 1)}
+          >
+            ‹
+          </button>
+          <strong>{year}</strong>
+          <button
+            type="button"
+            className="sc-action"
+            aria-label="Next year"
+            disabled={year >= maxYear}
+            onClick={() => pick(month, year + 1)}
+          >
+            ›
+          </button>
+        </div>
+      </div>
+
+      <div className="sc-months" role="group" aria-label="Month">
+        {MONTH_SHORT.map((label, index) => (
+          <button
+            key={label}
+            type="button"
+            className="sc-month"
+            aria-pressed={month === index + 1}
+            aria-label={`${MONTH_LONG[index]} ${year}`}
+            onClick={() => pick(index + 1)}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {!rows.length && !notes.length && !monthly.any ? (
+        <Message icon={CalendarBlankIcon} title="No monthly summary available">
+          There are no service records or monthly report details available for this month.
+        </Message>
+      ) : (
+        <>
+          <section
+            className="sc-summary sc-summary--five"
+            aria-label={`${MONTH_LONG[month - 1]} ${year} overview`}
+          >
+            {stats.map(({ label, value, icon: Icon }) => (
+              <div className="sc-summary-item" key={label}>
+                <span className="sc-summary-icon" aria-hidden="true">
+                  <Icon size={23} />
+                </span>
+
+                <div className="sc-summary-copy">
+                  <span>{label}</span>
+                  <strong>{value}</strong>
+                </div>
+
+                <span className="sc-summary-corner" aria-hidden="true">
+                  <Icon size={60} weight="thin" />
+                </span>
+              </div>
+            ))}
+          </section>
+
+          {monthly.any && (
+            <section className="sc-block sc-block--flush" aria-labelledby="sc-month-extra">
+              <div className="sc-section-title">
+                <h3 id="sc-month-extra">Payments, quotations and work records</h3>
+              </div>
+
+              <div className="sc-month-groups">
+                <div className="sc-month-group">
+                  <div className="sc-month-group-head">
+                    <h4>Payments</h4>
+                    {monthly.pay.count > 0 && (
+                      <Badge status={monthly.pay.outstanding === 0 ? 'completed' : 'pending'}>
+                        {monthly.pay.outstanding === 0 ? 'Nothing due' : 'Payment due'}
+                      </Badge>
+                    )}
+                  </div>
+                  <dl>
+                    <GroupRow label="Amount to pay" value={fmtMoney(monthly.pay.outstanding)} alert={monthly.pay.outstanding > 0} />
+                    <GroupRow label="Invoices to pay" value={monthly.pay.pendingInvoices} alert={monthly.pay.pendingInvoices > 0} />
+                  </dl>
+                </div>
+
+                <div className="sc-month-group">
+                  <div className="sc-month-group-head">
+                    <h4>Quotations</h4>
+                  </div>
+                  <dl>
+                    <GroupRow label="Approved" value={monthly.quo.approved || 0} />
+                    <GroupRow label="Awaiting approval" value={monthly.quo.pending || 0} alert={(monthly.quo.pending || 0) > 0} />
+                    <GroupRow label="Rejected" value={monthly.quo.rejected || 0} />
+                    <GroupRow label="Total / pending amount" value={`${fmtMoney(monthly.quo.amount)} / ${fmtMoney(monthly.quo.pendingAmount)}`} />
+                  </dl>
+                </div>
+
+                <div className="sc-month-group">
+                  <div className="sc-month-group-head">
+                    <h4>Inspections</h4>
+                  </div>
+                  <dl>
+                    <GroupRow label="Total" value={monthly.ins.count} />
+                    <GroupRow label="Completed" value={monthly.ins.completed || 0} />
+                    <GroupRow label="Pending" value={monthly.ins.pending || 0} alert={(monthly.ins.pending || 0) > 0} />
+                    <GroupRow label="In progress" value={monthly.ins.in_progress || 0} />
+                    <GroupRow label="Overdue" value={monthly.ins.overdue || 0} alert={(monthly.ins.overdue || 0) > 0} />
+                  </dl>
+                </div>
+
+                <div className="sc-month-group">
+                  <div className="sc-month-group-head">
+                    <h4>Job cards</h4>
+                  </div>
+                  <dl>
+                    <GroupRow label="Total" value={monthly.job.count} />
+                    <GroupRow label="Completed" value={monthly.job.completed || 0} />
+                    <GroupRow label="Pending" value={monthly.job.pending || 0} alert={(monthly.job.pending || 0) > 0} />
+                    <GroupRow label="In progress" value={monthly.job.in_progress || 0} />
+                    <GroupRow label="On hold" value={monthly.job.on_hold || 0} />
+                  </dl>
+                </div>
+              </div>
+
+              {extra.demo && <p className="sc-note">Sample figures for preview. Real records will replace them.</p>}
+            </section>
+          )}
+
+          {rows.length > 0 && (
+            <section className="sc-block sc-block--flush" aria-labelledby="sc-activity">
+              <div className="sc-section-title">
+                <h3 id="sc-activity">Service activity</h3>
+                <span className="sc-count">{shown.length}</span>
+              </div>
+
+              <div className="sc-segments sc-segments--small" role="group" aria-label="Filter services">
+                {[
+                  ['all', 'All'],
+                  ['outside', 'Outside AMC'],
+                  ['repair', 'Repairs'],
+                ].map(([value, label]) => (
+                  <button
+                    key={value}
+                    type="button"
+                    className="sc-segment"
+                    aria-pressed={filter === value}
+                    onClick={() => setFilter(value)}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+
+              {!shown.length ? (
+                <p className="sc-muted sc-report-empty">No services match this filter.</p>
+              ) : (
+                <div className="sc-table-wrap sc-report-table">
+                  <table className="sc-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Equipment</th>
+                        <th scope="col">Site</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Coverage</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Details</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {shown.map(a => {
+                        const equipment = equipmentById.get(a.equipment_id)
+                        const site = siteById.get(a.site_id)
+                        const open = openId === a.id
+                        const related = relatedServices.filter(s => s.equipment_id === a.equipment_id)
+                        return (
+                          <Fragment key={a.id}>
+                            <tr>
+                              <th scope="row">
+                                {equipment?.name || 'Equipment not recorded'}
+                                <small>
+                                  {[equipment?.asset, equipment?.serial].filter(Boolean).join(' · ') || a.reference}
+                                </small>
+                              </th>
+                              <td>{site?.name || 'Not recorded'}</td>
+                              <td>
+                                {fmtShort(a.scheduled_start)}
+                                <small>{fmtTime(a.scheduled_start)}</small>
+                              </td>
+                              <td>{PURPOSE[a.purpose] || 'Service'}</td>
+                              <td>
+                                <Badge status={a.is_amc ? 'active' : 'accent'}>
+                                  {a.is_amc ? 'AMC covered' : 'Outside AMC'}
+                                </Badge>
+                              </td>
+                              <td>
+                                <Badge status={a.status}>{APPOINTMENT_STATUS[a.status]}</Badge>
+                              </td>
+                              <td>
+                                <div className="sc-cell-actions">
+                                  <button
+                                    className="sc-action"
+                                    type="button"
+                                    aria-expanded={open}
+                                    aria-controls={`sc-detail-${a.id}`}
+                                    onClick={() => setOpenId(open ? null : a.id)}
+                                  >
+                                    {open ? 'Hide' : 'Details'}
+                                  </button>
+                                </div>
+                              </td>
+                            </tr>
+                            {open && (
+                              <tr className="sc-detail-row" id={`sc-detail-${a.id}`}>
+                                <td colSpan={7}>
+                                  <dl className="sc-facts sc-facts--three">
+                                    <Specification label="Job reference" value={a.reference} />
+                                    <Specification label="Technician" value={a.technician || 'Not assigned'} />
+                                    <Specification
+                                      label="Time (Saudi)"
+                                      value={`${fmtTime(a.scheduled_start)}–${fmtTime(a.scheduled_end)}`}
+                                    />
+                                    {a.amc_due_date && (
+                                      <Specification label="Original AMC due date" value={fmtDate(a.amc_due_date)} />
+                                    )}
+                                    {related.length > 0 && (
+                                      <Specification
+                                        label="Related services"
+                                        value={related
+                                          .map(s => `${s.reference} (${SERVICE_STATUS_TEXT[s.status] || 'open'})`)
+                                          .join('; ')}
+                                      />
+                                    )}
+                                  </dl>
+                                  <div className="sc-cell-actions">
+                                    <ActionButton
+                                      available={Boolean(handlers.onOpenService)}
+                                      onClick={() => handlers.onOpenService?.(a.reference)}
+                                    >
+                                      View service job
+                                    </ActionButton>
+                                    {a.status === 'completed' && a.has_completion_card && (
+                                      <ActionButton
+                                        available={Boolean(handlers.onOpenCompletion)}
+                                        onClick={() => handlers.onOpenCompletion?.(a.reference)}
+                                      >
+                                        View completion card
+                                      </ActionButton>
+                                    )}
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </Fragment>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </section>
+          )}
+
+          {notes.length > 0 && (
+            <section className="sc-block sc-block--flush" aria-labelledby="sc-notes">
+              <div className="sc-section-title">
+                <h3 id="sc-notes">Monthly notes</h3>
+                <span className="sc-count">{notes.length}</span>
+              </div>
+              <ul className="sc-due-list">
+                {notes.map(entry => (
+                  <li key={entry.id}>
+                    <CheckCircleIcon size={20} aria-hidden="true" />
+                    <div>
+                      <strong>
+                        {fmtMonth(entry.month_start)} · {entry.contract_number} · {entry.completed_count} completed AMC{' '}
+                        {entry.completed_count === 1 ? 'service' : 'services'}
+                      </strong>
+                      <p className="sc-muted">
+                        {entry.site_name}
+                        {entry.summary ? ` — ${entry.summary}` : ''}
+                      </p>
+                      <div className="sc-cell-actions sc-notes-actions">
+                        {(entry.services || []).map(service => (
+                          <ActionButton
+                            key={service.reference}
+                            available={Boolean(handlers.onOpenService)}
+                            onClick={() => handlers.onOpenService?.(service.reference)}
+                          >
+                            Service {service.reference}
+                          </ActionButton>
+                        ))}
+                        {entry.pdf_url && (
+                          <a className="sc-action" href={entry.pdf_url} target="_blank" rel="noreferrer">
+                            Summary PDF
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </>
+      )}
+    </section>
+  )
+}
+
 // ---------- Page content ----------
 
 function ScheduleContent({ data, handlers }) {
@@ -793,7 +1264,6 @@ function ScheduleContent({ data, handlers }) {
   const [openContract, setOpenContract] = useState(null)
   const [rescheduleId, setRescheduleId] = useState(null)
   const [message, setMessage] = useState('')
-  const [showAllSummaries, setShowAllSummaries] = useState(false)
 
   // Customers never see internal draft contracts.
   const contracts = data.contracts.filter(contract => contract.status !== 'draft')
@@ -942,17 +1412,6 @@ function ScheduleContent({ data, handlers }) {
     .filter(c => rowsFor(c.id).some(row => rowMatches(row, c)))
 
   const visibleContractCount = currentPanels.length + previousContracts.length
-
-  // ----- Monthly summaries: finished months only, newest first -----
-  const finishedSummaries = data.monthly_summaries
-    .filter(entry => {
-      const start = parse(entry.month_start)
-      if (!start) return false
-      const monthEnd = new Date(Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + 1, 1))
-      return monthEnd <= now
-    })
-    .sort((a, b) => parse(b.month_start) - parse(a.month_start))
-  const shownSummaries = showAllSummaries ? finishedSummaries : finishedSummaries.slice(0, SUMMARIES_SHOWN)
 
   // ----- Appointment filtering -----
   const visibleAppointments = appointments
@@ -1108,21 +1567,21 @@ function ScheduleContent({ data, handlers }) {
 
       <section className="sc-summary" aria-label="Schedule summary">
         {summary.map(({ label, value, icon: Icon }) => (
-            <div className="sc-summary-item" key={label}>
-              <span className="sc-summary-icon" aria-hidden="true">
-                <Icon size={23} />
-              </span>
+          <div className="sc-summary-item" key={label}>
+            <span className="sc-summary-icon" aria-hidden="true">
+              <Icon size={23} />
+            </span>
 
-              <div className="sc-summary-copy">
-                <span>{label}</span>
-                <strong>{value}</strong>
-              </div>
-
-              <span className="sc-summary-corner" aria-hidden="true">
-                <Icon size={60} weight="thin" />
-              </span>
+            <div className="sc-summary-copy">
+              <span>{label}</span>
+              <strong>{value}</strong>
             </div>
-          ))}
+
+            <span className="sc-summary-corner" aria-hidden="true">
+              <Icon size={60} weight="thin" />
+            </span>
+          </div>
+        ))}
       </section>
 
       <p className="sc-notice" role="status" aria-live="polite">
@@ -1137,6 +1596,7 @@ function ScheduleContent({ data, handlers }) {
           { id: 'contracts', label: 'Contracts & coverage', count: contracts.length },
           { id: 'schedule', label: 'Service schedule', count: stats.visits },
           { id: 'requests', label: 'Reschedule requests', count: requests.length },
+          { id: 'monthly', label: 'Monthly summaries' },
         ]}
       />
 
@@ -1253,82 +1713,6 @@ function ScheduleContent({ data, handlers }) {
               )}
             </>
           )}
-
-          {/* Monthly summaries */}
-          <section className="sc-block" aria-labelledby="sc-monthly">
-            <div className="sc-section-title">
-              <h2 id="sc-monthly">Monthly summaries</h2>
-              <span className="sc-count">{finishedSummaries.length}</span>
-            </div>
-            <p className="sc-note">
-              Summaries cover finished months, newest first. Summary generation and delivery are still pending in the
-              backend, so these are preview entries only.
-            </p>
-
-            {!finishedSummaries.length ? (
-              <p className="sc-muted">No monthly summaries are available yet.</p>
-            ) : (
-              <>
-                <div className="sc-grid">
-                  {shownSummaries.map(entry => (
-                    <article className="sc-card" key={entry.id}>
-                      <div className="sc-card-header">
-                        <span className="sc-card-icon">
-                          <CalendarBlankIcon size={26} aria-hidden="true" />
-                        </span>
-                        <div className="sc-card-title">
-                          <h3>{fmtMonth(entry.month_start)}</h3>
-                          <p>{entry.contract_number}</p>
-                        </div>
-                        <Badge status="good">
-                          {entry.completed_count} completed AMC {entry.completed_count === 1 ? 'service' : 'services'}
-                        </Badge>
-                      </div>
-
-                      <dl className="sc-facts">
-                        <Specification
-                          label="Equipment serviced"
-                          value={entry.equipment.map(item => `${item.name}, ${item.asset}`).join('; ')}
-                        />
-                        <Specification label="Site" value={entry.site_name} />
-                      </dl>
-                      <p>{entry.summary}</p>
-
-                      <div className="sc-card-actions">
-                        {entry.services.map(service => (
-                          <ActionButton
-                            key={service.reference}
-                            available={Boolean(handlers.onOpenService)}
-                            onClick={() => handlers.onOpenService?.(service.reference)}
-                          >
-                            Service {service.reference}
-                          </ActionButton>
-                        ))}
-                        {entry.pdf_url && (
-                          <a className="sc-action" href={entry.pdf_url} target="_blank" rel="noreferrer">
-                            <FilePdfIcon size={16} aria-hidden="true" /> Sample summary PDF
-                          </a>
-                        )}
-                      </div>
-                    </article>
-                  ))}
-                </div>
-
-                {finishedSummaries.length > SUMMARIES_SHOWN && (
-                  <div className="sc-more-row">
-                    <button
-                      className="sc-action"
-                      type="button"
-                      aria-expanded={showAllSummaries}
-                      onClick={() => setShowAllSummaries(value => !value)}
-                    >
-                      {showAllSummaries ? 'Show fewer summaries' : 'Show older summaries'}
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </section>
         </section>
       )}
 
@@ -1577,6 +1961,20 @@ function ScheduleContent({ data, handlers }) {
             </div>
           )}
         </section>
+      )}
+
+      {/* ---------------- Monthly summaries ---------------- */}
+      {tab === 'monthly' && (
+        <MonthlyReport
+          appointments={appointments}
+          equipmentById={equipmentById}
+          siteById={siteById}
+          summaries={data.monthly_summaries ?? []}
+          relatedServices={data.related_services ?? []}
+          today={today}
+          handlers={handlers}
+          source={data}
+        />
       )}
 
       {/* ---------------- Dialogs ---------------- */}

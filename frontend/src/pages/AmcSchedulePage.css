@@ -1961,6 +1961,288 @@ body:has(.sc-page) {
 
 /* Remove the extra decorative circle.
    The existing .sc-summary-corner already provides it. */
-.sc-summary-item::after {
-  content: none;
+/* =========================================================
+   MONTHLY SUMMARIES TAB
+   ========================================================= */
+
+.sc-report-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sc-report-head h2 {
+  color: var(--sc-heading);
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.sc-year {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sc-year strong {
+  min-width: 48px;
+  color: var(--sc-heading);
+  font-size: 15px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.sc-year .sc-action {
+  min-width: 44px;
+  font-size: 16px !important;
+}
+
+/* 12-month selector: compact, scrolls sideways on small screens */
+.sc-months {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 20px;
+  padding: 4px;
+  overflow-x: auto;
+  border: 1px solid var(--sc-line);
+  border-radius: 10px;
+  background: var(--sc-soft);
+  scrollbar-width: thin;
+  max-width: 100%;
+}
+
+.sc-month {
+  flex: 1 0 56px;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--sc-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 220ms ease, color 220ms ease, box-shadow 220ms ease;
+}
+
+.sc-month[aria-pressed='true'] {
+  background: var(--sc-button);
+  color: #fff;
+  box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+}
+
+/* Overview cards */
+.sc-mini-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.sc-mini-stat {
+  padding: 14px 16px;
+  border: 1px solid var(--sc-line);
+  border-radius: 12px;
+  background: var(--sc-surface);
+}
+
+.sc-mini-stat dt {
+  margin: 0 0 4px;
+  color: var(--sc-muted);
+  font-size: 12px;
+}
+
+.sc-mini-stat dd {
+  margin: 0;
+  color: var(--sc-heading);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Service activity */
+.sc-segments--small {
+  margin-bottom: 14px;
+}
+
+.sc-segments--small .sc-segment {
+  min-height: 34px;
+  padding: 0 14px;
+}
+
+.sc-report-table .sc-table {
+  min-width: 860px;
+}
+
+.sc-report-table .sc-table td,
+.sc-report-table .sc-table th {
+  vertical-align: middle;
+}
+
+.sc-detail-row td {
+  background: var(--sc-soft);
+}
+
+.sc-detail-row .sc-facts {
+  margin-bottom: 12px;
+}
+
+.sc-report-empty {
+  padding: 8px 0;
+}
+
+.sc-notes-actions {
+  margin-top: 10px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .sc-month:hover:not([aria-pressed='true']) {
+    background: var(--sc-accent-soft);
+    color: var(--sc-accent);
+  }
+}
+
+@media (max-width: 1199px) {
+  .sc-mini-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .sc-mini-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .sc-mini-stat {
+    padding: 12px;
+  }
+
+  .sc-mini-stat dd {
+    font-size: 22px;
+  }
+
+  .sc-year {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+/* Monthly summaries: payments, quotations, inspections, job cards */
+.sc-month-groups {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.sc-month-group {
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: var(--sc-soft);
+}
+
+.sc-month-group-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 26px;
+  margin-bottom: 10px;
+}
+
+.sc-month-group-head h4 {
+  color: var(--sc-heading);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sc-month-group dl {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.sc-month-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sc-month-row dt {
+  color: var(--sc-muted);
+  font-size: 12px;
+}
+
+.sc-month-row dd {
+  margin: 0;
+  color: var(--sc-heading);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sc-month-row--alert dd {
+  color: var(--sc-accent);
+}
+
+@media (max-width: 1199px) {
+  .sc-month-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .sc-month-groups {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* Monthly overview: five cards styled like the top summary cards */
+.sc-summary--five {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.sc-summary--five .sc-summary-item {
+  padding: 18px;
+  gap: 12px;
+}
+
+.sc-summary--five .sc-summary-item strong {
+  font-size: 30px;
+}
+
+.sc-summary--five .sc-summary-item:nth-child(5) { animation-delay: 240ms; }
+
+@media (max-width: 1399px) {
+  .sc-summary--five {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1199px) {
+  .sc-summary--five {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 639px) {
+  .sc-summary--five {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .sc-summary--five .sc-summary-item {
+    padding: 16px;
+  }
+
+  .sc-summary--five .sc-summary-item strong {
+    font-size: 25px;
+  }
 }
