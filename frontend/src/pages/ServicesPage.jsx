@@ -292,6 +292,7 @@ function Progress({ status }) {
   if (current === undefined) return null
 
   const finished = status === 'completed'
+  let nextStepStart = 0
 
   return (
     <ol key={status} ref={progressRef} className="sv-steps" aria-label="Service progress">
@@ -303,11 +304,20 @@ function Progress({ status }) {
               ? 'current'
               : 'todo'
 
+        const lineDuration = !finished && index < current ? 80 : 280
+        const ringDuration = !finished && index < current - 1 ? 80 : 260
+        const ringDelay = nextStepStart + (index === 0 ? 0 : lineDuration)
+        nextStepStart = ringDelay + ringDuration
+
         return (
           <li
             key={label}
             className={`sv-step sv-step--${state}`}
-            style={{ '--sv-step-delay': `${index * 540}ms` }}
+            style={{
+              '--sv-step-delay': `${ringDelay}ms`,
+              '--sv-step-line-duration': `${lineDuration}ms`,
+              '--sv-step-ring-duration': `${ringDuration}ms`,
+            }}
             aria-current={state === 'current' ? 'step' : undefined}
           >
             <span className="sv-step-dot" aria-hidden="true">

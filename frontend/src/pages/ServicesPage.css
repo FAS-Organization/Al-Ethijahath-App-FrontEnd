@@ -911,8 +911,8 @@ body:has(.sv-page) {
   height: 2px;
   background: var(--sv-green);
   transform-origin: left center;
-  animation: sv-step-fill 280ms linear
-    calc(var(--sv-step-delay) - 280ms) both;
+  animation: sv-step-fill var(--sv-step-line-duration) linear
+    calc(var(--sv-step-delay) - var(--sv-step-line-duration)) both;
 }
 
 .sv-step-ring {
@@ -931,17 +931,18 @@ body:has(.sv-page) {
 .sv-step-ring path {
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  animation: sv-step-trace 260ms linear var(--sv-step-delay) both;
+  animation: sv-step-trace var(--sv-step-ring-duration) linear
+    var(--sv-step-delay) both;
 }
 
 .sv-step--done .sv-step-dot {
   animation: sv-step-complete 120ms linear
-    calc(var(--sv-step-delay) + 260ms) both;
+    calc(var(--sv-step-delay) + var(--sv-step-ring-duration)) both;
 }
 
 .sv-step--done .sv-step-dot > svg:not(.sv-step-ring) {
   animation: sv-step-check 120ms linear
-    calc(var(--sv-step-delay) + 260ms) both;
+    calc(var(--sv-step-delay) + var(--sv-step-ring-duration)) both;
 }
 
 .sv-step--current .sv-step-dot::after {
@@ -953,7 +954,7 @@ body:has(.sv-page) {
   opacity: 0;
   pointer-events: none;
   animation: sv-step-pulse 1.2s ease-out
-    calc(var(--sv-step-delay) + 260ms) 2;
+    calc(var(--sv-step-delay) + var(--sv-step-ring-duration)) 2;
 }
 
 .sv-steps:not([data-in-view]) .sv-step::after,
