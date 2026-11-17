@@ -535,9 +535,37 @@
   to { opacity: 1; transform: translate(0, 0) scale(1); }
 }
 
-@media (width < 425px) {
-  .portal-chat__robot-launcher { --robot-size: 72px; }
+
+
+@media (width <= 1440px) {
+  .portal-chat__robot-launcher { --robot-size: 84px; }
 }
+
+
+@media (width <= 1024px) {
+  .portal-chat__robot-launcher { --robot-size: 82px; }
+}
+
+@media (width <= 768px) {
+  .portal-chat__robot-launcher { --robot-size: 76px; }
+}
+
+@media (width < 500px) {
+  .portal-chat__robot-launcher { --robot-size: 70px; }
+}
+
+@media (width < 425px) {
+  .portal-chat__robot-launcher { --robot-size: 68px; }
+}
+
+@media (width < 375px) {
+  .portal-chat__robot-launcher { --robot-size: 66px; }
+}
+
+@media (width < 321px) {
+  .portal-chat__robot-launcher { --robot-size: 64px; }
+}
+
 
 .portal-chat__dialog {
   --chat-max-height: max(0px, calc(100dvh - var(--chat-topbar-height, 76px) - 50px - var(--chat-bottom)));
