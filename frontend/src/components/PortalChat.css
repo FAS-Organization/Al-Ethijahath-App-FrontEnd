@@ -347,20 +347,25 @@
   opacity: 1;
 }
 
-.portal-chat__robot-launcher[data-landed] .portal-chat__robot-dialogue:not(.portal-chat__robot-dialogue--landing) {
+.portal-chat__robot-launcher[data-landed] .portal-chat__robot-dialogue {
   opacity: 0;
 }
 
-.portal-chat__robot-launcher[data-landed] .portal-chat__robot-dialogue--landing {
-  inset: auto 72% 88% auto;
+.portal-chat__robot-dialogue--landing {
+  position: fixed;
+  right: calc(var(--chat-right) + 40px);
+  bottom: calc(var(--chat-bottom) + 80px);
+  z-index: 35;
+  pointer-events: none;
   transform: none;
   transition: none;
   animation: portal-robot-landing-fade 2500ms ease both;
 }
 
 @keyframes portal-robot-landing-fade {
-  0%, 100% { opacity: 0; }
-  8%, 88% { opacity: 1; }
+  0%, 6% { opacity: 0; }
+  13%, 88% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .portal-chat__robot-relief {
@@ -371,10 +376,12 @@
 .portal-chat__robot-launcher[data-landed] .portal-chat__robot-gaze,
 .portal-chat__robot-launcher[data-landed] .portal-chat__robot-mouth {
   opacity: 0;
+  transition: none;
 }
 
 .portal-chat__robot-launcher[data-landed] .portal-chat__robot-relief {
   opacity: 1;
+  transition: none;
 }
 
 .portal-chat__companion {

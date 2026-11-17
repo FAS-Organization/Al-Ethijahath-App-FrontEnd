@@ -267,22 +267,8 @@ export default function PortalChat() {
 
     if (!drag.bounds || event.type !== 'pointerup') return
 
-    function sayLandingLine() {
-      if (!launcher.isConnected || dragRef.current || dialogRef.current?.open) return
-
-      const index = Math.floor(Math.random() * LANDING_LINES.length)
-      setLandingLine(LANDING_LINES[index])
-    }
-
-    const returnMotion = launcher.getAnimations().find(
-      animation => animation.transitionProperty === 'transform',
-    )
-
-    if (returnMotion) {
-      returnMotion.finished.then(sayLandingLine, () => {})
-    } else {
-      sayLandingLine()
-    }
+    const index = Math.floor(Math.random() * LANDING_LINES.length)
+    setLandingLine(LANDING_LINES[index])
   }
 
   function openChat() {
@@ -423,17 +409,18 @@ export default function PortalChat() {
           <span className="portal-chat__robot-dialogue portal-chat__robot-dialogue--drag" aria-hidden="true">
             {DRAG_LINES[dragLine]}
           </span>
-          {landingLine && (
-            <span
-              className="portal-chat__robot-dialogue portal-chat__robot-dialogue--landing"
-              aria-hidden="true"
-              onAnimationEnd={() => setLandingLine('')}
-            >
-              {landingLine}
-            </span>
-          )}
         </span>
       </button>
+
+      {landingLine && (
+        <span
+          className="portal-chat__robot-dialogue portal-chat__robot-dialogue--landing"
+          aria-hidden="true"
+          onAnimationEnd={() => setLandingLine('')}
+        >
+          {landingLine}
+        </span>
+      )}
 
       <dialog
         ref={dialogRef}
