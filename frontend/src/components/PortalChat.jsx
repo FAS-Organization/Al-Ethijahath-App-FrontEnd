@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { RobotIcon, XIcon } from '@phosphor-icons/react'
+import { CaretRightIcon, RobotIcon, XIcon } from '@phosphor-icons/react'
 import PortalChatRobot from './PortalChatRobot'
 import './PortalChat.css'
 
@@ -29,6 +29,7 @@ export default function PortalChat() {
   const suppressClickRef = useRef(false)
   const [dragLine, setDragLine] = useState(DRAG_LINES.length - 1)
   const [landingReaction, setLandingReaction] = useState(null)
+  const [isDocked, setIsDocked] = useState(false)
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
   const backdropPressRef = useRef(false)
@@ -399,7 +400,10 @@ export default function PortalChat() {
       <button
         ref={launcherRef}
         type="button"
+        id="portal-chat-launcher"
         className="portal-chat__robot-launcher"
+        data-docked={isDocked ? '' : undefined}
+        inert={isDocked}
         aria-label="Ask AI"
         aria-haspopup="dialog"
         aria-controls="portal-chat-dialog"
@@ -429,6 +433,23 @@ export default function PortalChat() {
           <span className="portal-chat__robot-dialogue portal-chat__robot-dialogue--drag" aria-hidden="true">
             {DRAG_LINES[dragLine]}
           </span>
+        </span>
+      </button>
+
+      <button
+        type="button"
+        className="portal-chat__dock-toggle"
+        aria-label={isDocked ? 'Bring back EthiBot' : 'Tuck away EthiBot'}
+        aria-controls="portal-chat-launcher"
+        aria-expanded={!isDocked}
+        onClick={() => {
+          if (dragRef.current) return
+          setLandingReaction(null)
+          setIsDocked(docked => !docked)
+        }}
+      >
+        <span className="portal-chat__dock-tab" aria-hidden="true">
+          {isDocked ? <RobotIcon size={16} /> : <CaretRightIcon size={15} />}
         </span>
       </button>
 
