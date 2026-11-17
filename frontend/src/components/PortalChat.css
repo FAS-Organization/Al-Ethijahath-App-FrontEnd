@@ -348,6 +348,36 @@
   opacity: 1;
 }
 
+.portal-chat__robot-launcher[data-landed] .portal-chat__robot-dialogue:not(.portal-chat__robot-dialogue--landing) {
+  opacity: 0;
+}
+
+.portal-chat__robot-launcher[data-landed] .portal-chat__robot-dialogue--landing {
+  inset: auto 72% 88% auto;
+  transform: none;
+  transition: none;
+  animation: portal-robot-landing-fade 2500ms ease both;
+}
+
+@keyframes portal-robot-landing-fade {
+  0%, 100% { opacity: 0; }
+  8%, 88% { opacity: 1; }
+}
+
+.portal-chat__robot-relief {
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.portal-chat__robot-launcher[data-landed] .portal-chat__robot-gaze,
+.portal-chat__robot-launcher[data-landed] .portal-chat__robot-mouth {
+  opacity: 0;
+}
+
+.portal-chat__robot-launcher[data-landed] .portal-chat__robot-relief {
+  opacity: 1;
+}
+
 .portal-chat__companion {
   position: relative;
   z-index: 1;

@@ -109,6 +109,16 @@ export default function PortalChatRobot({ profile = false }) {
             </g>
             <path className="portal-chat__robot-mouth portal-chat__robot-mouth--smile" d="M45 49q5 4 10 0" />
             <path className="portal-chat__robot-mouth portal-chat__robot-mouth--grin" d="M43 48h14q-7 12-14 0Z" />
+            <g
+              className="portal-chat__robot-relief"
+              fill="none"
+              stroke="#ffe2b9"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            >
+              <path d="M35 40q4 4 8 0m14 0q4 4 8 0" />
+              <path d="M46 49q4 4 8 0" />
+            </g>
             <path
               className="portal-chat__robot-drag-face"
               d="M35 33q4 0 7-3m16 0q3 3 7 3"

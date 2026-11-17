@@ -16,11 +16,19 @@ const DRAG_LINES = [
   'My wings need a break.',
 ]
 
+const LANDING_LINES = [
+  'Whew!',
+  'Back on solid ground.',
+  'That was a ride!',
+  'My wings needed that break.',
+]
+
 export default function PortalChat() {
   const launcherRef = useRef(null)
   const dragRef = useRef(null)
   const suppressClickRef = useRef(false)
   const [dragLine, setDragLine] = useState(DRAG_LINES.length - 1)
+  const [landingLine, setLandingLine] = useState('')
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
   const backdropPressRef = useRef(false)
@@ -36,6 +44,8 @@ export default function PortalChat() {
     clearTimeout(drag?.pauseTimer)
     drag?.flaps?.forEach(animation => animation.cancel())
   }, [])
+
+
 
   const expression = isSending ? 'thinking' : error ? 'concerned' : 'smile'
 
@@ -150,8 +160,12 @@ export default function PortalChat() {
   function startRobotDrag(event) {
     if (event.button !== 0 || dragRef.current) return
 
+    event.preventDefault()
     const launcher = event.currentTarget
+    launcher.focus({ preventScroll: true })
+
     const { clientX: x, clientY: y, pointerId } = event
+    setLandingLine('')
     suppressClickRef.current = false
     dragRef.current = { pointerId, x, y, lastX: x, lastY: y, lastTime: event.timeStamp }
     launcher.setPointerCapture(pointerId)
@@ -250,6 +264,25 @@ export default function PortalChat() {
     launcher.style.removeProperty('--robot-speech-x')
     launcher.style.removeProperty('--robot-flight-x')
     launcher.style.removeProperty('--robot-flight-y')
+
+    if (!drag.bounds || event.type !== 'pointerup') return
+
+    function sayLandingLine() {
+      if (!launcher.isConnected || dragRef.current || dialogRef.current?.open) return
+
+      const index = Math.floor(Math.random() * LANDING_LINES.length)
+      setLandingLine(LANDING_LINES[index])
+    }
+
+    const returnMotion = launcher.getAnimations().find(
+      animation => animation.transitionProperty === 'transform',
+    )
+
+    if (returnMotion) {
+      returnMotion.finished.then(sayLandingLine, () => {})
+    } else {
+      sayLandingLine()
+    }
   }
 
   function openChat() {
@@ -258,6 +291,8 @@ export default function PortalChat() {
     const companion = companionRef.current
     const start = launcher?.querySelector('.portal-chat__robot-art')?.getBoundingClientRect()
     if (!dialog || dialog.open) return
+
+    setLandingLine('')
 
     const previousGreeting = messages.findLast(message => message.role === 'greeting')?.text
     const choices = CHAT_GREETINGS.filter(text => text !== previousGreeting)
@@ -363,6 +398,7 @@ export default function PortalChat() {
         aria-label="Ask AI"
         aria-haspopup="dialog"
         aria-controls="portal-chat-dialog"
+        data-landed={landingLine ? '' : undefined}
         onPointerDown={startRobotDrag}
         onPointerMove={moveRobotDrag}
         onPointerUp={endRobotDrag}
@@ -387,6 +423,15 @@ export default function PortalChat() {
           <span className="portal-chat__robot-dialogue portal-chat__robot-dialogue--drag" aria-hidden="true">
             {DRAG_LINES[dragLine]}
           </span>
+          {landingLine && (
+            <span
+              className="portal-chat__robot-dialogue portal-chat__robot-dialogue--landing"
+              aria-hidden="true"
+              onAnimationEnd={() => setLandingLine('')}
+            >
+              {landingLine}
+            </span>
+          )}
         </span>
       </button>
 
