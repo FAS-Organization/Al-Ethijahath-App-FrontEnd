@@ -42,10 +42,14 @@ export default function PortalChatRobot({ profile = false }) {
           <path d="M66 66q9-5 16 10 4 8-1 9-7 0-17-12Z" fill={fill('red')} />
         )}
         <path d="M32 70c0-8 8-12 18-12s18 4 18 12c0 13-8 22-18 22s-18-9-18-22Z" fill={fill('shell')} />
-        <circle cx={profile ? 55 : 50} cy="76" r="9.5" fill="#fff8f1" fillOpacity=".9" />
-        <svg x={profile ? 48.5 : 43.5} y="69.5" width="13" height="13" viewBox="0 0 303 280" aria-hidden="true">
-          <image href={`${import.meta.env.BASE_URL}images/portal-robot-mark.png`} width="303" height="280" clipPath={fill('badge')} />
-        </svg>
+          {!profile && (
+            <>
+              <circle cx="50" cy="76" r="9.5" fill="#fff8f1" fillOpacity=".9" />
+              <svg x="43.5" y="69.5" width="13" height="13" viewBox="0 0 303 280" aria-hidden="true">
+                <image href={`${import.meta.env.BASE_URL}images/portal-robot-mark.png`} width="303" height="280" clipPath={fill('badge')} />
+              </svg>
+            </>
+          )}
         </g>
 
         <g className="portal-chat__robot-head">
@@ -60,11 +64,15 @@ export default function PortalChatRobot({ profile = false }) {
             <path d="M34 47q7 11 29 9" fill="none" stroke="#db4655" strokeWidth="3" strokeLinecap="round" />
             <rect x="60" y="53" width="8" height="5" rx="2.5" fill="#fd9382" />
             <g className="portal-chat__robot-gaze">
-              <ellipse className="portal-chat__robot-eye" cx="72" cy="41" rx="3.2" ry="5" fill="#ffe2b9" />
+              <path
+                className="portal-chat__robot-eye"
+                d="M75.1 35.7C77.5 34.9 79.4 36.8 79 39.8C78.6 42.5 77 44.6 75 44.7C72.9 44.8 72.4 42.8 72.8 40.3C73.2 38 74 36.3 75.1 35.7Z"
+                fill="#ffe2b9"
+              />
             </g>
-            <path className="portal-chat__robot-mouth portal-chat__robot-mouth--smile" d="M73 48q4.5 4 9 0" />
-            <path className="portal-chat__robot-mouth portal-chat__robot-mouth--thinking" d="M74 50h6" />
-            <path className="portal-chat__robot-mouth portal-chat__robot-mouth--concerned" d="M73 51q4.5-4 9 0" />
+            <path className="portal-chat__robot-mouth portal-chat__robot-mouth--smile portal-chat__robot-mouth--profile-smile" d="M74 48.3Q80.4 49.8 86.1 46.9C84.6 52.1 78.6 54.2 74 48.3Z" />
+            <path className="portal-chat__robot-mouth portal-chat__robot-mouth--thinking" d="M76 49.9Q79.5 50.6 83.3 48.8" />
+            <path className="portal-chat__robot-mouth portal-chat__robot-mouth--concerned" d="M75.5 51.8Q79 47.7 82.9 50" />
           </>
         ) : (
           <>

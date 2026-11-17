@@ -226,6 +226,18 @@
   animation: portal-robot-turn 320ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
+.portal-chat__companion .portal-chat__robot-head {
+  transform-box: fill-box;
+  transform-origin: 50% 80%;
+  transform: rotate(var(--robot-head-tilt, 0deg));
+  transition: transform 180ms ease-out;
+}
+
+.portal-chat__companion .portal-chat__robot-mouth--profile-smile {
+  fill: #fff0d8;
+  stroke: none;
+}
+
 .portal-chat__companion[data-expression='thinking'] .portal-chat__robot-eye {
   animation-duration: 1.8s;
 }

@@ -22,10 +22,7 @@ export default function PortalChat() {
 
   useEffect(() => {
     const log = logRef.current
-    if (log) {
-      log.scrollTop = log.scrollHeight
-      positionChatGaze(log)
-    }
+    if (log) log.scrollTop = log.scrollHeight
   }, [messages])
 
   useEffect(() => {
@@ -86,16 +83,33 @@ export default function PortalChat() {
     }
   }, [])
 
-  function positionChatGaze(scroller) {
-    const scrollRange = scroller.scrollHeight - scroller.clientHeight
-    const progress = scrollRange > 0 ? scroller.scrollTop / scrollRange : 0.5
-    const y = (Math.max(0, Math.min(1, progress)) - 0.5) * 7
-    companionRef.current?.style.setProperty('--robot-look-y', `${y}px`)
+  function trackChatPointer(event) {
+    const companion = companionRef.current
+    if (!companion || event.pointerType === 'touch') return
+
+    const panel = event.currentTarget.getBoundingClientRect()
+    const robot = companion.getBoundingClientRect()
+    const dx = event.clientX - (robot.left + robot.width * 0.76)
+    const dy = event.clientY - (robot.top + robot.height * 0.36)
+    const angle = Math.atan2(dy, Math.max(1, dx)) * 180 / Math.PI
+    const tilt = Math.max(-22, Math.min(22, angle))
+    const across = Math.max(0, Math.min(1, (event.clientX - panel.left) / panel.width))
+
+    companion.style.setProperty('--robot-head-tilt', `${tilt}deg`)
+    companion.style.setProperty('--robot-look-x', `${across * 2}px`)
+    companion.style.setProperty('--robot-look-y', `${tilt / 14}px`)
+  }
+
+  function resetChatGaze() {
+    const companion = companionRef.current
+    companion?.style.removeProperty('--robot-head-tilt')
+    companion?.style.removeProperty('--robot-look-x')
+    companion?.style.removeProperty('--robot-look-y')
   }
 
   function openChat() {
+    resetChatGaze()
     dialogRef.current?.showModal()
-    if (logRef.current) positionChatGaze(logRef.current)
     launcherRef.current?.style.removeProperty('--robot-look-x')
     launcherRef.current?.style.removeProperty('--robot-look-y')
   }
@@ -169,9 +183,8 @@ export default function PortalChat() {
 
         <div
           className="portal-chat__panel"
-          onScroll={event => {
-            if (event.target === event.currentTarget) positionChatGaze(event.currentTarget)
-          }}
+          onPointerMove={trackChatPointer}
+          onPointerLeave={resetChatGaze}
         >
           <header className="portal-chat__header">
             <h2 id="portal-chat-title">Al Ethijahath Assistant</h2>
@@ -197,7 +210,6 @@ export default function PortalChat() {
               {messages.length > 0 && (
                 <div
                   ref={logRef}
-                  onScroll={event => positionChatGaze(event.currentTarget)}
                   className="portal-chat__messages"
                   role="log"
                   aria-label="Chat messages"
