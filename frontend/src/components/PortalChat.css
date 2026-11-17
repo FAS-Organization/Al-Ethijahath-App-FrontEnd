@@ -54,7 +54,6 @@
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 3px 5px rgb(62 14 31 / 26%));
 }
 
 .portal-chat__robot-float { animation: portal-robot-float 3.8s ease-in-out infinite; }
@@ -620,6 +619,10 @@
 .portal-chat :is(button, dialog):focus-visible {
   outline: 2px solid var(--chat-focus);
   outline-offset: 3px;
+}
+
+.portal-chat .portal-chat__robot-launcher:focus-visible {
+  outline: none;
 }
 
 .portal-chat__description {
