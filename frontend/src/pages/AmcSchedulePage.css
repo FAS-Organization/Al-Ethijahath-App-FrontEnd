@@ -1901,7 +1901,7 @@ body:has(.sc-page) {
   }
 
   .sc-main *:not(.sc-summary-item, .sc-summary-icon),
-  .sc-main :not(.sc-segments)::before,
+  .sc-main :not(.sc-segments, .sc-months)::before,
   .sc-main *::after,
   .sc-dialog,
   .sc-dialog::backdrop {
@@ -1918,6 +1918,7 @@ body:has(.sc-page) {
 
 @media (forced-colors: active) {
   .sc-segment[aria-pressed='true'],
+  .sc-month[aria-pressed='true'],
   .sc-tab[aria-selected='true'] {
     outline: 2px solid Highlight;
     outline-offset: -2px;
@@ -2001,6 +2002,7 @@ body:has(.sc-page) {
 
 /* 12-month selector: compact, scrolls sideways on small screens */
 .sc-months {
+  position: relative;
   display: flex;
   gap: 6px;
   margin-bottom: 20px;
@@ -2014,6 +2016,7 @@ body:has(.sc-page) {
 }
 
 .sc-month {
+  position: relative;
   flex: 1 0 56px;
   min-height: 40px;
   padding: 0 10px;
@@ -2031,6 +2034,26 @@ body:has(.sc-page) {
   background: var(--sc-button);
   color: #fff;
   box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+}
+
+.sc-months[data-glide-ready='true']::before {
+  content: '';
+  position: absolute;
+  inset: 4px auto 4px 0;
+  width: var(--sc-month-width);
+  border-radius: 7px;
+  background: var(--sc-button);
+  box-shadow: 0 4px 12px rgb(143 0 13 / 22%);
+  pointer-events: none;
+  transform: translateX(var(--sc-month-x));
+  transition:
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 300ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.sc-months[data-glide-ready='true'] .sc-month[aria-pressed='true'] {
+  background: transparent;
+  box-shadow: none;
 }
 
 /* Overview cards */

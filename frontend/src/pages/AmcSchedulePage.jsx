@@ -837,10 +837,63 @@ function RescheduleForm({ appointment, equipment, site, minDate, today, onSubmit
 
 // ---------- Monthly report ----------
 
+function useSegmentHighlight(selection, visible) {
+  const segmentsRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const segments = segmentsRef.current
+    const selected = segments?.querySelector('.sc-segment[aria-pressed="true"]')
+    if (!visible || !selected) return
+
+    function positionHighlight() {
+      segments.style.setProperty('--sc-visit-x', `${selected.offsetLeft}px`)
+      segments.style.setProperty('--sc-visit-y', `${selected.offsetTop}px`)
+      segments.style.setProperty('--sc-visit-width', `${selected.offsetWidth}px`)
+      segments.style.setProperty('--sc-visit-height', `${selected.offsetHeight}px`)
+      segments.dataset.glideReady = 'true'
+    }
+
+    positionHighlight()
+
+    const observer = new ResizeObserver(positionHighlight)
+    observer.observe(segments)
+    segments.querySelectorAll('.sc-segment').forEach(button => observer.observe(button))
+    return () => observer.disconnect()
+  }, [selection, visible])
+
+  return segmentsRef
+}
+
+
 function MonthlyReport({ appointments, equipmentById, siteById, summaries, relatedServices, today, handlers, source }) {
   // Initial state = current month/year, every time the tab opens.
   const [year, setYear] = useState(() => Number(today.slice(0, 4)))
   const [month, setMonth] = useState(() => Number(today.slice(5, 7)))
+  const monthsRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const months = monthsRef.current
+    const selected = months?.querySelector('.sc-month[aria-pressed="true"]')
+    if (!selected) return
+
+    function positionHighlight() {
+      months.style.setProperty('--sc-month-x', `${selected.offsetLeft}px`)
+      months.style.setProperty('--sc-month-width', `${selected.offsetWidth}px`)
+    }
+
+    positionHighlight()
+
+    if (!months.dataset.glideReady) {
+      months.scrollLeft = selected.offsetLeft - (months.clientWidth - selected.offsetWidth) / 2
+      months.dataset.glideReady = 'true'
+    }
+
+    const observer = new ResizeObserver(positionHighlight)
+    observer.observe(months)
+    months.querySelectorAll('.sc-month').forEach(button => observer.observe(button))
+    return () => observer.disconnect()
+  }, [month])
+
   const [filter, setFilter] = useState('all')
   const [openId, setOpenId] = useState(null)
   const key = `${year}-${String(month).padStart(2, '0')}`
@@ -874,6 +927,7 @@ function MonthlyReport({ appointments, equipmentById, siteById, summaries, relat
         .sort((a, b) => parse(a.scheduled_start) - parse(b.scheduled_start)),
     [appointments, key]
   )
+  const serviceFiltersRef = useSegmentHighlight(filter, rows.length > 0)
   const notes = summaries.filter(entry => monthKey(entry.month_start) === key)
 
   const completed = rows.filter(a => a.status === 'completed')
@@ -927,7 +981,7 @@ function MonthlyReport({ appointments, equipmentById, siteById, summaries, relat
         </div>
       </div>
 
-      <div className="sc-months" role="group" aria-label="Month">
+      <div ref={monthsRef} className="sc-months" role="group" aria-label="Month">
         {MONTH_SHORT.map((label, index) => (
           <button
             key={label}
@@ -1042,7 +1096,7 @@ function MonthlyReport({ appointments, equipmentById, siteById, summaries, relat
                 <span className="sc-count">{shown.length}</span>
               </div>
 
-              <div className="sc-segments sc-segments--small" role="group" aria-label="Filter services">
+              <div ref={serviceFiltersRef} className="sc-segments sc-segments--small" role="group" aria-label="Filter services">
                 {[
                   ['all', 'All'],
                   ['outside', 'Outside AMC'],
@@ -1233,28 +1287,7 @@ function ScheduleContent({ data, handlers }) {
   const [contractStatus, setContractStatus] = useState('all')
   const [contractSite, setContractSite] = useState('all')
   const [view, setView] = useState('upcoming')
-  const visitSegmentsRef = useRef(null)
-
-  useLayoutEffect(() => {
-    const segments = visitSegmentsRef.current
-    const selected = segments?.querySelector('.sc-segment[aria-pressed="true"]')
-    if (!selected) return
-
-    function positionHighlight() {
-      segments.style.setProperty('--sc-visit-x', `${selected.offsetLeft}px`)
-      segments.style.setProperty('--sc-visit-y', `${selected.offsetTop}px`)
-      segments.style.setProperty('--sc-visit-width', `${selected.offsetWidth}px`)
-      segments.style.setProperty('--sc-visit-height', `${selected.offsetHeight}px`)
-      segments.dataset.glideReady = 'true'
-    }
-
-    positionHighlight()
-
-    const observer = new ResizeObserver(positionHighlight)
-    observer.observe(segments)
-    segments.querySelectorAll('.sc-segment').forEach(button => observer.observe(button))
-    return () => observer.disconnect()
-  }, [tab, view])
+  const visitSegmentsRef = useSegmentHighlight(view, tab === 'schedule')
   const [siteFilter, setSiteFilter] = useState('all')
   const [equipmentFilter, setEquipmentFilter] = useState('all')
   const [purposeFilter, setPurposeFilter] = useState('all')
