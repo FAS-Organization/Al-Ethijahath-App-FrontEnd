@@ -3,6 +3,13 @@ import { RobotIcon, XIcon } from '@phosphor-icons/react'
 import PortalChatRobot from './PortalChatRobot'
 import './PortalChat.css'
 
+const CHAT_GREETINGS = [
+  "Hi, I'm EthiBot. How can I help?",
+  "Hello! I'm EthiBot. What can I help you with today?",
+  "Hey, I'm EthiBot. Need help with an invoice or service job?",
+  "Hi there! I'm EthiBot. What would you like to check today?",
+]
+
 export default function PortalChat() {
   const launcherRef = useRef(null)
   const companionRef = useRef(null)
@@ -115,6 +122,18 @@ export default function PortalChat() {
     const start = launcher?.querySelector('.portal-chat__robot-art')?.getBoundingClientRect()
     if (!dialog || dialog.open) return
 
+    const previousGreeting = messages.findLast(message => message.role === 'greeting')?.text
+    const choices = CHAT_GREETINGS.filter(text => text !== previousGreeting)
+    const greeting = {
+      role: 'greeting',
+      text: choices[Math.floor(Math.random() * choices.length)],
+    }
+
+    setMessages(current => current.at(-1)?.role === 'greeting'
+      ? [...current.slice(0, -1), greeting]
+      : [...current, greeting],
+    )
+
     resetChatGaze()
     dialog.showModal()
 
@@ -146,7 +165,8 @@ export default function PortalChat() {
 
     try {
       const { askGemini } = await import('../data/portalChatDemo')
-      const reply = await askGemini(key, conversation)
+      const history = conversation.filter(message => message.role !== 'greeting')
+      const reply = await askGemini(key, history)
 
       if (!reply) {
         setError('Gemini returned an empty reply. Try rephrasing your question.')
@@ -234,41 +254,39 @@ export default function PortalChat() {
               : 'The assistant is currently available in the local demo.'}
           </p>
 
+          <div
+            ref={logRef}
+            className="portal-chat__messages"
+            role="log"
+            aria-label="Chat messages"
+          >
+            {messages.map(({ role, text }, index) => (
+              <div
+                key={index}
+                className={
+                  role === 'user'
+                    ? 'portal-chat__message portal-chat__message--user'
+                    : 'portal-chat__message'
+                }
+              >
+                <p>
+                  <span className="portal-chat__sr-only">{role === 'user' ? 'You: ' : 'EthiBot: '}</span>
+                  {text}
+                </p>
+              </div>
+            ))}
+            {isSending && (
+              <div className="portal-chat__message portal-chat__typing" role="status">
+                <span className="portal-chat__sr-only">EthiBot is typing</span>
+                <span aria-hidden="true" />
+                <span aria-hidden="true" />
+                <span aria-hidden="true" />
+              </div>
+            )}
+          </div>
+
           {demoEnabled && (
             <>
-              {messages.length > 0 && (
-                <div
-                  ref={logRef}
-                  className="portal-chat__messages"
-                  role="log"
-                  aria-label="Chat messages"
-                >
-                  {messages.map(({ role, text }, index) => (
-                    <div
-                      key={index}
-                      className={
-                        role === 'user'
-                          ? 'portal-chat__message portal-chat__message--user'
-                          : 'portal-chat__message'
-                      }
-                    >
-                      <p>
-                        <span className="portal-chat__sr-only">{role === 'user' ? 'You: ' : 'EthiBot: '}</span>
-                        {text}
-                      </p>
-                    </div>
-                  ))}
-                  {isSending && (
-                    <div className="portal-chat__message portal-chat__typing" role="status">
-                      <span className="portal-chat__sr-only">EthiBot is typing</span>
-                      <span aria-hidden="true" />
-                      <span aria-hidden="true" />
-                      <span aria-hidden="true" />
-                    </div>
-                  )}
-                </div>
-              )}
-
               <form className="portal-chat__form" onSubmit={handleSubmit}>
                 <label>
                   Your question
