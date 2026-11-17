@@ -320,11 +320,13 @@
 }
 
 .portal-chat__dialog {
+  --chat-max-height: max(0px, calc(100dvh - var(--chat-topbar-height, 76px) - 50px - var(--chat-bottom)));
+
   position: fixed;
   inset: auto var(--chat-right) var(--chat-bottom) auto;
   box-sizing: border-box;
   width: min(474px, calc(100% - var(--chat-left) - var(--chat-right)));
-  max-height: calc(100dvh - var(--chat-bottom) - 12px);
+  max-height: var(--chat-max-height);
   margin: 0;
   padding: 0;
   border: 0;
@@ -346,7 +348,7 @@
   flex-direction: column;
   min-width: 0;
   gap: 8px;
-  max-height: calc(100dvh - var(--chat-bottom) - 12px);
+  max-height: var(--chat-max-height);
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 12px;

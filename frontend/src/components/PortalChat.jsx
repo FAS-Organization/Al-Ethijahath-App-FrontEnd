@@ -33,6 +33,22 @@ export default function PortalChat() {
   }, [messages, isSending])
 
   useEffect(() => {
+    const topbar = document.querySelector('.portal-topbar')
+    const dialog = dialogRef.current
+    if (!topbar || !dialog) return
+
+    function updateTopbarHeight() {
+      const height = Math.ceil(topbar.getBoundingClientRect().height)
+      dialog.style.setProperty('--chat-topbar-height', `${height}px`)
+    }
+
+    updateTopbarHeight()
+    const observer = new ResizeObserver(updateTopbarHeight)
+    observer.observe(topbar, { box: 'border-box' })
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
     let frame = 0
     let pointer
 

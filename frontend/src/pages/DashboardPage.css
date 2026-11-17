@@ -2913,6 +2913,10 @@ html:has(.ed-dashboard) {
   transform: translateY(-100%);
 }
 
+body:has(.portal-topbar[data-theme='dark']) {
+  background-color: #171415;
+}
+
 .portal-topbar[data-theme='dark'] {
   --ed-bg: #171415;
   --ed-glass-tint: 62%;
