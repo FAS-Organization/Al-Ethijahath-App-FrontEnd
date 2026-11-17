@@ -28,7 +28,7 @@ export default function PortalChat() {
   const dragRef = useRef(null)
   const suppressClickRef = useRef(false)
   const [dragLine, setDragLine] = useState(DRAG_LINES.length - 1)
-  const [landingLine, setLandingLine] = useState('')
+  const [landingReaction, setLandingReaction] = useState(null)
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
   const backdropPressRef = useRef(false)
@@ -165,7 +165,7 @@ export default function PortalChat() {
     launcher.focus({ preventScroll: true })
 
     const { clientX: x, clientY: y, pointerId } = event
-    setLandingLine('')
+    setLandingReaction(null)
     suppressClickRef.current = false
     dragRef.current = { pointerId, x, y, lastX: x, lastY: y, lastTime: event.timeStamp }
     launcher.setPointerCapture(pointerId)
@@ -268,7 +268,27 @@ export default function PortalChat() {
     if (!drag.bounds || event.type !== 'pointerup') return
 
     const index = Math.floor(Math.random() * LANDING_LINES.length)
-    setLandingLine(LANDING_LINES[index])
+    const reaction = { line: LANDING_LINES[index], ready: false }
+    setLandingReaction(reaction)
+
+    function revealLandingLine() {
+      setLandingReaction(current =>
+        current === reaction ? { ...reaction, ready: true } : current,
+      )
+    }
+
+    const returnMotion = launcher.getAnimations().find(
+      animation => animation.transitionProperty === 'transform',
+    )
+
+    if (!returnMotion) {
+      revealLandingLine()
+      return
+    }
+
+    returnMotion.finished.then(revealLandingLine, () => {
+      setLandingReaction(current => current === reaction ? null : current)
+    })
   }
 
   function openChat() {
@@ -278,7 +298,7 @@ export default function PortalChat() {
     const start = launcher?.querySelector('.portal-chat__robot-art')?.getBoundingClientRect()
     if (!dialog || dialog.open) return
 
-    setLandingLine('')
+    setLandingReaction(null)
 
     const previousGreeting = messages.findLast(message => message.role === 'greeting')?.text
     const choices = CHAT_GREETINGS.filter(text => text !== previousGreeting)
@@ -384,7 +404,7 @@ export default function PortalChat() {
         aria-label="Ask AI"
         aria-haspopup="dialog"
         aria-controls="portal-chat-dialog"
-        data-landed={landingLine ? '' : undefined}
+        data-landed={landingReaction ? '' : undefined}
         onPointerDown={startRobotDrag}
         onPointerMove={moveRobotDrag}
         onPointerUp={endRobotDrag}
@@ -412,13 +432,13 @@ export default function PortalChat() {
         </span>
       </button>
 
-      {landingLine && (
+      {landingReaction?.ready && (
         <span
           className="portal-chat__robot-dialogue portal-chat__robot-dialogue--landing"
           aria-hidden="true"
-          onAnimationEnd={() => setLandingLine('')}
+          onAnimationEnd={() => setLandingReaction(null)}
         >
-          {landingLine}
+          {landingReaction.line}
         </span>
       )}
 
