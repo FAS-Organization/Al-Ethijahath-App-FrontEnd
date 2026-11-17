@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { XIcon } from '@phosphor-icons/react'
+import { RobotIcon, XIcon } from '@phosphor-icons/react'
 import PortalChatRobot from './PortalChatRobot'
 import './PortalChat.css'
 
@@ -189,7 +189,12 @@ export default function PortalChat() {
           onPointerLeave={resetChatGaze}
         >
           <header className="portal-chat__header">
-            <h2 id="portal-chat-title">Al Ethijahath Assistant</h2>
+            <h2 id="portal-chat-title">
+              <span className="portal-chat__title-icon" aria-hidden="true">
+                <RobotIcon size={16} />
+              </span>
+              EthiBot
+            </h2>
 
             <button
               type="button"

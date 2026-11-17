@@ -339,9 +339,23 @@
 }
 
 .portal-chat__header h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   font-size: 15px;
   font-weight: 600;
+}
+
+.portal-chat__title-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
+  background: var(--chat-close-hover);
+  color: var(--chat-focus);
 }
 
 .portal-chat__close {
@@ -386,7 +400,7 @@
 }
 
 .portal-chat__message {
-  --message-fill: color-mix(in srgb, #9194a5 28%, var(--chat-surface));
+  --message-fill: var(--chat-close-hover);
   position: relative;
   justify-self: start;
   box-sizing: border-box;
@@ -412,7 +426,7 @@
 }
 
 .portal-chat__message--user {
-  --message-fill: #006dd6;
+  --message-fill: #8f000d;
   justify-self: end;
   border-radius: 18px 18px 8px 18px;
   color: #fff;
@@ -454,7 +468,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #508fc8;
+  background: var(--chat-focus);
   animation: portal-chat-typing 1.15s ease-in-out infinite;
 }
 
