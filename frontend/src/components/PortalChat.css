@@ -377,38 +377,93 @@
   display: grid;
   flex: 1 1 auto;
   align-content: start;
-  gap: 6px;
+  gap: 8px;
   min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding: 2px 4px 2px 0;
+  padding: 2px 8px 5px;
   scrollbar-gutter: stable;
 }
 
 .portal-chat__message {
+  --message-fill: color-mix(in srgb, #9194a5 28%, var(--chat-surface));
+  position: relative;
   justify-self: start;
   box-sizing: border-box;
-  max-width: 92%;
-  padding: 7px 9px;
-  border: 1px solid var(--chat-line);
-  border-radius: 11px;
+  max-width: 86%;
+  padding: 8px 12px;
+  border-radius: 18px 18px 18px 8px;
+  background: var(--message-fill);
+  color: var(--chat-text);
   overflow-wrap: anywhere;
 }
 
-.portal-chat__message--user {
-  justify-self: end;
-  background: var(--chat-close-hover);
+.portal-chat__message::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: -5px;
+  width: 12px;
+  height: 12px;
+  background: var(--message-fill);
+  clip-path: path('M0 0 Q4 0 5 5 Q6 10 12 12 Q5 12 0 8Z');
+  transform: scaleX(-1);
+  pointer-events: none;
 }
 
-.portal-chat__message strong {
-  color: var(--chat-muted);
-  font-size: 11px;
-  font-weight: 500;
+.portal-chat__message--user {
+  --message-fill: #006dd6;
+  justify-self: end;
+  border-radius: 18px 18px 8px 18px;
+  color: #fff;
+}
+
+.portal-chat__message--user::before {
+  left: auto;
+  right: -5px;
+  transform: none;
 }
 
 .portal-chat__message p {
-  margin: 1px 0 0;
+  margin: 0;
   white-space: pre-wrap;
+}
+
+.portal-chat__typing {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 12px;
+  border-radius: 999px;
+}
+
+.portal-chat__typing::before {
+  content: none;
+}
+
+.portal-chat__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.portal-chat__typing span[aria-hidden] {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #508fc8;
+  animation: portal-chat-typing 1.15s ease-in-out infinite;
+}
+
+.portal-chat__typing span:nth-child(3) { animation-delay: 120ms; }
+.portal-chat__typing span:nth-child(4) { animation-delay: 240ms; }
+
+@keyframes portal-chat-typing {
+  0%, 60%, 100% { transform: translateY(0); opacity: .55; }
+  30% { transform: translateY(-3px); opacity: 1; }
 }
 
 .portal-chat__form {

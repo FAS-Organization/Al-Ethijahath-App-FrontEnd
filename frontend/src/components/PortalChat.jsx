@@ -8,7 +8,7 @@ export default function PortalChat() {
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
   const logRef = useRef(null)
-  const apiKey = ' '
+  const apiKey = ''
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
@@ -23,7 +23,7 @@ export default function PortalChat() {
   useEffect(() => {
     const log = logRef.current
     if (log) log.scrollTop = log.scrollHeight
-  }, [messages])
+  }, [messages, isSending])
 
   useEffect(() => {
     let frame = 0
@@ -125,6 +125,8 @@ export default function PortalChat() {
 
     const conversation = [...messages, { role: 'user', text }]
 
+    setMessages(conversation)
+    setQuestion('')
     setError('')
     setIsSending(true)
 
@@ -137,8 +139,7 @@ export default function PortalChat() {
         return
       }
 
-      setMessages([...conversation, { role: 'model', text: reply }])
-      setQuestion('')
+      setMessages(current => [...current, { role: 'model', text: reply }])
     } catch (requestError) {
       setError(
         Number(requestError?.status) === 429
@@ -224,10 +225,20 @@ export default function PortalChat() {
                           : 'portal-chat__message'
                       }
                     >
-                      <strong>{role === 'user' ? 'You' : 'EthiBot'}</strong>
-                      <p>{text}</p>
+                      <p>
+                        <span className="portal-chat__sr-only">{role === 'user' ? 'You: ' : 'EthiBot: '}</span>
+                        {text}
+                      </p>
                     </div>
                   ))}
+                  {isSending && (
+                    <div className="portal-chat__message portal-chat__typing" role="status">
+                      <span className="portal-chat__sr-only">EthiBot is typing</span>
+                      <span aria-hidden="true" />
+                      <span aria-hidden="true" />
+                      <span aria-hidden="true" />
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -258,7 +269,6 @@ export default function PortalChat() {
                   {isSending ? 'Sending…' : 'Send'}
                 </button>
 
-                {isSending && <p role="status">EthiBot is thinking…</p>}
                 {error && <p role="alert">{error}</p>}
               </form>
             </>
