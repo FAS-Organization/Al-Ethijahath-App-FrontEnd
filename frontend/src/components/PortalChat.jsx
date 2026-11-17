@@ -25,7 +25,7 @@ export default function PortalChat() {
   const dialogRef = useRef(null)
   const backdropPressRef = useRef(false)
   const logRef = useRef(null)
-  const apiKey = ''
+  const apiKey = ' '
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
@@ -484,20 +484,22 @@ export default function PortalChat() {
               <form className="portal-chat__form" onSubmit={handleSubmit}>
                 <label>
                   Your question
-                  <textarea
-                    name="chat-question"
-                    placeholder="How much do I owe?"
-                    rows={3}
-                    maxLength={1000}
-                    value={question}
-                    disabled={isSending}
-                    onChange={event => setQuestion(event.target.value)}
-                    onKeyDown={event => {
-                      if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
-                      event.preventDefault()
-                      event.currentTarget.form?.requestSubmit()
-                    }}
-                  />
+                  <span className="portal-chat__input" data-value={question}>
+                    <textarea
+                      name="chat-question"
+                      placeholder="How much do I owe?"
+                      rows={1}
+                      maxLength={1000}
+                      value={question}
+                      disabled={isSending}
+                      onChange={event => setQuestion(event.target.value)}
+                      onKeyDown={event => {
+                        if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
+                        event.preventDefault()
+                        event.currentTarget.form?.requestSubmit()
+                      }}
+                    />
+                  </span>
                 </label>
 
                 <button
