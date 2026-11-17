@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { ChatCircleDotsIcon, GearIcon, LightningIcon, WrenchIcon, XIcon } from '@phosphor-icons/react'
+import { XIcon } from '@phosphor-icons/react'
 import PortalChatRobot from './PortalChatRobot'
 import './PortalChat.css'
 
@@ -148,11 +148,10 @@ export default function PortalChat() {
       >
         <span className="portal-chat__robot-scene">
           <PortalChatRobot />
-          <span className="portal-chat__robot-bubbles" aria-hidden="true">
-            <span><ChatCircleDotsIcon weight="fill" /></span>
-            <span><LightningIcon weight="fill" /></span>
-            <span><GearIcon weight="fill" /></span>
-            <span><WrenchIcon weight="fill" /></span>
+          <span className="portal-chat__robot-dialogue" aria-hidden="true">
+            <span>Need a hand?</span>
+            <span>Track a service job</span>
+            <span>Check your invoices</span>
           </span>
         </span>
       </button>

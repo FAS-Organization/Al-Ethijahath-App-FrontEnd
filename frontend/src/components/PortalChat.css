@@ -69,7 +69,7 @@
 
 .portal-chat__robot-arm {
   transform-box: fill-box;
-  transform-origin: left top;
+  transform-origin: right top;
 }
 
 .portal-chat__robot-mouth {
@@ -84,40 +84,67 @@
 .portal-chat__robot-mouth--smile { opacity: 1; }
 .portal-chat__robot-mouth--grin { fill: #fff0d8; }
 
-.portal-chat__robot-bubbles {
+.portal-chat__robot-dialogue {
   position: absolute;
-  inset: 0;
-  color: #8f2037;
-}
-
-.portal-chat__robot-bubbles > span {
-  position: absolute;
+  right: calc(100% - 14px);
+  bottom: 45%;
   display: grid;
-  width: 22px;
-  height: 22px;
-  place-items: center;
-  border: 1px solid rgb(255 244 224 / 76%);
-  border-radius: 50%;
-  background: linear-gradient(145deg, #fff7e9, #efabb0);
-  box-shadow: 0 3px 7px rgb(93 27 44 / 24%);
+  width: max-content;
+  padding: 5px 9px;
+  border: 1px solid #edb0b4;
+  border-radius: 9px;
+  background: linear-gradient(155deg, #fff8ef, #f5c5c6);
+  color: #791c32;
+  box-shadow: inset 0 1px 0 #fff9f1, 0 2px 0 #c98089, 0 5px 9px rgb(87 24 40 / 24%);
+  font: 600 10px/1.25 system-ui, sans-serif;
+  white-space: nowrap;
   opacity: 0;
-  transform: translate(var(--bubble-x), var(--bubble-y)) scale(.55);
-  transition: opacity 180ms ease, transform 300ms cubic-bezier(.22, 1, .36, 1);
+  transform: translateX(5px) scale(.94);
+  transform-origin: right center;
+  transition: opacity 160ms ease, transform 220ms ease;
 }
 
-.portal-chat__robot-bubbles svg { width: 12px; height: 12px; }
-.portal-chat__robot-bubbles > span:nth-child(1) { top: 4%; left: -12%; --bubble-x: 13px; --bubble-y: 11px; }
-.portal-chat__robot-bubbles > span:nth-child(2) { top: 8%; right: -2%; --bubble-x: -11px; --bubble-y: 10px; }
-.portal-chat__robot-bubbles > span:nth-child(3) { bottom: 15%; left: -12%; --bubble-x: 13px; --bubble-y: -10px; }
-.portal-chat__robot-bubbles > span:nth-child(4) { bottom: 12%; right: -2%; --bubble-x: -12px; --bubble-y: -9px; }
+.portal-chat__robot-dialogue::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -4px;
+  width: 6px;
+  height: 6px;
+  border-top: 1px solid #edb0b4;
+  border-right: 1px solid #edb0b4;
+  background: #f8d0ce;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.portal-chat__robot-dialogue > span {
+  grid-area: 1 / 1;
+  text-align: center;
+  opacity: 0;
+}
+
+.portal-chat__robot-dialogue > span:nth-child(2) { animation-delay: 3s; }
+.portal-chat__robot-dialogue > span:nth-child(3) { animation-delay: 6s; }
+
+@keyframes portal-robot-dialogue {
+  0% { opacity: 0; transform: translateY(2px); }
+  4%, 29% { opacity: 1; transform: translateY(0); }
+  33.33%, 100% { opacity: 0; transform: translateY(-2px); }
+}
 
 .portal-chat__robot-launcher:focus-visible .portal-chat__robot-scene {
   transform: translate(-18px, -4px) scale(1.12);
 }
 
-.portal-chat__robot-launcher:focus-visible .portal-chat__robot-bubbles > span {
+.portal-chat__robot-launcher:focus-visible .portal-chat__robot-dialogue {
   opacity: 1;
-  transform: translate(0, 0) scale(1);
+  transform: translateX(0) scale(1);
+}
+
+.portal-chat__robot-launcher:focus-visible .portal-chat__robot-dialogue > span {
+  animation-name: portal-robot-dialogue;
+  animation-duration: 9s;
+  animation-iteration-count: infinite;
 }
 
 .portal-chat__robot-launcher:focus-visible .portal-chat__robot-mouth--smile { opacity: 0; }
@@ -128,9 +155,15 @@
     transform: translate(-18px, -4px) scale(1.12);
   }
 
-  .portal-chat__robot-launcher:hover .portal-chat__robot-bubbles > span {
+  .portal-chat__robot-launcher:hover .portal-chat__robot-dialogue {
     opacity: 1;
-    transform: translate(0, 0) scale(1);
+    transform: translateX(0) scale(1);
+  }
+
+  .portal-chat__robot-launcher:hover .portal-chat__robot-dialogue > span {
+    animation-name: portal-robot-dialogue;
+    animation-duration: 9s;
+    animation-iteration-count: infinite;
   }
 
   .portal-chat__robot-launcher:hover .portal-chat__robot-arm {
@@ -180,8 +213,8 @@
 
 @keyframes portal-robot-wave {
   0%, 100% { transform: rotate(0); }
-  35% { transform: rotate(-35deg); }
-  68% { transform: rotate(10deg); }
+  35% { transform: rotate(35deg); }
+  68% { transform: rotate(-10deg); }
 }
 
 @keyframes portal-robot-turn {

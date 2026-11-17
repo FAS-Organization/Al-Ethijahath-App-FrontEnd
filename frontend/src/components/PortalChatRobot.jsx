@@ -36,9 +36,9 @@ export default function PortalChatRobot({ profile = false }) {
       <ellipse className="portal-chat__robot-shadow" cx="50" cy="105" rx="25" ry="3.5" fill="#3d1528" />
       <g className="portal-chat__robot-float">
         <path d="M41 86h18l-4 10q-5 10-10 0Z" fill={fill('thruster')} />
-        <path d="M34 66q-9-5-16 10-4 8 1 9 7 0 17-12Z" fill={fill('red')} />
+        <path className={profile ? undefined : 'portal-chat__robot-arm'} d="M34 66q-9-5-16 10-4 8 1 9 7 0 17-12Z" fill={fill('red')} />
         {!profile && (
-          <path className="portal-chat__robot-arm" d="M66 66q9-5 16 10 4 8-1 9-7 0-17-12Z" fill={fill('red')} />
+          <path d="M66 66q9-5 16 10 4 8-1 9-7 0-17-12Z" fill={fill('red')} />
         )}
         <path d="M32 70c0-8 8-12 18-12s18 4 18 12c0 13-8 22-18 22s-18-9-18-22Z" fill={fill('shell')} />
         <circle cx={profile ? 55 : 50} cy="76" r="9.5" fill="#fff8f1" fillOpacity=".9" />
