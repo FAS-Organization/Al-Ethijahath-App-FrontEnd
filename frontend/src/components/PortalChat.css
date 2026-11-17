@@ -228,7 +228,8 @@
   cursor: grabbing;
 }
 
-.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-scene {
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-scene,
+.portal-chat__robot-launcher[data-landed] .portal-chat__robot-scene {
   --robot-lean: 0;
   --robot-head-animation: none;
   transform: translateX(7px);

@@ -162,7 +162,6 @@ export default function PortalChat() {
 
     event.preventDefault()
     const launcher = event.currentTarget
-    launcher.focus({ preventScroll: true })
 
     const { clientX: x, clientY: y, pointerId } = event
     setLandingReaction(null)
@@ -415,6 +414,7 @@ export default function PortalChat() {
         }}
         onClick={event => {
           if (event.detail > 0 && suppressClickRef.current) return
+          event.currentTarget.focus({ preventScroll: true })
           openChat()
         }}
       >
