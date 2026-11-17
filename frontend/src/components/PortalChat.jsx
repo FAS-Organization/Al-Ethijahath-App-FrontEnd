@@ -109,10 +109,24 @@ export default function PortalChat() {
   }
 
   function openChat() {
+    const dialog = dialogRef.current
+    const launcher = launcherRef.current
+    const companion = companionRef.current
+    const start = launcher?.querySelector('.portal-chat__robot-art')?.getBoundingClientRect()
+    if (!dialog || dialog.open) return
+
     resetChatGaze()
-    dialogRef.current?.showModal()
-    launcherRef.current?.style.removeProperty('--robot-look-x')
-    launcherRef.current?.style.removeProperty('--robot-look-y')
+    dialog.showModal()
+
+    if (start && companion) {
+      const end = companion.getBoundingClientRect()
+      companion.style.setProperty('--robot-open-x', `${start.left + start.width / 2 - (end.left + end.width / 2)}px`)
+      companion.style.setProperty('--robot-open-y', `${start.top + start.height / 2 - (end.top + end.height / 2)}px`)
+      companion.style.setProperty('--robot-open-scale', String(start.height / end.height))
+    }
+
+    launcher?.style.removeProperty('--robot-look-x')
+    launcher?.style.removeProperty('--robot-look-y')
   }
 
   async function handleSubmit(event) {
@@ -165,6 +179,7 @@ export default function PortalChat() {
         <span className="portal-chat__robot-scene">
           <PortalChatRobot />
           <span className="portal-chat__robot-dialogue" aria-hidden="true">
+            <span>Hi, I'm EthiBot</span>
             <span>Need a hand?</span>
             <span>Track a service job</span>
             <span>Check your invoices</span>
@@ -180,7 +195,14 @@ export default function PortalChat() {
         aria-describedby="portal-chat-description"
       >
         <div ref={companionRef} className="portal-chat__companion" data-expression={expression} aria-hidden="true">
-          <PortalChatRobot profile />
+          <div className="portal-chat__companion-motion">
+            <span className="portal-chat__companion-front">
+              <PortalChatRobot />
+            </span>
+            <span className="portal-chat__companion-side">
+              <PortalChatRobot profile />
+            </span>
+          </div>
         </div>
 
         <div
