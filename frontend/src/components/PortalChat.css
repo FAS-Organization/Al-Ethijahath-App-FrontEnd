@@ -61,9 +61,14 @@
   transform-origin: center bottom;
   transform:
     translate(calc(-27px * var(--robot-lean, 0)), calc(-5px * var(--robot-lean, 0)))
-    rotate(calc(-9deg * var(--robot-lean, 0)))
     scale(calc(1 + .09 * var(--robot-lean, 0)));
   transition: transform 280ms cubic-bezier(.22, 1, .36, 1);
+  animation: var(--robot-head-animation, none) 280ms ease-in-out;
+}
+
+@keyframes portal-robot-head-nod {
+  0%, 100% { rotate: 0deg; }
+  35% { rotate: -9deg; }
 }
 
 .portal-chat__robot-scene .portal-chat__robot-body {
@@ -160,6 +165,7 @@
 
 .portal-chat__robot-launcher:focus-visible .portal-chat__robot-scene {
   --robot-lean: 1;
+  --robot-head-animation: portal-robot-head-nod;
 }
 
 .portal-chat__robot-launcher:focus-visible .portal-chat__robot-dialogue {
@@ -179,6 +185,7 @@
 @media (hover: hover) and (pointer: fine) {
   .portal-chat__robot-launcher:hover .portal-chat__robot-scene {
     --robot-lean: 1;
+    --robot-head-animation: portal-robot-head-nod;
   }
 
   .portal-chat__robot-launcher:hover .portal-chat__robot-dialogue {
