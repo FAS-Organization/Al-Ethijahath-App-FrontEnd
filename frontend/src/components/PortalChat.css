@@ -32,7 +32,10 @@
   border-radius: 20px 0 0 20px;
   background: transparent;
   cursor: pointer;
-  touch-action: manipulation;
+  touch-action: none;
+  user-select: none;
+  transform: translate3d(var(--robot-drag-x, 0px), var(--robot-drag-y, 0px), 0);
+  transition: transform 520ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .portal-chat__robot-scene {
@@ -219,6 +222,56 @@
 
 .portal-chat:has(.portal-chat__dialog[open]) .portal-chat__robot-scene {
   opacity: 0;
+}
+
+.portal-chat__robot-launcher[data-drag-state] {
+  transition: none;
+  cursor: grabbing;
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-scene {
+  --robot-lean: 0;
+  --robot-head-animation: none;
+  transform: translateX(7px);
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-float,
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-arm {
+  animation: none;
+}
+
+.portal-chat__robot-arm--right {
+  transform-box: fill-box;
+  transform-origin: left top;
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-dialogue:not(.portal-chat__robot-dialogue--drag) {
+  opacity: 0;
+}
+
+.portal-chat__robot-launcher .portal-chat__robot-dialogue.portal-chat__robot-dialogue--drag {
+  inset: var(--robot-speech-top, auto) auto var(--robot-speech-bottom, 96%) 50%;
+  opacity: 0;
+  transform: translateX(calc(-50% + var(--robot-speech-x, 0px)));
+}
+
+.portal-chat__robot-dialogue--drag::after {
+  right: calc(50% + var(--robot-speech-x, 0px) - 3px);
+}
+
+.portal-chat__robot-launcher[data-speech-below] .portal-chat__robot-dialogue--drag {
+  --robot-speech-top: 90%;
+  --robot-speech-bottom: auto;
+}
+
+.portal-chat__robot-launcher[data-speech-below] .portal-chat__robot-dialogue--drag::after {
+  top: -3px;
+  bottom: auto;
+  transform: rotate(225deg);
+}
+
+.portal-chat__robot-launcher[data-drag-state='held'] .portal-chat__robot-dialogue--drag {
+  opacity: 1;
 }
 
 .portal-chat__companion {

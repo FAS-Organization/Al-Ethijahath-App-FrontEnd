@@ -10,8 +10,17 @@ const CHAT_GREETINGS = [
   "Hi there! I'm EthiBot. What would you like to check today?",
 ]
 
+const DRAG_LINES = [
+  'Can I land now?',
+  'Easy, I get dizzy!',
+  'My wings need a break.',
+]
+
 export default function PortalChat() {
   const launcherRef = useRef(null)
+  const dragRef = useRef(null)
+  const suppressClickRef = useRef(false)
+  const [dragLine, setDragLine] = useState(DRAG_LINES.length - 1)
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
   const backdropPressRef = useRef(false)
@@ -21,6 +30,12 @@ export default function PortalChat() {
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
   const [error, setError] = useState('')
+
+  useEffect(() => () => {
+    const drag = dragRef.current
+    clearTimeout(drag?.pauseTimer)
+    drag?.flaps?.forEach(animation => animation.cancel())
+  }, [])
 
   const expression = isSending ? 'thinking' : error ? 'concerned' : 'smile'
 
@@ -130,6 +145,103 @@ export default function PortalChat() {
     companion?.style.removeProperty('--robot-head-tilt')
     companion?.style.removeProperty('--robot-look-x')
     companion?.style.removeProperty('--robot-look-y')
+  }
+
+  function startRobotDrag(event) {
+    if (event.button !== 0 || dragRef.current) return
+
+    const launcher = event.currentTarget
+    const { clientX: x, clientY: y, pointerId } = event
+    suppressClickRef.current = false
+    dragRef.current = { pointerId, x, y, lastX: x, lastY: y, lastTime: event.timeStamp }
+    launcher.setPointerCapture(pointerId)
+  }
+
+  function moveRobotDrag(event) {
+    const drag = dragRef.current
+    if (drag?.pointerId !== event.pointerId) return
+
+    const launcher = event.currentTarget
+    const dx = event.clientX - drag.x
+    const dy = event.clientY - drag.y
+
+    if (!drag.bounds) {
+      if (Math.hypot(dx, dy) < 7) return
+
+      const rect = launcher.getBoundingClientRect()
+      const offset = new DOMMatrixReadOnly(getComputedStyle(launcher).transform)
+      drag.bounds = {
+        left: rect.left - offset.m41,
+        top: rect.top - offset.m42,
+        width: rect.width,
+        height: rect.height,
+      }
+      drag.offsetX = offset.m41
+      drag.offsetY = offset.m42
+      drag.arms = Array.from(launcher.querySelectorAll('[data-robot-wing]'))
+      suppressClickRef.current = true
+    }
+
+    const distance = Math.hypot(event.clientX - drag.lastX, event.clientY - drag.lastY)
+    if (!distance) return
+
+    const { left, top, width, height } = drag.bounds
+    const x = Math.max(-left, Math.min(window.innerWidth - left - width, drag.offsetX + dx))
+    const y = Math.max(-top, Math.min(window.innerHeight - top - height, drag.offsetY + dy))
+    launcher.style.setProperty('--robot-drag-x', `${x}px`)
+    launcher.style.setProperty('--robot-drag-y', `${y}px`)
+
+    const center = left + x + width / 2
+    const speechCenter = Math.max(82, Math.min(window.innerWidth - 82, center))
+    launcher.style.setProperty('--robot-speech-x', `${speechCenter - center}px`)
+    launcher.toggleAttribute('data-speech-below', top + y < 34)
+    launcher.dataset.dragState = 'moving'
+
+    if (!drag.flaps) {
+      drag.flaps = drag.arms.map(arm => {
+        const angle = arm.dataset.robotWing === 'left' ? 1 : -1
+        return arm.animate(
+          [
+            { rotate: '0deg' },
+            { rotate: `${angle * 32}deg` },
+            { rotate: `${angle * -18}deg` },
+            { rotate: '0deg' },
+          ],
+          { duration: 470, easing: 'ease-in-out', iterations: Infinity },
+        )
+      })
+    }
+
+    const elapsed = Math.max(8, event.timeStamp - drag.lastTime)
+    const rate = Math.min(2.8, 0.65 + (distance / elapsed) * 1.2)
+    drag.flaps.forEach(animation => animation.updatePlaybackRate(rate))
+    drag.lastX = event.clientX
+    drag.lastY = event.clientY
+    drag.lastTime = event.timeStamp
+
+    clearTimeout(drag.pauseTimer)
+    drag.pauseTimer = setTimeout(() => {
+      drag.flaps.forEach(animation => animation.cancel())
+      drag.flaps = null
+      launcher.dataset.dragState = 'held'
+      setDragLine(index => (index + 1) % DRAG_LINES.length)
+    }, 180)
+  }
+
+  function endRobotDrag(event) {
+    const drag = dragRef.current
+    if (drag?.pointerId !== event.pointerId) return
+
+    dragRef.current = null
+    clearTimeout(drag.pauseTimer)
+    drag.flaps?.forEach(animation => animation.cancel())
+
+    const launcher = event.currentTarget
+    launcher.removeAttribute('data-drag-state')
+    launcher.removeAttribute('data-speech-below')
+    launcher.style.removeProperty('--robot-drag-x')
+    launcher.style.removeProperty('--robot-drag-y')
+    launcher.style.removeProperty('--robot-speech-x')
   }
 
   function openChat() {
@@ -243,7 +355,18 @@ export default function PortalChat() {
         aria-label="Ask AI"
         aria-haspopup="dialog"
         aria-controls="portal-chat-dialog"
-        onClick={openChat}
+        onPointerDown={startRobotDrag}
+        onPointerMove={moveRobotDrag}
+        onPointerUp={endRobotDrag}
+        onPointerCancel={endRobotDrag}
+        onLostPointerCapture={endRobotDrag}
+        onContextMenu={event => {
+          if (dragRef.current) event.preventDefault()
+        }}
+        onClick={event => {
+          if (event.detail > 0 && suppressClickRef.current) return
+          openChat()
+        }}
       >
         <span className="portal-chat__robot-scene">
           <PortalChatRobot />
@@ -252,6 +375,9 @@ export default function PortalChat() {
             <span>Need a hand?</span>
             <span>Track a service job</span>
             <span>Check your invoices</span>
+          </span>
+          <span className="portal-chat__robot-dialogue portal-chat__robot-dialogue--drag" aria-hidden="true">
+            {DRAG_LINES[dragLine]}
           </span>
         </span>
       </button>
