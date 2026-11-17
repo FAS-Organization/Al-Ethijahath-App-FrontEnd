@@ -35,7 +35,8 @@ export default function PortalChatRobot({ profile = false }) {
 
       <ellipse className="portal-chat__robot-shadow" cx="50" cy="105" rx="25" ry="3.5" fill="#3d1528" />
       <g className="portal-chat__robot-float">
-        <path d="M41 86h18l-4 10q-5 10-10 0Z" fill={fill('thruster')} />
+        <g className="portal-chat__robot-body">
+          <path d="M41 86h18l-4 10q-5 10-10 0Z" fill={fill('thruster')} />
         <path className={profile ? undefined : 'portal-chat__robot-arm'} d="M34 66q-9-5-16 10-4 8 1 9 7 0 17-12Z" fill={fill('red')} />
         {!profile && (
           <path d="M66 66q9-5 16 10 4 8-1 9-7 0-17-12Z" fill={fill('red')} />
@@ -45,7 +46,9 @@ export default function PortalChatRobot({ profile = false }) {
         <svg x={profile ? 48.5 : 43.5} y="69.5" width="13" height="13" viewBox="0 0 303 280" aria-hidden="true">
           <image href={`${import.meta.env.BASE_URL}images/portal-robot-mark.png`} width="303" height="280" clipPath={fill('badge')} />
         </svg>
+        </g>
 
+        <g className="portal-chat__robot-head">
         {profile ? (
           <>
             <path d="M52 15l3-10" stroke="#db4b57" strokeWidth="3" strokeLinecap="round" />
@@ -82,6 +85,7 @@ export default function PortalChatRobot({ profile = false }) {
             <rect x="62" y="53.5" width="9" height="5" rx="2.5" fill="#ff9a83" />
           </>
         )}
+        </g>
       </g>
     </svg>
   )
