@@ -52,7 +52,7 @@
 .portal-chat__dock-toggle {
   position: fixed;
   right: env(safe-area-inset-right, 0px);
-  bottom: var(--chat-bottom);
+  bottom: calc(var(--chat-bottom) - 10px);
   z-index: 36;
   display: grid;
   place-items: center end;
@@ -62,7 +62,7 @@
   padding: 0;
   border: 0;
   background: transparent;
-  color: var(--chat-focus);
+  color: #fff;
   cursor: pointer;
 }
 
@@ -71,23 +71,22 @@
   place-items: center;
   box-sizing: border-box;
   width: 30px;
-  height: 30px;
-  border: 1px solid var(--chat-line);
+  height: 25px;
+  border: 1px solid rgb(255 255 255 / 34%);
   border-right: 0;
   border-radius: 11px 0 0 11px;
-  background: var(--chat-surface);
-  background: color-mix(in srgb, var(--chat-surface) 94%, transparent);
+  background: #8f1931;
   box-shadow: 0 2px 8px rgb(30 20 21 / 14%);
   transition: background-color 150ms ease-out, transform 150ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .portal-chat__dock-toggle[aria-expanded='false'] .portal-chat__dock-tab {
-  background: var(--chat-close-hover);
+  background: #aa2340;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .portal-chat__dock-toggle:hover .portal-chat__dock-tab {
-    background: var(--chat-close-hover);
+    background: #b52b46;
   }
 }
 
