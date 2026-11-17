@@ -8,7 +8,7 @@ export default function PortalChat() {
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
   const logRef = useRef(null)
-  const apiKey = ''
+  const apiKey = ' '
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
@@ -234,14 +234,19 @@ export default function PortalChat() {
               <form className="portal-chat__form" onSubmit={handleSubmit}>
                 <label>
                   Your question
-                  <input
-                    type="text"
+                  <textarea
                     name="chat-question"
                     placeholder="How much do I owe?"
+                    rows={3}
                     maxLength={1000}
                     value={question}
                     disabled={isSending}
                     onChange={event => setQuestion(event.target.value)}
+                    onKeyDown={event => {
+                      if (event.key !== 'Enter' || event.shiftKey || event.nativeEvent.isComposing) return
+                      event.preventDefault()
+                      event.currentTarget.form?.requestSubmit()
+                    }}
                   />
                 </label>
 
