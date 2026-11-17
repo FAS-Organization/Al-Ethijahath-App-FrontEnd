@@ -245,6 +245,80 @@
   transform-origin: left top;
 }
 
+.portal-chat__robot-antenna,
+.portal-chat__robot-thruster {
+  transform-box: fill-box;
+  transition: transform 220ms ease-out;
+}
+
+.portal-chat__robot-antenna { transform-origin: left bottom; }
+.portal-chat__robot-thruster { transform-origin: center top; }
+
+.portal-chat__robot-launcher[data-drag-state='held'] .portal-chat__robot-scene {
+  --robot-flight-x: 0;
+  --robot-flight-y: 0;
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-head {
+  transform:
+    translate(calc(var(--robot-flight-x, 0) * 6px), calc(var(--robot-flight-y, 0) * 4px))
+    rotate(calc(var(--robot-flight-x, 0) * 19deg))
+    scaleY(calc(1 + var(--robot-flight-y, 0) * .1));
+  transition: transform 100ms ease-out;
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-body {
+  transform:
+    translate(calc(var(--robot-flight-x, 0) * -5px), calc(var(--robot-flight-y, 0) * -4px))
+    rotate(calc(var(--robot-flight-x, 0) * 12deg))
+    scaleY(calc(1 - var(--robot-flight-y, 0) * .08));
+  transition: transform 220ms cubic-bezier(.22, 1, .36, 1) 45ms;
+  animation: portal-robot-tremble 260ms ease-in-out infinite;
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-antenna {
+  transform: rotate(calc(var(--robot-flight-x, 0) * -18deg));
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-thruster {
+  transform:
+    skewX(calc(var(--robot-flight-x, 0) * -23deg))
+    scaleY(calc(1 - var(--robot-flight-y, 0) * .22));
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-shadow {
+  transform: translate(calc(var(--robot-flight-x, 0) * -8px), calc(var(--robot-flight-y, 0) * -3px));
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-gaze {
+  transform: translate(calc(var(--robot-flight-x, 0) * 3px), calc(var(--robot-flight-y, 0) * 2px));
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-head .portal-chat__robot-eye {
+  animation: none;
+  transform: scale(1.15, 1.28);
+}
+
+.portal-chat__robot-drag-face { opacity: 0; }
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-mouth,
+.portal-chat__robot-launcher[data-drag-state='moving'] .portal-chat__robot-frown,
+.portal-chat__robot-launcher[data-drag-state='held'] .portal-chat__robot-gasp {
+  opacity: 0;
+}
+
+.portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-drag-face:not(.portal-chat__robot-gasp, .portal-chat__robot-frown),
+.portal-chat__robot-launcher[data-drag-state='moving'] .portal-chat__robot-gasp,
+.portal-chat__robot-launcher[data-drag-state='held'] .portal-chat__robot-frown {
+  opacity: 1;
+}
+
+@keyframes portal-robot-tremble {
+  0%, 100% { translate: 0 0; }
+  30% { translate: -.6px -1px; }
+  70% { translate: .6px .4px; }
+}
+
 .portal-chat__robot-launcher[data-drag-state] .portal-chat__robot-dialogue:not(.portal-chat__robot-dialogue--drag) {
   opacity: 0;
 }

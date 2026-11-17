@@ -182,8 +182,16 @@ export default function PortalChat() {
       suppressClickRef.current = true
     }
 
-    const distance = Math.hypot(event.clientX - drag.lastX, event.clientY - drag.lastY)
+    const stepX = event.clientX - drag.lastX
+    const stepY = event.clientY - drag.lastY
+    const distance = Math.hypot(stepX, stepY)
     if (!distance) return
+
+    const elapsed = Math.max(8, event.timeStamp - drag.lastTime)
+    const speed = distance / elapsed
+    const lean = Math.min(1, 0.25 + speed * 1.5)
+    launcher.style.setProperty('--robot-flight-x', String(stepX / distance * lean))
+    launcher.style.setProperty('--robot-flight-y', String(stepY / distance * lean))
 
     const { left, top, width, height } = drag.bounds
     const x = Math.max(-left, Math.min(window.innerWidth - left - width, drag.offsetX + dx))
@@ -212,8 +220,7 @@ export default function PortalChat() {
       })
     }
 
-    const elapsed = Math.max(8, event.timeStamp - drag.lastTime)
-    const rate = Math.min(2.8, 0.65 + (distance / elapsed) * 1.2)
+    const rate = Math.min(2.8, 0.75 + speed * 1.2)
     drag.flaps.forEach(animation => animation.updatePlaybackRate(rate))
     drag.lastX = event.clientX
     drag.lastY = event.clientY
@@ -221,8 +228,7 @@ export default function PortalChat() {
 
     clearTimeout(drag.pauseTimer)
     drag.pauseTimer = setTimeout(() => {
-      drag.flaps.forEach(animation => animation.cancel())
-      drag.flaps = null
+      drag.flaps.forEach(animation => animation.updatePlaybackRate(0.55))
       launcher.dataset.dragState = 'held'
       setDragLine(index => (index + 1) % DRAG_LINES.length)
     }, 180)
@@ -242,6 +248,8 @@ export default function PortalChat() {
     launcher.style.removeProperty('--robot-drag-x')
     launcher.style.removeProperty('--robot-drag-y')
     launcher.style.removeProperty('--robot-speech-x')
+    launcher.style.removeProperty('--robot-flight-x')
+    launcher.style.removeProperty('--robot-flight-y')
   }
 
   function openChat() {

@@ -36,7 +36,7 @@ export default function PortalChatRobot({ profile = false }) {
       <ellipse className="portal-chat__robot-shadow" cx="50" cy="105" rx="25" ry="3.5" fill="#3d1528" />
       <g className="portal-chat__robot-float">
         <g className="portal-chat__robot-body">
-          <path d="M41 86h18l-4 10q-5 10-10 0Z" fill={fill('thruster')} />
+          <path className="portal-chat__robot-thruster" d="M41 86h18l-4 10q-5 10-10 0Z" fill={fill('thruster')} />
           {!profile && (
             <>
               <path
@@ -94,8 +94,10 @@ export default function PortalChatRobot({ profile = false }) {
           </>
         ) : (
           <>
-            <path d="M68 18l8-13" stroke="#db4b57" strokeWidth="3" strokeLinecap="round" />
-            <circle cx="77" cy="5" r="3.3" fill="#ff9a83" />
+            <g className="portal-chat__robot-antenna">
+              <path d="M68 18l8-13" stroke="#db4b57" strokeWidth="3" strokeLinecap="round" />
+              <circle cx="77" cy="5" r="3.3" fill="#ff9a83" />
+            </g>
             <ellipse cx="15" cy="42" rx="7" ry="8" fill={fill('red')} />
             <ellipse cx="85" cy="42" rx="7" ry="8" fill={fill('red')} />
             <path d="M13 45c0-17 15-33 37-33s37 16 37 33c0 14-14 20-37 20S13 59 13 45Z" fill={fill('shell')} />
@@ -107,6 +109,32 @@ export default function PortalChatRobot({ profile = false }) {
             </g>
             <path className="portal-chat__robot-mouth portal-chat__robot-mouth--smile" d="M45 49q5 4 10 0" />
             <path className="portal-chat__robot-mouth portal-chat__robot-mouth--grin" d="M43 48h14q-7 12-14 0Z" />
+            <path
+              className="portal-chat__robot-drag-face"
+              d="M35 33q4 0 7-3m16 0q3 3 7 3"
+              fill="none"
+              stroke="#ffe2b9"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+            <ellipse
+              className="portal-chat__robot-drag-face portal-chat__robot-gasp"
+              cx="50"
+              cy="49"
+              rx="3"
+              ry="4"
+              fill="none"
+              stroke="#fff0d8"
+              strokeWidth="1.8"
+            />
+            <path
+              className="portal-chat__robot-drag-face portal-chat__robot-frown"
+              d="M45 51q5-7 10 0"
+              fill="none"
+              stroke="#fff0d8"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+            />
             <path d="M83 44q-1 11-17 12" fill="none" stroke="#c33245" strokeWidth="3" strokeLinecap="round" />
             <rect x="62" y="53.5" width="9" height="5" rx="2.5" fill="#ff9a83" />
           </>
