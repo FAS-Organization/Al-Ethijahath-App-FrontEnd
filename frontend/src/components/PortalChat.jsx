@@ -8,7 +8,7 @@ export default function PortalChat() {
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
   const logRef = useRef(null)
-  const [apiKey, setApiKey] = useState('')
+  const apiKey = ''
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
@@ -224,7 +224,7 @@ export default function PortalChat() {
                           : 'portal-chat__message'
                       }
                     >
-                      <strong>{role === 'user' ? 'You' : 'Assistant'}</strong>
+                      <strong>{role === 'user' ? 'You' : 'EthiBot'}</strong>
                       <p>{text}</p>
                     </div>
                   ))}
@@ -232,18 +232,6 @@ export default function PortalChat() {
               )}
 
               <form className="portal-chat__form" onSubmit={handleSubmit}>
-                <label>
-                  Gemini test key
-                  <input
-                    type="password"
-                    name="gemini-test-key"
-                    autoComplete="off"
-                    value={apiKey}
-                    disabled={isSending}
-                    onChange={event => setApiKey(event.target.value)}
-                  />
-                </label>
-
                 <label>
                   Your question
                   <input
@@ -265,7 +253,7 @@ export default function PortalChat() {
                   {isSending ? 'Sending…' : 'Send'}
                 </button>
 
-                {isSending && <p role="status">Waiting for Gemini…</p>}
+                {isSending && <p role="status">EthiBot is thinking…</p>}
                 {error && <p role="alert">{error}</p>}
               </form>
             </>
