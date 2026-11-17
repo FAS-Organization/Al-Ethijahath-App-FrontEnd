@@ -91,17 +91,18 @@ export default function PortalChat() {
     const robot = companion.getBoundingClientRect()
     const dx = event.clientX - (robot.left + robot.width * 0.76)
     const dy = event.clientY - (robot.top + robot.height * 0.36)
-    const angle = Math.atan2(dy, Math.max(1, dx)) * 180 / Math.PI
-    const tilt = Math.max(-22, Math.min(22, angle))
+    const tilt = Math.max(-16, Math.min(16, dy * 9 / Math.max(180, dx)))
     const across = Math.max(0, Math.min(1, (event.clientX - panel.left) / panel.width))
 
+    companion.toggleAttribute('data-tracking', true)
     companion.style.setProperty('--robot-head-tilt', `${tilt}deg`)
     companion.style.setProperty('--robot-look-x', `${across * 2}px`)
-    companion.style.setProperty('--robot-look-y', `${tilt / 14}px`)
+    companion.style.setProperty('--robot-look-y', `${tilt / 10}px`)
   }
 
   function resetChatGaze() {
     const companion = companionRef.current
+    companion?.removeAttribute('data-tracking')
     companion?.style.removeProperty('--robot-head-tilt')
     companion?.style.removeProperty('--robot-look-x')
     companion?.style.removeProperty('--robot-look-y')

@@ -230,7 +230,11 @@
   transform-box: fill-box;
   transform-origin: 50% 80%;
   transform: rotate(var(--robot-head-tilt, 0deg));
-  transition: transform 180ms ease-out;
+  transition: transform 500ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.portal-chat__companion[data-tracking] .portal-chat__robot-head {
+  transition-duration: 220ms;
 }
 
 .portal-chat__companion .portal-chat__robot-mouth--profile-smile {
