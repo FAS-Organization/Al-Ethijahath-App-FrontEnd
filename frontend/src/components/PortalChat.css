@@ -21,139 +21,216 @@
 
 .portal-chat__robot-launcher {
   --robot-size: 88px;
-
   position: fixed;
   right: env(safe-area-inset-right, 0px);
   bottom: calc(var(--chat-bottom) + 12px);
   z-index: 35;
-  width: calc(var(--robot-size) - 18px);
-  height: calc(var(--robot-size) + 16px);
+  width: calc(var(--robot-size) - 1px);
+  height: var(--robot-size);
   padding: 0;
   border: 0;
-  border-radius: 22px 0 0 22px;
+  border-radius: 20px 0 0 20px;
   background: transparent;
-  clip-path: inset(-16px 0 -16px -24px);
   cursor: pointer;
   touch-action: manipulation;
 }
 
-.portal-chat__robot-launcher:focus-visible {
-  outline: 2px solid var(--chat-focus);
-  outline-offset: -2px;
-}
-
-.portal-chat__robot-launcher > svg {
+.portal-chat__robot-scene {
   position: absolute;
-  top: 8px;
-  left: 1px;
+  inset: 0 auto auto 0;
   display: block;
   width: var(--robot-size);
   height: var(--robot-size);
+  transform: translateX(7px);
+  transition: transform 300ms cubic-bezier(.22, 1, .36, 1);
+  pointer-events: none;
+}
+
+.portal-chat__robot-art {
+  display: block;
+  width: 100%;
+  height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 5px 7px rgb(47 15 30 / 30%));
-  transform: rotate(-25deg);
-  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 3px 5px rgb(62 14 31 / 26%));
 }
 
-.portal-chat__robot-body {
-  animation: portal-chat-robot-float 3.8s ease-in-out infinite;
-}
-
-.portal-chat__robot-look {
+.portal-chat__robot-float { animation: portal-robot-float 3.8s ease-in-out infinite; }
+.portal-chat__robot-shadow { opacity: .26; }
+.portal-chat__robot-gaze {
   transform: translate(var(--robot-look-x, 0px), var(--robot-look-y, 0px));
-  transition: transform 120ms ease-out;
+  transition: transform 140ms ease-out;
 }
 
-.portal-chat__robot-blink {
+.portal-chat__robot-eye {
   transform-box: fill-box;
   transform-origin: center;
-  animation: portal-chat-robot-blink 4.8s ease-in-out infinite;
+  animation: portal-robot-blink 5s ease-in-out infinite;
 }
 
 .portal-chat__robot-arm {
-  transform-origin: 66px 66px;
+  transform-box: fill-box;
+  transform-origin: left top;
 }
 
-.portal-chat__robot-small-smile,
-.portal-chat__robot-grin {
-  transition: opacity 140ms ease;
-}
-
-.portal-chat__robot-grin {
+.portal-chat__robot-mouth {
+  fill: none;
+  stroke: #fff0d8;
+  stroke-width: 2;
+  stroke-linecap: round;
   opacity: 0;
+  transition: opacity 160ms ease;
 }
 
-.portal-chat__robot-launcher:is(:focus-visible, :active) .portal-chat__robot-grin {
+.portal-chat__robot-mouth--smile { opacity: 1; }
+.portal-chat__robot-mouth--grin { fill: #fff0d8; }
+
+.portal-chat__robot-bubbles {
+  position: absolute;
+  inset: 0;
+  color: #8f2037;
+}
+
+.portal-chat__robot-bubbles > span {
+  position: absolute;
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border: 1px solid rgb(255 244 224 / 76%);
+  border-radius: 50%;
+  background: linear-gradient(145deg, #fff7e9, #efabb0);
+  box-shadow: 0 3px 7px rgb(93 27 44 / 24%);
+  opacity: 0;
+  transform: translate(var(--bubble-x), var(--bubble-y)) scale(.55);
+  transition: opacity 180ms ease, transform 300ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.portal-chat__robot-bubbles svg { width: 12px; height: 12px; }
+.portal-chat__robot-bubbles > span:nth-child(1) { top: 4%; left: -12%; --bubble-x: 13px; --bubble-y: 11px; }
+.portal-chat__robot-bubbles > span:nth-child(2) { top: 8%; right: -2%; --bubble-x: -11px; --bubble-y: 10px; }
+.portal-chat__robot-bubbles > span:nth-child(3) { bottom: 15%; left: -12%; --bubble-x: 13px; --bubble-y: -10px; }
+.portal-chat__robot-bubbles > span:nth-child(4) { bottom: 12%; right: -2%; --bubble-x: -12px; --bubble-y: -9px; }
+
+.portal-chat__robot-launcher:focus-visible .portal-chat__robot-scene {
+  transform: translate(-18px, -4px) scale(1.12);
+}
+
+.portal-chat__robot-launcher:focus-visible .portal-chat__robot-bubbles > span {
   opacity: 1;
+  transform: translate(0, 0) scale(1);
 }
 
-.portal-chat__robot-launcher:is(:focus-visible, :active) .portal-chat__robot-small-smile {
-  opacity: 0;
-}
+.portal-chat__robot-launcher:focus-visible .portal-chat__robot-mouth--smile { opacity: 0; }
+.portal-chat__robot-launcher:focus-visible .portal-chat__robot-mouth--grin { opacity: 1; }
 
 @media (hover: hover) and (pointer: fine) {
-  .portal-chat__robot-launcher:hover > svg {
-    transform: translate(-11px, -4px) rotate(-2deg) scale(1.05);
+  .portal-chat__robot-launcher:hover .portal-chat__robot-scene {
+    transform: translate(-18px, -4px) scale(1.12);
+  }
+
+  .portal-chat__robot-launcher:hover .portal-chat__robot-bubbles > span {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
   }
 
   .portal-chat__robot-launcher:hover .portal-chat__robot-arm {
-    animation: portal-chat-robot-wave 620ms ease-in-out 2;
+    animation: portal-robot-wave 560ms ease-in-out 2;
   }
 
-  .portal-chat__robot-launcher:hover .portal-chat__robot-grin {
-    opacity: 1;
-  }
-
-  .portal-chat__robot-launcher:hover .portal-chat__robot-small-smile {
-    opacity: 0;
-  }
+  .portal-chat__robot-launcher:hover .portal-chat__robot-mouth--smile { opacity: 0; }
+  .portal-chat__robot-launcher:hover .portal-chat__robot-mouth--grin { opacity: 1; }
 }
 
-.portal-chat__robot-launcher:active > svg {
-  transform: translate(-4px, 3px) rotate(-16deg) scale(0.94);
+.portal-chat__robot-launcher:active .portal-chat__robot-scene {
+  transform: translate(-5px, 2px) scale(.96);
 }
 
-.portal-chat__robot-launcher:active .portal-chat__robot-blink:first-child {
+.portal-chat__robot-launcher:active .portal-chat__robot-eye:first-child {
   animation: none;
-  transform: scaleY(0.13);
+  transform: scaleY(.15);
 }
 
-@keyframes portal-chat-robot-float {
+.portal-chat:has(.portal-chat__dialog[open]) .portal-chat__robot-scene {
+  opacity: 0;
+}
+
+.portal-chat__companion {
+  align-self: end;
+  --robot-look-x: 1px;
+  animation: portal-robot-turn 320ms cubic-bezier(.22, 1, .36, 1) both;
+}
+
+.portal-chat__companion[data-expression='thinking'] .portal-chat__robot-eye {
+  animation-duration: 1.8s;
+}
+
+.portal-chat__companion:not([data-expression='smile']) .portal-chat__robot-mouth--smile { opacity: 0; }
+.portal-chat__companion[data-expression='thinking'] .portal-chat__robot-mouth--thinking,
+.portal-chat__companion[data-expression='concerned'] .portal-chat__robot-mouth--concerned { opacity: 1; }
+
+@keyframes portal-robot-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-3px); }
 }
 
-@keyframes portal-chat-robot-blink {
-  0%, 86%, 94%, 100% { transform: scaleY(1); }
-  90% { transform: scaleY(0.12); }
+@keyframes portal-robot-blink {
+  0%, 87%, 94%, 100% { transform: scaleY(1); }
+  90% { transform: scaleY(.12); }
 }
 
-@keyframes portal-chat-robot-wave {
+@keyframes portal-robot-wave {
   0%, 100% { transform: rotate(0); }
-  33% { transform: rotate(-24deg); }
-  67% { transform: rotate(10deg); }
+  35% { transform: rotate(-35deg); }
+  68% { transform: rotate(10deg); }
+}
+
+@keyframes portal-robot-turn {
+  from { opacity: 0; transform: perspective(240px) translateX(32px) rotateY(-65deg) scale(.86); }
+  to { opacity: 1; transform: perspective(240px) translateX(0) rotateY(0) scale(1); }
+}
+
+@keyframes portal-chat-enter {
+  from { opacity: 0; transform: translateX(14px); }
+  to { opacity: 1; transform: translateX(0); }
 }
 
 @media (width < 425px) {
-  .portal-chat__robot-launcher {
-    --robot-size: 74px;
-  }
+  .portal-chat__robot-launcher { --robot-size: 72px; }
 }
 
 .portal-chat__dialog {
   position: fixed;
   inset: auto var(--chat-right) var(--chat-bottom) auto;
   box-sizing: border-box;
-  width: min(380px, calc(100% - var(--chat-left) - var(--chat-right)));
-  max-height: calc(100dvh - var(--chat-bottom) - 16px);
+  width: min(474px, calc(100% - var(--chat-left) - var(--chat-right)));
+  max-height: calc(100dvh - var(--chat-bottom) - 12px);
   margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  color: var(--chat-text);
+  font: 14px/1.55 Arial, Helvetica, sans-serif;
+}
+
+.portal-chat__dialog[open] {
+  display: grid;
+  grid-template-columns: clamp(42px, calc(20vw - 22px), 86px) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.portal-chat__panel {
+  box-sizing: border-box;
+  min-width: 0;
+  max-height: calc(100dvh - var(--chat-bottom) - 12px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 16px;
   border: 1px solid var(--chat-line);
   border-radius: 16px;
   background: var(--chat-surface);
-  color: var(--chat-text);
   box-shadow: 0 14px 44px rgb(32 20 21 / 24%);
-  font: 14px/1.55 Arial, Helvetica, sans-serif;
+  animation: portal-chat-enter 260ms cubic-bezier(.22, 1, .36, 1) both;
 }
 
 .portal-chat__dialog::backdrop {
