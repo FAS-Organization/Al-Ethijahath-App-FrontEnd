@@ -371,6 +371,20 @@
 
 .portal-chat__dialog::backdrop {
   background: rgb(23 20 21 / 38%);
+  transition: opacity 220ms ease-out;
+}
+
+.portal-chat__companion {
+  transition: opacity 220ms ease-out, transform 220ms ease-out;
+}
+
+.portal-chat__dialog[data-closing]::backdrop,
+.portal-chat__dialog[data-closing] .portal-chat__companion {
+  opacity: 0;
+}
+
+.portal-chat__dialog[data-closing] .portal-chat__companion {
+  transform: translateX(14px);
 }
 
 .portal-chat__header {

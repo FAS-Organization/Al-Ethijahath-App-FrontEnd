@@ -14,6 +14,7 @@ export default function PortalChat() {
   const launcherRef = useRef(null)
   const companionRef = useRef(null)
   const dialogRef = useRef(null)
+  const backdropPressRef = useRef(false)
   const logRef = useRef(null)
   const apiKey = ''
   const [question, setQuestion] = useState('')
@@ -164,6 +165,38 @@ export default function PortalChat() {
     launcher?.style.removeProperty('--robot-look-y')
   }
 
+  function closeChat() {
+    const dialog = dialogRef.current
+    if (!dialog?.open || dialog.hasAttribute('data-closing')) return
+
+    const panel = dialog.querySelector('.portal-chat__panel')
+    const style = panel ? getComputedStyle(panel) : null
+    dialog.setAttribute('data-closing', '')
+
+    function finishClose() {
+      dialog.close()
+      dialog.removeAttribute('data-closing')
+    }
+
+    if (!panel || !style || typeof panel.animate !== 'function') {
+      finishClose()
+      return
+    }
+
+    const animation = panel.animate(
+      [
+        { opacity: style.opacity, transform: style.transform },
+        { opacity: 0, transform: 'translate(18px, 12px) scale(.94)' },
+      ],
+      { duration: 220, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'forwards' },
+    )
+
+    animation.finished.then(() => {
+      finishClose()
+      animation.cancel()
+    }, finishClose)
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
 
@@ -229,6 +262,17 @@ export default function PortalChat() {
         className="portal-chat__dialog"
         aria-labelledby="portal-chat-title"
         aria-describedby="portal-chat-description"
+        onPointerDown={event => {
+          backdropPressRef.current = event.target === event.currentTarget
+        }}
+        onClick={event => {
+          if (backdropPressRef.current && event.target === event.currentTarget) closeChat()
+          backdropPressRef.current = false
+        }}
+        onCancel={event => {
+          event.preventDefault()
+          closeChat()
+        }}
       >
         <div ref={companionRef} className="portal-chat__companion" data-expression={expression} aria-hidden="true">
           <div className="portal-chat__companion-motion">
@@ -258,7 +302,7 @@ export default function PortalChat() {
               type="button"
               className="portal-chat__close"
               aria-label="Close chat"
-              onClick={() => dialogRef.current?.close()}
+              onClick={closeChat}
             >
               <XIcon size={20} aria-hidden="true" />
             </button>
