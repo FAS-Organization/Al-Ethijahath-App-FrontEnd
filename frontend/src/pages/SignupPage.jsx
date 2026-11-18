@@ -378,7 +378,7 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                   }`}
                 >
                   {fields.map(
-                    ([name, label, type, autoComplete]) => {
+                    ([name, label, type, autoComplete], index) => {
                       const isPassword = type === 'password'
                       const isVisible = Boolean(visible[name])
                       const error = errors[name]
@@ -400,6 +400,7 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                         <div
                           className={`field ${name === 'country' ? 'field--full-width' : ''}`}
                           key={name}
+                          style={{ animationDelay: `${55 + index * 20}ms` }}
                         >
                           {name !== 'country' && (
                             <label htmlFor={name}>
@@ -522,6 +523,7 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                     className="submit-button"
                     disabled={busy}
                     type="submit"
+                    style={{ animationDelay: `${55 + fields.length * 20}ms` }}
                   >
                     {busy
                       ? isLogin
