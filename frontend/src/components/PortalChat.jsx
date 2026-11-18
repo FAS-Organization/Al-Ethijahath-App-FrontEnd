@@ -298,6 +298,35 @@ export default function PortalChat() {
     })
   }
 
+  function turnCompanion(event, faceForward) {
+    if (event.pointerType === 'touch' || dialogRef.current?.hasAttribute('data-closing')) return
+
+    const companion = event.currentTarget
+    companion.toggleAttribute('data-hover-turn', faceForward)
+    companion.removeAttribute('data-waving')
+
+    const turns = companion.getAnimations({ subtree: true }).filter(animation =>
+      animation.animationName === 'portal-robot-front-out' ||
+      animation.animationName === 'portal-robot-side-in',
+    )
+
+    for (const turn of turns) {
+      const target = faceForward ? 0 : turn.effect.getComputedTiming().endTime
+      if (turn.currentTime === target) continue
+
+      turn.updatePlaybackRate(faceForward ? -0.52 : 0.6)
+      turn.play()
+    }
+
+    if (faceForward) {
+      Promise.all(turns.map(turn => turn.finished)).then(() => {
+        if (companion.hasAttribute('data-hover-turn') && dialogRef.current?.open) {
+          companion.setAttribute('data-waving', '')
+        }
+      }, () => {})
+    }
+  }
+
   function openChat() {
     const dialog = dialogRef.current
     const launcher = launcherRef.current
@@ -320,6 +349,8 @@ export default function PortalChat() {
     )
 
     resetChatGaze()
+    companion?.removeAttribute('data-hover-turn')
+    companion?.removeAttribute('data-waving')
     dialog.showModal()
 
     if (start && companion) {
@@ -477,10 +508,14 @@ export default function PortalChat() {
         aria-labelledby="portal-chat-title"
         aria-describedby="portal-chat-description"
         onPointerDown={event => {
-          backdropPressRef.current = event.target === event.currentTarget
+          backdropPressRef.current =
+            event.target === event.currentTarget || event.target === companionRef.current
         }}
         onClick={event => {
-          if (backdropPressRef.current && event.target === event.currentTarget) closeChat()
+          const clickedBackdrop =
+            event.target === event.currentTarget || event.target === companionRef.current
+
+          if (backdropPressRef.current && clickedBackdrop) closeChat()
           backdropPressRef.current = false
         }}
         onCancel={event => {
@@ -488,7 +523,14 @@ export default function PortalChat() {
           closeChat()
         }}
       >
-        <div ref={companionRef} className="portal-chat__companion" data-expression={expression} aria-hidden="true">
+        <div
+          ref={companionRef}
+          className="portal-chat__companion"
+          data-expression={expression}
+          aria-hidden="true"
+          onPointerEnter={event => turnCompanion(event, true)}
+          onPointerLeave={event => turnCompanion(event, false)}
+        >
           <div className="portal-chat__companion-motion">
             <span className="portal-chat__companion-front">
               <PortalChatRobot />
