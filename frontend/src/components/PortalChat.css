@@ -52,18 +52,17 @@
 
 .portal-chat__dock-toggle {
   --chat-dock-width: 30px;
-  --chat-dock-height: 24px;
-  --chat-dock-icon-size: 15px;
-  --chat-dock-hit-height: max(24px, var(--chat-dock-height));
+  --chat-dock-height: 30px;
+  --chat-dock-icon-size: 14px;
   position: fixed;
   right: env(safe-area-inset-right, 0px);
-  bottom: calc(var(--chat-launcher-bottom) - 0px - var(--chat-dock-hit-height));
+  bottom: calc(var(--chat-launcher-bottom) - var(--chat-dock-height));
   z-index: 36;
   display: grid;
   place-items: start end;
   box-sizing: border-box;
-  width: 44px;
-  height: var(--chat-dock-hit-height);
+  width: var(--chat-dock-width);
+  height: var(--chat-dock-height);
   padding: 0;
   border: 0;
   background: transparent;
@@ -90,21 +89,13 @@
   height: var(--chat-dock-icon-size);
 }
 
-@media (width <= 1024px) {
+@media (width > 1024px) {
   .portal-chat__dock-toggle {
-    --chat-dock-width: max(27px, calc(var(--robot-size) / 2 - 9px));
-    --chat-dock-height: calc(var(--robot-size) / 2 - 14px);
-    --chat-dock-icon-size: calc(var(--robot-size) / 4 - 4px);
+    --chat-dock-height: 25px;
   }
 }
 
-@media (width <= 768px) {
-  .portal-chat__dock-toggle {
-    --chat-dock-width: 30px;
-    --chat-dock-height: 30px;
-    --chat-dock-icon-size: 14px;
-  }
-}
+
 
 .portal-chat__dock-toggle[aria-expanded='false'] .portal-chat__dock-tab {
   background: #aa2340;
