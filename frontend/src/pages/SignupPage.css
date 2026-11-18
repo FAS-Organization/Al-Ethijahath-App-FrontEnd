@@ -1150,7 +1150,7 @@
 
 .signup-submit-row {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(86px, 1fr);
+  grid-template-columns: minmax(86px, 1fr) minmax(0, 3fr);
   gap: 8px;
   margin-top: 22px;
 }
@@ -1209,7 +1209,7 @@
 
 .signup-region-options {
   position: absolute;
-  inset: calc(100% + 6px) 0 auto auto;
+  inset: calc(100% + 6px) auto auto 0;
   z-index: 4;
   display: grid;
   gap: 2px;
@@ -1222,7 +1222,7 @@
   opacity: 0;
   visibility: hidden;
   transform: translateY(-6px) scale(.98);
-  transform-origin: top right;
+  transform-origin: top left;
   transition:
     opacity 180ms ease,
     transform 240ms cubic-bezier(.22, 1, .36, 1),

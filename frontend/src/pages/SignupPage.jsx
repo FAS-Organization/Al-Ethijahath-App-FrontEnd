@@ -522,19 +522,6 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                 </div>
 
                   <div className={isLogin ? undefined : 'signup-submit-row'}>
-                    <button
-                      className="submit-button"
-                      disabled={busy}
-                      type="submit"
-                    >
-                      {busy
-                        ? isLogin
-                          ? 'Logging in…'
-                          : 'Creating account…'
-                        : isLogin
-                          ? 'Log in'
-                          : 'Create account'}
-                    </button>
                     {!isLogin && (
                       <div
                         className="signup-region"
@@ -584,6 +571,20 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                         </div>
                       </div>
                     )}
+
+                    <button
+                      className="submit-button"
+                      disabled={busy}
+                      type="submit"
+                    >
+                      {busy
+                        ? isLogin
+                          ? 'Logging in…'
+                          : 'Creating account…'
+                        : isLogin
+                          ? 'Log in'
+                          : 'Create account'}
+                    </button>
                   </div>
 
                   {!isLogin && errors.region && (
