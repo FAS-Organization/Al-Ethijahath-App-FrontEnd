@@ -225,8 +225,17 @@
 
 .fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 16px;
+}
+
+.field--full-width {
+  grid-column: 1 / -1;
+}
+
+/* Country dropdown occupies the complete form width */
+.field--full-width {
+  grid-column: 1 / -1;
 }
 
 .field {
@@ -235,8 +244,8 @@
 
 .field label {
   display: block;
-  margin-bottom: 9px;
-  font-size: 13px;
+  margin-bottom: 4px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--heading);
 }
@@ -245,23 +254,67 @@
   position: relative;
 }
 
-.field input {
+.field input,
+.field select {
   width: 100%;
-  height: 48px;
-  padding: 0 12px;
+  height: 38px;
+  padding: 0 11px;
 
   border: 1px solid var(--signup-input-border);
   border-radius: 6px;
 
-  background: var(--pale);
+  background-color: var(--pale);
   color: var(--signup-text);
 
   font: inherit;
-  font-size: 16px;
+  font-size: 14px;
 
   transition:
     border-color 180ms ease,
     background-color 180ms ease;
+}
+
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+
+  padding-right: 42px;
+  cursor: pointer;
+
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+
+  background-repeat: no-repeat;
+  background-position: right 13px center;
+  background-size: 18px;
+}
+
+.field select:hover:not(:disabled) {
+  border-color: var(--heading);
+}
+
+.field select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+  background-color: var(--signup-input-focus);
+}
+
+.field select:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.field select option {
+  background: var(--pale);
+  color: var(--signup-text);
+}
+
+.field select:invalid {
+  color: #8a807b;
+}
+
+.field select[aria-invalid='true'] {
+  border-color: var(--signup-error);
 }
 
 .field input[autocomplete='new-password'] {
@@ -294,6 +347,8 @@
   position: absolute;
   top: 2px;
   right: 2px;
+  width: 38px;
+  height: 36px;
 
   display: inline-flex;
   align-items: center;
@@ -360,8 +415,8 @@
 
 .submit-button {
   width: 100%;
-  height: 50px;
-  margin-top: 28px;
+  height: 42px;
+  margin-top: 13px;
 
   border: 0;
   border-radius: 6px;
@@ -582,15 +637,18 @@
 
 
 .registration h2 {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  font-size: 32px;
 }
 
 .form-intro {
-  margin-bottom: 18px;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 
 .required-note {
-  margin-bottom: 14px;
+  margin-bottom: 8px;
+  font-size: 11px;
 }
 
 .fields {
@@ -608,7 +666,7 @@
 /* Reserve consistent desktop height for either form */
 @media (min-width: 901px) {
   .auth-content {
-    min-height: 405px;
+    min-height: 0;
   }
 }
 
@@ -1145,5 +1203,114 @@
     flex-direction: column-reverse;
     align-items: center;
     text-align: center;
+  }
+}
+
+/* Compact signup layout for laptop screens */
+@media (min-width: 901px) and (max-height: 850px) {
+  .registration-layout {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    gap: 65px;
+  }
+
+  .welcome-note {
+    margin-top: 35px;
+  }
+
+  .portal-footer {
+    padding-block: 10px;
+  }
+
+  .portal-header {
+    height: 64px;
+  }
+
+  .auth-switch-text button {
+    min-height: 34px;
+  }
+}
+
+
+/* Compact desktop signup layout */
+@media (min-width: 901px) and (min-height: 650px) {
+  .registration-layout {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    align-items: center;
+  }
+
+  .auth-content {
+    min-height: 0;
+  }
+
+  .registration h2 {
+    margin-bottom: 4px;
+    line-height: 1.15;
+  }
+
+  .form-intro {
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
+
+  .required-note {
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .fields {
+    row-gap: 10px;
+    column-gap: 18px;
+  }
+
+  .field label {
+    margin-bottom: 5px;
+    line-height: 1.2;
+  }
+
+  .field input,
+  .field select {
+    height: 44px;
+    box-sizing: border-box;
+  }
+
+  .field--full-width {
+    grid-column: 1 / -1;
+  }
+
+  .submit-button {
+    height: 48px;
+    margin-top: 14px;
+  }
+
+  .auth-switch-text {
+    margin-top: 12px;
+  }
+}
+
+/* Give shorter desktop screens a little extra room */
+@media (min-width: 901px) and (max-height: 800px) {
+  .registration-layout {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  .fields {
+    row-gap: 7px;
+  }
+
+  .field input,
+  .field select {
+    height: 41px;
+  }
+
+  .submit-button {
+    height: 44px;
+    margin-top: 10px;
+  }
+
+  .auth-switch-text {
+    margin-top: 8px;
   }
 }

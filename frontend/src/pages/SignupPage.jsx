@@ -19,7 +19,16 @@ const signupFields = [
   ['phone', 'Phone number', 'tel', 'tel'],
   ['password', 'Password', 'password', 'new-password'],
   ['confirmPassword', 'Confirm password', 'password', 'new-password'],
+  ['country', 'Country / Region', 'select', 'country-name'],
 ]
+
+const countries = [
+  'Afghanistan',
+  'Australia',
+  'Bahrain',
+].filter((country, index, list) =>
+  list.indexOf(country) === index
+).sort((a, b) => a.localeCompare(b))
 
 const loginFields = [
   ['email', 'Email address', 'email', 'username'],
@@ -388,34 +397,64 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                       }
 
                       return (
-                        <div className="field" key={name}>
-                          <label htmlFor={name}>
-                            {label}
-                          </label>
+                        <div
+                          className={`field ${name === 'country' ? 'field--full-width' : ''}`}
+                          key={name}
+                        >
+                          {name !== 'country' && (
+                            <label htmlFor={name}>
+                              {label}
+                            </label>
+                          )}
 
                           <div className="input-wrap">
-                            <input
-                              id={name}
-                              name={name}
-                              type={
-                                isPassword && isVisible
-                                  ? 'text'
-                                  : type
-                              }
-                              autoComplete={autoComplete}
-                              required
-                              disabled={busy}
-                              spellCheck={
-                                type === 'email' || isPassword
-                                  ? false
-                                  : undefined
-                              }
-                              aria-invalid={Boolean(error)}
-                              aria-describedby={descriptionId}
-                              onInput={() =>
-                                clearFieldError(name)
-                              }
-                            />
+                            {type === 'select' ? (
+                              <select
+                                id={name}
+                                name={name}
+                                autoComplete={autoComplete}
+                                aria-label="Region"
+                                required
+                                disabled={busy}
+                                defaultValue=""
+                                aria-invalid={Boolean(error)}
+                                aria-describedby={descriptionId}
+                                onChange={() => clearFieldError(name)}
+                              >
+                                <option value="" disabled>
+                                  Select a region
+                                </option>
+
+                                {countries.map(country => (
+                                  <option key={country} value={country}>
+                                    {country}
+                                  </option>
+                                ))}
+                              </select>
+                            ) : (
+                              <input
+                                id={name}
+                                name={name}
+                                type={
+                                  isPassword && isVisible
+                                    ? 'text'
+                                    : type
+                                }
+                                autoComplete={autoComplete}
+                                required
+                                disabled={busy}
+                                spellCheck={
+                                  type === 'email' || isPassword
+                                    ? false
+                                    : undefined
+                                }
+                                aria-invalid={Boolean(error)}
+                                aria-describedby={descriptionId}
+                                onInput={() => clearFieldError(name)}
+                              />
+                            )}
+
+
 
                             {isPassword && (
                               <button
