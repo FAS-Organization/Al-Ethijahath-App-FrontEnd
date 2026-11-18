@@ -1150,7 +1150,7 @@
 
 .signup-submit-row {
   display: grid;
-  grid-template-columns: minmax(86px, 1fr) minmax(0, 3fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 4fr);
   gap: 8px;
   margin-top: 22px;
 }
@@ -1168,8 +1168,15 @@
 }
 
 .signup-region {
+  --region-blue: 46 126 240;
+  --region-text: #174577;
   position: relative;
   min-width: 0;
+}
+
+.signup-shell[data-theme='dark'] .signup-region {
+  --region-blue: 105 173 255;
+  --region-text: #c6e2ff;
 }
 
 .signup-region-trigger {
@@ -1179,14 +1186,33 @@
   gap: 4px;
   width: 100%;
   height: 50px;
-  padding: 0 6px;
-  border: 1px solid var(--signup-input-border);
+  padding: 0 4px;
+  border: 1px solid rgb(var(--region-blue) / 34%);
   border-radius: 12px;
-  background: var(--ed-accent-soft);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
-  color: var(--heading);
-  font: 600 12px/1 Arial, sans-serif;
+  background: linear-gradient(
+    160deg,
+    rgb(var(--region-blue) / 23%),
+    rgb(var(--region-blue) / 10%)
+  );
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
+  color: var(--region-text);
+  font: 600 12px/1.15 Arial, sans-serif;
   cursor: pointer;
+}
+
+.signup-region-trigger span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (width <= 480px) {
+  .signup-region-trigger {
+    flex-direction: column;
+    gap: 2px;
+    font-size: 11px;
+  }
 }
 
 .signup-region-trigger[aria-invalid='true'] {
@@ -1200,7 +1226,7 @@
 
 .signup-region-trigger svg {
   flex: none;
-  transition: transform 220ms cubic-bezier(.22, 1, .36, 1);
+  transition: transform 280ms cubic-bezier(.22, 1, .36, 1);
 }
 
 .signup-region-trigger[aria-expanded='true'] svg {
@@ -1221,12 +1247,12 @@
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 12px 28px rgb(24 13 16 / 20%);
   opacity: 0;
   visibility: hidden;
-  transform: translateY(-6px) scale(.98);
+  transform: translateY(-10px) scale(.985);
   transform-origin: top left;
   transition:
-    opacity 180ms ease,
-    transform 240ms cubic-bezier(.22, 1, .36, 1),
-    visibility 0s linear 240ms;
+    opacity 220ms ease,
+    transform 320ms cubic-bezier(.22, 1, .36, 1),
+    visibility 0s linear 320ms;
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
@@ -1259,7 +1285,7 @@
 }
 
 .signup-region-options button:is(:hover, [aria-pressed='true']) {
-  background: var(--ed-accent-soft);
+  background: rgb(var(--region-blue) / 14%);
 }
 
 .signup-region-options button:focus-visible {
