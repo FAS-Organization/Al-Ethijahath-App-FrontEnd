@@ -482,14 +482,14 @@
   pointer-events: none;
 }
 
-.portal-chat__companion[data-waving] .portal-chat__companion-front [data-robot-wing='right'] {
+.portal-chat__companion[data-waving] .portal-chat__companion-front [data-robot-wing='left'] {
   animation: portal-robot-companion-wave 1450ms ease-in-out;
 }
 
 @keyframes portal-robot-companion-wave {
   0%, 100% { rotate: 0deg; }
-  22%, 57% { rotate: -98deg; }
-  39%, 74% { rotate: -68deg; }
+  22%, 57% { rotate: 98deg; }
+  39%, 74% { rotate: 68deg; }
 }
 
 .portal-chat__companion-motion {
