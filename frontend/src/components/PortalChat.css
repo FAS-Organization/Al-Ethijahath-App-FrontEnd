@@ -846,11 +846,31 @@
   padding: 11px 12px;
   border: 1px solid transparent;
   font: inherit;
-  font-size: 16px;
+  font-size: var(--chat-input-font-size, 16px);
   font-weight: 400;
   line-height: 22px;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+}
+
+@media (width <= 768px) {
+  .portal-chat__input { --chat-input-font-size: 15px; }
+}
+
+@media (width <= 500px) {
+  .portal-chat__input { --chat-input-font-size: 14px; }
+}
+
+@media (width <= 425px) {
+  .portal-chat__input { --chat-input-font-size: 13.5px; }
+}
+
+@media (width <= 375px) {
+  .portal-chat__input { --chat-input-font-size: 13px; }
+}
+
+@media (width <= 321px) {
+  .portal-chat__input { --chat-input-font-size: 12.5px; }
 }
 
 .portal-chat__input::after {
