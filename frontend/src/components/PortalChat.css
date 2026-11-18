@@ -1,6 +1,7 @@
 .portal-chat {
   --robot-size: 88px;
   --chat-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  --chat-launcher-bottom: calc(var(--chat-bottom) + 18px);
   --chat-right: calc(16px + env(safe-area-inset-right, 0px));
   --chat-left: calc(16px + env(safe-area-inset-left, 0px));
   --chat-surface: #fffaf7;
@@ -23,7 +24,7 @@
 .portal-chat__robot-launcher {
   position: fixed;
   right: env(safe-area-inset-right, 0px);
-  bottom: calc(var(--chat-bottom) + 12px);
+  bottom: var(--chat-launcher-bottom);
   z-index: 35;
   width: calc(var(--robot-size) - 1px);
   height: var(--robot-size);
@@ -50,15 +51,20 @@
 }
 
 .portal-chat__dock-toggle {
+  --chat-dock-width: 30px;
+  --chat-dock-height: 25px;
+  --chat-dock-icon-size: 15px;
+  --chat-dock-hit-height: max(24px, var(--chat-dock-height));
+
   position: fixed;
   right: env(safe-area-inset-right, 0px);
-  bottom: calc(var(--chat-bottom) - 10px);
+  bottom: calc(var(--chat-launcher-bottom) - 4px - var(--chat-dock-hit-height));
   z-index: 36;
   display: grid;
-  place-items: center end;
+  place-items: start end;
   box-sizing: border-box;
   width: 44px;
-  height: 44px;
+  height: var(--chat-dock-hit-height);
   padding: 0;
   border: 0;
   background: transparent;
@@ -70,14 +76,27 @@
   display: grid;
   place-items: center;
   box-sizing: border-box;
-  width: 30px;
-  height: 25px;
+  width: var(--chat-dock-width);
+  height: var(--chat-dock-height);
   border: 1px solid rgb(255 255 255 / 34%);
   border-right: 0;
   border-radius: 11px 0 0 11px;
   background: #8f1931;
   box-shadow: 0 2px 8px rgb(30 20 21 / 14%);
   transition: background-color 150ms ease-out, transform 150ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.portal-chat__dock-tab svg {
+  width: var(--chat-dock-icon-size);
+  height: var(--chat-dock-icon-size);
+}
+
+@media (width <= 1024px) {
+  .portal-chat__dock-toggle {
+    --chat-dock-width: calc(var(--robot-size) / 2 - 9px);
+    --chat-dock-height: calc(var(--robot-size) / 2 - 14px);
+    --chat-dock-icon-size: calc(var(--robot-size) / 4 - 4px);
+  }
 }
 
 .portal-chat__dock-toggle[aria-expanded='false'] .portal-chat__dock-tab {
@@ -734,7 +753,8 @@
   outline-offset: 3px;
 }
 
-.portal-chat .portal-chat__robot-launcher:focus-visible {
+.portal-chat .portal-chat__robot-launcher:focus-visible,
+.portal-chat .portal-chat__close:focus-visible {
   outline: none;
 }
 
