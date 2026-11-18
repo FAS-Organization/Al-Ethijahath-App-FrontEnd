@@ -550,19 +550,19 @@
 }
 
 @media (width < 500px) {
-  .portal-chat { --robot-size: 70px; }
-}
-
-@media (width < 425px) {
-  .portal-chat { --robot-size: 68px; }
-}
-
-@media (width < 375px) {
   .portal-chat { --robot-size: 66px; }
 }
 
-@media (width < 321px) {
+@media (width < 425px) {
   .portal-chat { --robot-size: 64px; }
+}
+
+@media (width < 375px) {
+  .portal-chat { --robot-size: 62px; }
+}
+
+@media (width < 321px) {
+  .portal-chat { --robot-size: 60px; }
 }
 
 
@@ -1046,35 +1046,4 @@
   .portal-chat__form {
     gap: 4px;
   }
-}
-
-@media (width <= 500px) {
-  .portal-chat__panel {
-    --chat-min-height: 52dvh;
-    min-height: min(var(--chat-min-height), var(--chat-max-height));
-  }
-}
-
-@media (width <= 450px) {
-  .portal-chat__panel { --chat-min-height: 55dvh; }
-}
-
-@media (width <= 425px) {
-  .portal-chat__panel { --chat-min-height: 58dvh; }
-}
-
-@media (width <= 400px) {
-  .portal-chat__panel { --chat-min-height: 61dvh; }
-}
-
-@media (width <= 375px) {
-  .portal-chat__panel { --chat-min-height: 64dvh; }
-}
-
-@media (width <= 350px) {
-  .portal-chat__panel { --chat-min-height: 67dvh; }
-}
-
-@media (width <= 320px) {
-  .portal-chat__panel { --chat-min-height: 70dvh; }
 }
