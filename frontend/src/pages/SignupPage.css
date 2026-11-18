@@ -1147,3 +1147,128 @@
     text-align: center;
   }
 }
+
+.signup-submit-row {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(86px, 1fr);
+  gap: 8px;
+  margin-top: 22px;
+}
+
+.signup-submit-row .submit-button {
+  margin-top: 0;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 12px;
+  background: linear-gradient(165deg, #bd3040, #8f000d);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 20%);
+}
+
+.signup-main:has(.signup-region-trigger[aria-expanded='true']) {
+  overflow: visible;
+}
+
+.signup-region {
+  position: relative;
+  min-width: 0;
+}
+
+.signup-region-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 50px;
+  padding: 0 6px;
+  border: 1px solid var(--signup-input-border);
+  border-radius: 12px;
+  background: var(--ed-accent-soft);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%);
+  color: var(--heading);
+  font: 600 12px/1 Arial, sans-serif;
+  cursor: pointer;
+}
+
+.signup-region-trigger[aria-invalid='true'] {
+  border-color: var(--signup-error);
+}
+
+.signup-region-trigger:disabled {
+  cursor: wait;
+  opacity: .65;
+}
+
+.signup-region-trigger svg {
+  flex: none;
+  transition: transform 220ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.signup-region-trigger[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.signup-region-options {
+  position: absolute;
+  inset: calc(100% + 6px) 0 auto auto;
+  z-index: 4;
+  display: grid;
+  gap: 2px;
+  width: 168px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--pale);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 12px 28px rgb(24 13 16 / 20%);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px) scale(.98);
+  transform-origin: top right;
+  transition:
+    opacity 180ms ease,
+    transform 240ms cubic-bezier(.22, 1, .36, 1),
+    visibility 0s linear 240ms;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .signup-region-options {
+    background: color-mix(in srgb, var(--pale) 88%, transparent);
+    -webkit-backdrop-filter: blur(16px) saturate(130%);
+    backdrop-filter: blur(16px) saturate(130%);
+  }
+}
+
+.signup-region-trigger[aria-expanded='true'] + .signup-region-options {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition-delay: 0s;
+}
+
+.signup-region-options button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--signup-text);
+  font: 600 13px/1.2 Arial, sans-serif;
+  cursor: pointer;
+}
+
+.signup-region-options button:is(:hover, [aria-pressed='true']) {
+  background: var(--ed-accent-soft);
+}
+
+.signup-region-options button:focus-visible {
+  outline-offset: -3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signup-region-trigger svg,
+  .signup-region-options {
+    transition: none;
+  }
+}

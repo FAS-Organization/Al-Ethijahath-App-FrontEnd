@@ -1,5 +1,7 @@
-import { useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import {
+  CaretDownIcon,
+  CheckIcon,
   EyeIcon,
   EyeSlashIcon,
   HeadsetIcon,
@@ -11,6 +13,8 @@ import {
 } from '@phosphor-icons/react'
 import PortalThemeToggle from '../components/PortalThemeToggle'
 import './SignupPage.css'
+
+const REGIONS = ['Riyadh', 'Jeddah', 'Dammam']
 
 const signupFields = [
   ['fullName', 'Full name', 'text', 'name'],
@@ -32,10 +36,25 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
   const [errors, setErrors] = useState({})
   const [status, setStatus] = useState('')
   const [busy, setBusy] = useState(false)
+  const [region, setRegion] = useState('')
+  const [regionOpen, setRegionOpen] = useState(false)
 
   const headingRef = useRef(null)
   const switchingRef = useRef(false)
   const layoutRef = useRef(null)
+  const regionControlRef = useRef(null)
+  const regionButtonRef = useRef(null)
+
+  useEffect(() => {
+    if (!regionOpen) return
+
+    function closeOutside(event) {
+      if (!regionControlRef.current?.contains(event.target)) setRegionOpen(false)
+    }
+
+    document.addEventListener('pointerdown', closeOutside)
+    return () => document.removeEventListener('pointerdown', closeOutside)
+  }, [regionOpen])
 
   useLayoutEffect(() => {
     const layout = layoutRef.current
@@ -108,6 +127,7 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
     switchingRef.current = true
 
     setMode(old => (old === 'signup' ? 'login' : 'signup'))
+    setRegionOpen(false)
     setVisible({})
     setErrors({})
     setStatus('')
@@ -136,6 +156,21 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
       ...old,
       [name]: !old[name],
     }))
+  }
+
+  function selectRegion(value) {
+    setRegion(value)
+    setRegionOpen(false)
+    clearFieldError('region')
+    regionButtonRef.current?.focus()
+  }
+
+  function handleRegionKeyDown(event) {
+    if (event.key !== 'Escape' || !regionOpen) return
+
+    event.preventDefault()
+    setRegionOpen(false)
+    regionButtonRef.current?.focus()
   }
 
   async function submit(event) {
@@ -189,13 +224,19 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
       }
     }
 
+    if (!isLogin && !REGIONS.includes(values.region)) {
+      next.region = 'Select your region.'
+    }
+
+    setRegionOpen(false)
     setErrors(next)
     setStatus('')
 
     const firstError = Object.keys(next)[0]
 
     if (firstError) {
-      form.elements[firstError].focus()
+      const field = firstError === 'region' ? regionButtonRef.current : form.elements[firstError]
+      field?.focus()
       return
     }
 
@@ -229,6 +270,7 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
       await handler(payload)
 
       form.reset()
+      setRegion('')
       setVisible({})
 
       setStatus(
@@ -479,19 +521,74 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                   )}
                 </div>
 
-                  <button
-                    className="submit-button"
-                    disabled={busy}
-                    type="submit"
-                  >
-                    {busy
-                      ? isLogin
-                        ? 'Logging in…'
-                        : 'Creating account…'
-                      : isLogin
-                        ? 'Log in'
-                        : 'Create account'}
-                  </button>
+                  <div className={isLogin ? undefined : 'signup-submit-row'}>
+                    <button
+                      className="submit-button"
+                      disabled={busy}
+                      type="submit"
+                    >
+                      {busy
+                        ? isLogin
+                          ? 'Logging in…'
+                          : 'Creating account…'
+                        : isLogin
+                          ? 'Log in'
+                          : 'Create account'}
+                    </button>
+                    {!isLogin && (
+                      <div
+                        className="signup-region"
+                        ref={regionControlRef}
+                        onKeyDown={handleRegionKeyDown}
+                        onBlur={event => {
+                          if (regionOpen && !event.currentTarget.contains(event.relatedTarget)) {
+                            setRegionOpen(false)
+                          }
+                        }}
+                      >
+                        <input type="hidden" name="region" value={region} />
+                        <button
+                          type="button"
+                          className="signup-region-trigger"
+                          ref={regionButtonRef}
+                          aria-expanded={regionOpen}
+                          aria-controls="signup-region-options"
+                          aria-label={region ? `Region: ${region}` : 'Region'}
+                          aria-invalid={errors.region ? true : undefined}
+                          aria-describedby={errors.region ? 'signup-region-error' : undefined}
+                          disabled={busy}
+                          onClick={() => setRegionOpen(open => !open)}
+                        >
+                          <span>{region || 'Region'}</span>
+                          <CaretDownIcon size={14} aria-hidden="true" />
+                        </button>
+                        <div
+                          className="signup-region-options"
+                          id="signup-region-options"
+                          role="group"
+                          aria-label="Regions"
+                          inert={!regionOpen}
+                        >
+                          {REGIONS.map(option => (
+                            <button
+                              key={option}
+                              type="button"
+                              aria-pressed={region === option}
+                              disabled={busy}
+                              onClick={() => selectRegion(option)}
+                            >
+                              {option}
+                              {region === option && <CheckIcon size={16} aria-hidden="true" />}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {!isLogin && errors.region && (
+                    <p className="field-error" id="signup-region-error">{errors.region}</p>
+                  )}
 
                   <p className="auth-switch-text">
                     {isLogin
