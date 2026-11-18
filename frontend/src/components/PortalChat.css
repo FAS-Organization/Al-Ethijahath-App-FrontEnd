@@ -1027,3 +1027,34 @@
     gap: 4px;
   }
 }
+
+@media (width <= 500px) {
+  .portal-chat__panel {
+    --chat-min-height: 52dvh;
+    min-height: min(var(--chat-min-height), var(--chat-max-height));
+  }
+}
+
+@media (width <= 450px) {
+  .portal-chat__panel { --chat-min-height: 55dvh; }
+}
+
+@media (width <= 425px) {
+  .portal-chat__panel { --chat-min-height: 58dvh; }
+}
+
+@media (width <= 400px) {
+  .portal-chat__panel { --chat-min-height: 61dvh; }
+}
+
+@media (width <= 375px) {
+  .portal-chat__panel { --chat-min-height: 64dvh; }
+}
+
+@media (width <= 350px) {
+  .portal-chat__panel { --chat-min-height: 67dvh; }
+}
+
+@media (width <= 320px) {
+  .portal-chat__panel { --chat-min-height: 70dvh; }
+}
