@@ -1,22 +1,12 @@
-import { useContext, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useContext, useLayoutEffect, useRef } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { BellIcon, LightningIcon, MoonIcon, SunIcon } from '@phosphor-icons/react'
+import { BellIcon, LightningIcon } from '@phosphor-icons/react'
 import { NotificationsPreviewContext } from '../data/notificationsPreviewData'
 import CustomerNavbar from './CustomerNavbar'
 import PortalChat from './PortalChat'
+import PortalThemeToggle from './PortalThemeToggle'
 
-const THEME_KEY = 'ethijahath-dashboard-theme'
-
-function initialTheme() {
-  try {
-    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
-  } catch {
-    return 'light'
-  }
-}
-
-export default function CustomerPortalLayout() {
-  const [theme, setTheme] = useState(initialTheme)
+export default function CustomerPortalLayout({ theme, onToggleTheme }) {
   const { pathname } = useLocation()
   const scrollPositions = useRef(new Map())
 
@@ -45,14 +35,6 @@ export default function CustomerPortalLayout() {
   }, [pathname])
   const notifications = useContext(NotificationsPreviewContext)?.data
   const unread = notifications?.items.filter(item => !item.read_at).length ?? 0
-
-  useEffect(() => {
-    try {
-      localStorage.setItem(THEME_KEY, theme)
-    } catch {
-      // Theme switching also works without storage.
-    }
-  }, [theme])
 
   return (
     <>
@@ -87,16 +69,7 @@ export default function CustomerPortalLayout() {
             )}
           </Link>
 
-          <button
-            type="button"
-            className="ed-icon-button"
-            aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            onClick={() => setTheme(current => current === 'light' ? 'dark' : 'light')}
-          >
-            {theme === 'light'
-              ? <MoonIcon size={21} aria-hidden="true" />
-              : <SunIcon size={21} aria-hidden="true" />}
-          </button>
+          <PortalThemeToggle theme={theme} onToggleTheme={onToggleTheme} />
         </div>
       </CustomerNavbar>
 

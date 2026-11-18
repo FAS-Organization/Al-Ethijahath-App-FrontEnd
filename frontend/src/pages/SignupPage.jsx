@@ -9,6 +9,7 @@ import {
   GlobeIcon,
   WhatsappLogoIcon,
 } from '@phosphor-icons/react'
+import PortalThemeToggle from '../components/PortalThemeToggle'
 import './SignupPage.css'
 
 const signupFields = [
@@ -25,7 +26,7 @@ const loginFields = [
   ['password', 'Password', 'password', 'current-password'],
 ]
 
-export default function SignupPage({ onRegister, onLogin }) {
+export default function SignupPage({ onRegister, onLogin, theme = 'light', onToggleTheme }) {
   const [mode, setMode] = useState('signup')
   const [visible, setVisible] = useState({})
   const [errors, setErrors] = useState({})
@@ -249,7 +250,7 @@ export default function SignupPage({ onRegister, onLogin }) {
   }
 
   return (
-    <div className="signup-shell">
+    <div className="signup-shell" data-theme={theme}>
 
       <header className="portal-header">
         <a
@@ -257,14 +258,14 @@ export default function SignupPage({ onRegister, onLogin }) {
           aria-label="Al Ethijahath company website"
         >
           <img
-            src="/images/logo.webp"
+            src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
             width="160"
             height="50"
             alt="Al Ethijahath"
           />
         </a>
 
-        <nav className="header-actions" aria-label="Help">
+        <nav className="header-actions" aria-label="Portal actions">
           <a
             className="dispatch-link"
             href="https://www.alethijahath.com/#dispatch-form"
@@ -292,6 +293,8 @@ export default function SignupPage({ onRegister, onLogin }) {
 
             <span>Support</span>
           </a>
+
+          <PortalThemeToggle theme={theme} onToggleTheme={onToggleTheme} />
         </nav>
       </header>
 

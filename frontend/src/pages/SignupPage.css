@@ -6,16 +6,50 @@
   --heading: #6e1b1b;
   --body: #7a4b45;
   --line: #e2beba;
+  --signup-text: #1b1c17;
+  --signup-input-border: #8e706d;
+  --signup-input-focus: #fff;
+  --signup-error: #ba1a1a;
+  --signup-button-hover: #8f000d;
+  --signup-tint: 242 217 211;
+  --signup-footer-hover-text: #fff;
+
+  --ed-line: var(--line);
+  --ed-surface: var(--pale);
+  --ed-text: var(--signup-text);
+  --ed-accent: var(--primary);
+  --ed-accent-soft: rgb(var(--signup-tint) / 55%);
 
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
 
   background: var(--cream);
-  color: #1b1c17;
+  color: var(--signup-text);
   font-family: Arial, sans-serif;
   color-scheme: light;
   caret-color: var(--primary);
+}
+
+.signup-shell[data-theme='dark'] {
+  --cream: #171415;
+  --pale: #211d1e;
+  --primary: #ed9299;
+  --heading: #f0d9d3;
+  --body: #c6b8b4;
+  --line: #493c40;
+  --signup-text: #f1e9e5;
+  --signup-input-border: #80666d;
+  --signup-input-focus: #292325;
+  --signup-error: #ffabae;
+  --signup-button-hover: #8f000d;
+  --signup-tint: 85 49 58;
+  --signup-footer-hover-text: #171415;
+  color-scheme: dark;
+}
+
+.signup-shell[data-theme='dark'] .signup-main {
+  background: radial-gradient(ellipse at 100% 35%, #291f23, transparent 70%);
 }
 
 .signup-shell * {
@@ -23,7 +57,7 @@
 }
 
 .signup-shell ::selection {
-  background: #f2d9d3;
+  background: rgb(var(--signup-tint));
   color: var(--heading);
 }
 
@@ -44,7 +78,7 @@
 .signup-shell button,
 .signup-shell a {
   touch-action: manipulation;
-  -webkit-tap-highlight-color: #f2d9d3;
+  -webkit-tap-highlight-color: rgb(var(--signup-tint));
 }
 
 /* Navbar */
@@ -216,11 +250,11 @@
   height: 48px;
   padding: 0 12px;
 
-  border: 1px solid #8e706d;
+  border: 1px solid var(--signup-input-border);
   border-radius: 6px;
 
   background: var(--pale);
-  color: #1b1c17;
+  color: var(--signup-text);
 
   font: inherit;
   font-size: 16px;
@@ -242,11 +276,11 @@
   outline: 2px solid var(--primary);
   outline-offset: 2px;
   border-color: var(--primary);
-  background: #ffffff;
+  background: var(--signup-input-focus);
 }
 
 .field input[aria-invalid='true'] {
-  border-color: #ba1a1a;
+  border-color: var(--signup-error);
 }
 
 .field input:disabled {
@@ -282,7 +316,7 @@
 }
 
 .reveal:hover:not(:disabled) {
-  background: rgba(242, 217, 211, 0.65);
+  background: rgb(var(--signup-tint) / 0.65);
   color: var(--primary);
 }
 
@@ -319,7 +353,7 @@
 }
 
 .field-error {
-  color: #ba1a1a;
+  color: var(--signup-error);
 }
 
 /* Submit button */
@@ -349,7 +383,7 @@
 
 @media (hover: hover) {
   .submit-button:hover:not(:disabled) {
-    background: var(--primary);
+    background: var(--signup-button-hover);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(143, 0, 13, 0.16);
   }
@@ -376,7 +410,7 @@
 .form-status:not(:empty) {
   padding: 12px 14px;
   border-radius: 6px;
-  background: rgba(242, 217, 211, 0.55);
+  background: rgb(var(--signup-tint) / 0.55);
 }
 
 .form-status:empty {
@@ -781,7 +815,7 @@
 .portal-header .support-link:hover {
   text-decoration: none;
   color: var(--primary);
-  background: rgba(242, 217, 211, 0.5);
+  background: rgb(var(--signup-tint) / 0.5);
 }
 
 
@@ -817,7 +851,7 @@
 }
 
 .portal-header .dispatch-link:hover {
-  background: var(--primary);
+  background: var(--signup-button-hover);
   color: #ffffff;
   text-decoration: none;
   box-shadow: 0 4px 12px rgba(143, 0, 13, 0.16);
@@ -861,7 +895,7 @@
 .portal-footer .footer-links a:hover,
 .portal-footer .footer-links a:focus-visible {
   background: var(--primary);
-  color: #ffffff;
+  color: var(--signup-footer-hover-text);
 }
 
 .header-actions svg,
@@ -978,3 +1012,11 @@
 .sv-upload-remove:hover:not(:disabled) { border-color: var(--sv-accent); background: var(--sv-accent-soft); }
 
 
+
+@media (width < 456px) {
+  .signup-shell[data-theme] .portal-footer {
+    flex-direction: column-reverse;
+    align-items: center;
+    text-align: center;
+  }
+}

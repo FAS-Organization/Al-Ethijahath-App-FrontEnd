@@ -6,7 +6,7 @@ import {
   useLocation,
 } from 'react-router-dom'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ErrorBoundary from './components/ErrorBoundary'
 import ErrorPage, { ErrorPreviewPage } from './components/ErrorPage'
 import CustomerPortalLayout from './components/CustomerPortalLayout'
@@ -29,15 +29,38 @@ import DocumentsPage from './pages/DocumentsPage'
 import AccountPage from './pages/AccountPage'
 
 
+const THEME_KEY = 'ethijahath-dashboard-theme'
+
+function initialTheme() {
+  try {
+    return localStorage.getItem(THEME_KEY) === 'dark' ? 'dark' : 'light'
+  } catch {
+    return 'light'
+  }
+}
+
 function AppRoutes() {
   const location = useLocation()
+  const [theme, setTheme] = useState(initialTheme)
+
+  function toggleTheme() {
+    setTheme(current => current === 'light' ? 'dark' : 'light')
+  }
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(THEME_KEY, theme)
+    } catch {
+      // Theme switching also works without storage.
+    }
+  }, [theme])
 
   return (
     <ErrorBoundary resetKey={location.pathname}>
       <Routes>
-        <Route path="/" element={<SignupPage />} />
+        <Route path="/" element={<SignupPage theme={theme} onToggleTheme={toggleTheme} />} />
 
-        <Route element={<CustomerPortalLayout />}>
+        <Route element={<CustomerPortalLayout theme={theme} onToggleTheme={toggleTheme} />}>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/equipment" element={<EquipmentPage />} />
           <Route path="/services" element={<ServicesPage />} />
