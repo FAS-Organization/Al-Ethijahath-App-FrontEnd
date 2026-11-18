@@ -284,6 +284,7 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
           <a
             className="support-link"
             href="mailto:info@alethijahath.com"
+            aria-label="Support"
           >
             <HeadsetIcon
               size={20}
