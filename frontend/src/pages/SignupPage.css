@@ -274,24 +274,46 @@
     background-color 180ms ease;
 }
 
+
 .field select {
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
   appearance: none;
   -webkit-appearance: none;
 
-  padding-right: 42px;
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 34px 10px 12px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  background: var(--pale) var(--select-chevron)
+    no-repeat right 11px center / 16px;
+
+  color: var(--signup-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
   cursor: pointer;
 
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-
-  background-repeat: no-repeat;
-  background-position: right 13px center;
-  background-size: 18px;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
 }
 
+/* Dark mode dropdown arrow */
+.signup-shell[data-theme='dark'] .field select {
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23ed9299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Hover */
 .field select:hover:not(:disabled) {
-  border-color: var(--heading);
+  border-color: var(--primary);
 }
 
+/* Focus */
 .field select:focus {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
@@ -299,23 +321,94 @@
   background-color: var(--signup-input-focus);
 }
 
+/* Disabled */
 .field select:disabled {
   opacity: 0.65;
   cursor: wait;
 }
 
+/* Dropdown options */
 .field select option {
   background: var(--pale);
   color: var(--signup-text);
 }
 
+/* Placeholder */
 .field select:invalid {
-  color: #8a807b;
+  color: var(--body);
 }
 
+/* Validation */
 .field select[aria-invalid='true'] {
   border-color: var(--signup-error);
 }
+
+/* Modern browser dropdown styling */
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .field select,
+  .field select::picker(select) {
+    appearance: base-select;
+  }
+
+  .field select {
+    align-items: center;
+    background-image: none;
+  }
+
+  .field select::picker-icon {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-inline-start: auto;
+    border-right: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    rotate: 45deg;
+    translate: 0 -2px;
+    content: '';
+  }
+
+  .field select:open {
+    border-color: var(--primary);
+  }
+
+  .field select:open::picker-icon {
+    rotate: 225deg;
+    translate: 0 2px;
+  }
+
+  .field select::picker(select) {
+    max-block-size: min(320px, 60dvh);
+    overflow-y: auto;
+    margin-block: 5px;
+    padding: 5px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--pale);
+    color: var(--signup-text);
+    box-shadow: 0 8px 24px rgb(40 35 33 / 12%);
+  }
+
+  .field select option {
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .field select option:hover,
+  .field select option:focus-visible {
+    background: var(--ed-accent-soft);
+  }
+
+  .field select option:checked {
+    background: var(--ed-accent-soft);
+    color: var(--primary);
+    font-weight: 700;
+  }
+}
+
 
 .field input[autocomplete='new-password'] {
   padding-right: 52px;
