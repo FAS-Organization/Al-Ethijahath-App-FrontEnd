@@ -34,7 +34,9 @@ export default function PortalChat() {
   const dialogRef = useRef(null)
   const backdropPressRef = useRef(false)
   const logRef = useRef(null)
-  const apiKey = ''
+  const apiKey = import.meta.env.DEV
+    ? (import.meta.env.VITE_CHAT_DEMO_API_KEY ?? '')
+    : ''
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
@@ -50,9 +52,14 @@ export default function PortalChat() {
 
   const expression = isSending ? 'thinking' : error ? 'concerned' : 'smile'
 
+  const lanDemoHosts = (import.meta.env.VITE_CHAT_DEMO_HOSTS ?? '')
+    .split(',')
+    .map(host => host.trim())
+    .filter(Boolean)
+
   const demoEnabled =
     import.meta.env.DEV &&
-    ['localhost', '127.0.0.1', '[::1]'].includes(window.location.hostname)
+    ['localhost', '127.0.0.1', '[::1]', ...lanDemoHosts].includes(window.location.hostname)
 
   useEffect(() => {
     const log = logRef.current
