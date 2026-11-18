@@ -92,9 +92,17 @@
 
 @media (width <= 1024px) {
   .portal-chat__dock-toggle {
-    --chat-dock-width: calc(var(--robot-size) / 2 - 9px);
+    --chat-dock-width: max(27px, calc(var(--robot-size) / 2 - 9px));
     --chat-dock-height: calc(var(--robot-size) / 2 - 14px);
     --chat-dock-icon-size: calc(var(--robot-size) / 4 - 4px);
+  }
+}
+
+@media (width <= 768px) {
+  .portal-chat__dock-toggle {
+    --chat-dock-width: 30px;
+    --chat-dock-height: 30px;
+    --chat-dock-icon-size: 14px;
   }
 }
 
