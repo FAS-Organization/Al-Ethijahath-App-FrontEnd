@@ -676,10 +676,7 @@ export default function DocumentsPage({
             </>
           )}
 
-          <footer className="dp-footer">
-            <span>Al Ethijahath</span>
-            <span>Dates and times use Saudi time.</span>
-          </footer>
+          <div className="portal-page-footer-space" aria-hidden="true" />
         </div>
       </main>
     </div>

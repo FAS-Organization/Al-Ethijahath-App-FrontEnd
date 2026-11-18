@@ -1595,10 +1595,7 @@ export default function AccountPage({
             </>
           )}
 
-          <footer className="sv-footer">
-            <span>Al Ethijahath</span>
-            <a href="mailto:info@alethijahath.com">Contact support</a>
-          </footer>
+          <div className="portal-page-footer-space" aria-hidden="true" />
         </main>
 
         {siteDialog && ready && (

@@ -668,10 +668,7 @@ export default function ExtraServicesPage({ items = RENTAL_ITEMS, initialOrders 
             </section>
           )}
 
-          <footer className="sv-footer">
-            <span>Al Ethijahath</span>
-            <a href="mailto:info@alethijahath.com">Contact support</a>
-          </footer>
+          <div className="portal-page-footer-space" aria-hidden="true" />
         </main>
 
         {placed && (

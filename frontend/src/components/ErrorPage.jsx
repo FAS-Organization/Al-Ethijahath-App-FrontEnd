@@ -3,22 +3,18 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowClockwiseIcon,
   ArrowLeftIcon,
-  EnvelopeSimpleIcon,
-  GlobeIcon,
   HeadsetIcon,
   HouseLineIcon,
   LightningIcon,
-  LinkedinLogoIcon,
   SignOutIcon,
-  WhatsappLogoIcon,
 } from '@phosphor-icons/react'
 import { ERROR_TYPES } from '../utils/errorTypes'
-// The header and footer styles come from the signup page.
+// The header styles come from the signup page.
 import '../pages/SignupPage.css'
 import './ErrorPage.css'
 
 /**
- * One page for every error, with the same header and footer as the signup page.
+ * One page for every error, with the same header as the signup page.
  *
  * type      key of ERROR_TYPES (default 'not_found')
  * onRetry   what "Try again" does (default: reload the page)
@@ -133,51 +129,7 @@ export default function ErrorPage({ type = 'not_found', onRetry, onSignOut }) {
         </main>
       </div>
 
-      <footer className="portal-footer">
-        <span>
-          © {new Date().getFullYear()} Al Ethijahath. All rights reserved.
-        </span>
-
-        <nav className="footer-links" aria-label="Contact links">
-          <a
-            href="https://www.linkedin.com/company/al-ethijahath/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Al Ethijahath on LinkedIn"
-            title="LinkedIn"
-          >
-            <LinkedinLogoIcon size={25} weight="regular" aria-hidden="true" />
-          </a>
-
-          <a
-            href="mailto:info@alethijahath.com"
-            aria-label="Email info@alethijahath.com"
-            title="Email"
-          >
-            <EnvelopeSimpleIcon size={25} weight="regular" aria-hidden="true" />
-          </a>
-
-          <a
-            href="https://www.alethijahath.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Visit Al Ethijahath website"
-            title="Website"
-          >
-            <GlobeIcon size={25} weight="regular" aria-hidden="true" />
-          </a>
-
-          <a
-            href="https://wa.me/966509374109"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Contact Al Ethijahath on WhatsApp"
-            title="WhatsApp"
-          >
-            <WhatsappLogoIcon size={25} weight="regular" aria-hidden="true" />
-          </a>
-        </nav>
-      </footer>
+      <div className="portal-page-footer-space" aria-hidden="true" />
     </div>
   )
 }

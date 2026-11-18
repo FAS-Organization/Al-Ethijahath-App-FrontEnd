@@ -1142,10 +1142,7 @@ export default function DashboardPage({
             </>
           )}
 
-          <footer className="ed-footer">
-            <span>© {new Date().getFullYear()} Al Ethijahath</span>
-            <a href="mailto:info@alethijahath.com">Contact support</a>
-          </footer>
+          <div className="portal-page-footer-space" aria-hidden="true" />
         </main>
       </div>
     </div>

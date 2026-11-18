@@ -1415,10 +1415,7 @@ export default function QuotationsPage({
             </div>
           </section>
 
-          <footer className="qt-footer">
-            <span>Al Ethijahath</span>
-            <span>Quotation approval and invoice payment are separate steps.</span>
-          </footer>
+          <div className="portal-page-footer-space" aria-hidden="true" />
         </div>
 
         {selectedQuotation ? (

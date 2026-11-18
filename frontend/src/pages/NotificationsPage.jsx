@@ -493,10 +493,7 @@ export default function NotificationsPage() {
             )}
           </section>
 
-          <footer className="np-footer">
-            <span>Al Ethijahath</span>
-            <span>Dates and times use Saudi time.</span>
-          </footer>
+          <div className="portal-page-footer-space" aria-hidden="true" />
         </div>
       </main>
     </div>
