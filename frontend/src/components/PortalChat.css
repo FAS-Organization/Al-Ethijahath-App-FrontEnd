@@ -1,4 +1,5 @@
 .portal-chat {
+  --robot-size: 88px;
   --chat-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   --chat-right: calc(16px + env(safe-area-inset-right, 0px));
   --chat-left: calc(16px + env(safe-area-inset-left, 0px));
@@ -20,7 +21,6 @@
 }
 
 .portal-chat__robot-launcher {
-  --robot-size: 88px;
   position: fixed;
   right: env(safe-area-inset-right, 0px);
   bottom: calc(var(--chat-bottom) + 12px);
@@ -538,32 +538,31 @@
 
 
 @media (width <= 1440px) {
-  .portal-chat__robot-launcher { --robot-size: 84px; }
+  .portal-chat { --robot-size: 84px; }
 }
 
-
 @media (width <= 1024px) {
-  .portal-chat__robot-launcher { --robot-size: 82px; }
+  .portal-chat { --robot-size: 82px; }
 }
 
 @media (width <= 768px) {
-  .portal-chat__robot-launcher { --robot-size: 76px; }
+  .portal-chat { --robot-size: 76px; }
 }
 
 @media (width < 500px) {
-  .portal-chat__robot-launcher { --robot-size: 70px; }
+  .portal-chat { --robot-size: 70px; }
 }
 
 @media (width < 425px) {
-  .portal-chat__robot-launcher { --robot-size: 68px; }
+  .portal-chat { --robot-size: 68px; }
 }
 
 @media (width < 375px) {
-  .portal-chat__robot-launcher { --robot-size: 66px; }
+  .portal-chat { --robot-size: 66px; }
 }
 
 @media (width < 321px) {
-  .portal-chat__robot-launcher { --robot-size: 64px; }
+  .portal-chat { --robot-size: 64px; }
 }
 
 
@@ -586,7 +585,7 @@
 
 .portal-chat__dialog[open] {
   display: grid;
-  grid-template-columns: clamp(42px, calc(20vw - 22px), 86px) minmax(0, 1fr);
+  grid-template-columns: calc(var(--robot-size) * 100 / 112) minmax(0, 1fr);
   gap: 8px;
 }
 

@@ -34,7 +34,7 @@ export default function PortalChat() {
   const dialogRef = useRef(null)
   const backdropPressRef = useRef(false)
   const logRef = useRef(null)
-  const apiKey = ' '
+  const apiKey = ''
   const [question, setQuestion] = useState('')
   const [messages, setMessages] = useState([])
   const [isSending, setIsSending] = useState(false)
