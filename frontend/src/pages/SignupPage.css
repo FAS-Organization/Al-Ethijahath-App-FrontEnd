@@ -1038,18 +1038,25 @@
 }
 
 @media (width <= 350px) {
+  .signup-shell .portal-header img {
+    width: 112px;
+  }
+
   .signup-shell .header-actions {
     gap: 3px;
   }
 
   .signup-shell .header-actions .dispatch-link {
-    gap: 3px;
-    padding-inline: 4px;
+    padding-inline: 8px;
   }
 
   .signup-shell .header-actions .dispatch-link svg {
-    width: 14px;
-    height: 14px;
+    display: none;
+  }
+
+  .signup-shell .header-actions :is(.support-link, .ed-icon-button) svg {
+    width: 17px;
+    height: 17px;
   }
 }
 
