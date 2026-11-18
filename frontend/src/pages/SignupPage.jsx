@@ -278,7 +278,8 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
               aria-hidden="true"
             />
 
-            <span>Emergency Dispatch</span>
+            <span className="dispatch-label-full">Emergency Dispatch</span>
+            <span className="dispatch-label-short">Emergency</span>
           </a>
 
           <a

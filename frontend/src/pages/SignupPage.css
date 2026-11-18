@@ -985,7 +985,29 @@
   }
 }
 
+.signup-shell .dispatch-label-short {
+  display: none;
+}
+
+@media (width <= 500px) {
+  .signup-shell .portal-header {
+    gap: 8px;
+  }
+
+  .signup-shell .portal-header img {
+    width: 120px;
+  }
+}
+
 @media (width <= 480px) {
+  .signup-shell .dispatch-label-full {
+    display: none;
+  }
+
+  .signup-shell .dispatch-label-short {
+    display: inline;
+  }
+
   .signup-shell .header-actions .support-link {
     flex: 0 0 44px;
     padding: 0;
@@ -1005,6 +1027,7 @@
 }
 
 @media (width <= 400px) {
+  .signup-shell .portal-header,
   .signup-shell .header-actions {
     gap: 4px;
   }
@@ -1012,9 +1035,21 @@
   .signup-shell .header-actions .dispatch-link {
     padding-inline: 8px;
   }
+}
 
-  .signup-shell .header-actions .dispatch-link span {
-    max-inline-size: 10ch;
+@media (width <= 350px) {
+  .signup-shell .header-actions {
+    gap: 3px;
+  }
+
+  .signup-shell .header-actions .dispatch-link {
+    gap: 3px;
+    padding-inline: 4px;
+  }
+
+  .signup-shell .header-actions .dispatch-link svg {
+    width: 14px;
+    height: 14px;
   }
 }
 
