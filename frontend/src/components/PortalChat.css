@@ -52,13 +52,12 @@
 
 .portal-chat__dock-toggle {
   --chat-dock-width: 30px;
-  --chat-dock-height: 25px;
+  --chat-dock-height: 24px;
   --chat-dock-icon-size: 15px;
   --chat-dock-hit-height: max(24px, var(--chat-dock-height));
-
   position: fixed;
   right: env(safe-area-inset-right, 0px);
-  bottom: calc(var(--chat-launcher-bottom) - 4px - var(--chat-dock-hit-height));
+  bottom: calc(var(--chat-launcher-bottom) - 0px - var(--chat-dock-hit-height));
   z-index: 36;
   display: grid;
   place-items: start end;
