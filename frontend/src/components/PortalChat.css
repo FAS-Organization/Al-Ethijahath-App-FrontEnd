@@ -194,7 +194,7 @@
 
 .portal-chat__robot-dialogue {
   position: absolute;
-  right: 83%;
+  right: calc(114.98% + var(--robot-dialogue-gap, 2px));
   bottom: 79%;
   display: grid;
   width: max-content;
@@ -248,7 +248,7 @@
 
 .portal-chat__robot-launcher:focus-visible .portal-chat__robot-dialogue {
   opacity: 1;
-  transform: translate(-20px, -5px) scale(1);
+  transform: translate(0, -5px) scale(1);
 }
 
 .portal-chat__robot-launcher:focus-visible .portal-chat__robot-dialogue > span {
@@ -268,7 +268,7 @@
 
   .portal-chat__robot-launcher:hover .portal-chat__robot-dialogue {
     opacity: 1;
-    transform: translate(-20px, -5px) scale(1);
+    transform: translate(0, -5px) scale(1);
   }
 
   .portal-chat__robot-launcher:hover .portal-chat__robot-dialogue > span {
@@ -429,8 +429,8 @@
 
 .portal-chat__robot-dialogue--landing {
   position: fixed;
-  right: calc(var(--chat-right) + 40px);
-  bottom: calc(var(--chat-bottom) + 80px);
+  right: calc(env(safe-area-inset-right, 0px) + var(--robot-size) * .875 - 8px + var(--robot-dialogue-gap, -5px));
+  bottom: calc(var(--chat-launcher-bottom) + var(--robot-size) * .79 + 5px);
   z-index: 35;
   pointer-events: none;
   transform: none;
