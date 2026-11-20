@@ -1279,3 +1279,42 @@
   align-items: center;
   gap: 8px;
 }
+
+.ac-sharing-password {
+  position: relative;
+}
+
+.ac-field .ac-sharing-password > input {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ac-field .ac-sharing-password:has(.ac-sharing-password-toggle) > input {
+  padding-inline-end: 44px;
+}
+
+.ac-sharing-password-toggle {
+  position: absolute;
+  inset-inline-end: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.ac-sharing-password-toggle:hover {
+  background: color-mix(in srgb, currentColor 10%, transparent);
+}
+
+.ac-sharing-password-toggle:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}

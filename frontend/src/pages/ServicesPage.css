@@ -1880,4 +1880,5 @@ body:has(.sv-page) {
 }
 .sv-locked-content {
   opacity: .55;
+  filter: blur(4px);
 }

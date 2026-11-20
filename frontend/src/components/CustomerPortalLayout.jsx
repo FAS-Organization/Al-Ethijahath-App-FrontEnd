@@ -46,9 +46,10 @@ export default function CustomerPortalLayout({ theme, onToggleTheme, serviceOnly
         serviceOnly={serviceOnly}
         onSignOut={onSignOut}
       >
-        <div className="ed-top-actions" inert={serviceOnly}>
+        <div className="ed-top-actions">
           <a
             className="ed-dispatch"
+            inert={serviceOnly}
             href="https://www.alethijahath.com/#dispatch-form"
             target="_blank"
             rel="noopener noreferrer"
@@ -63,6 +64,7 @@ export default function CustomerPortalLayout({ theme, onToggleTheme, serviceOnly
 
           <Link
             className="ed-icon-button"
+            inert={serviceOnly}
             to="/notifications"
             aria-label={`Notifications, ${unread} unread`}
           >

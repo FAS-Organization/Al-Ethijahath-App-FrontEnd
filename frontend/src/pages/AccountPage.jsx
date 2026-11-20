@@ -968,15 +968,24 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
           </div>
           <div className="ac-field">
             <label htmlFor={`${idBase}-password`}>Initial password</label>
-            <input id={`${idBase}-password`} name="password" type={showPassword ? 'text' : 'password'}
-              defaultValue={editingEmail ? getDemoPassword(editingEmail) : ''}
-              minLength={8} maxLength={128} autoComplete="new-password" required
-            />
-            {editingEmail && (
-              <button className="ac-edit" type="button" onClick={() => setShowPassword(current => !current)}>
-                {showPassword ? 'Hide password' : 'Show password'}
-              </button>
-            )}
+            <div className="ac-sharing-password">
+              <input id={`${idBase}-password`} name="password" type={showPassword ? 'text' : 'password'}
+                defaultValue={editingEmail ? getDemoPassword(editingEmail) : ''}
+                minLength={8} maxLength={128} autoComplete="new-password" required
+              />
+              {editingEmail && (
+                <button
+                  className="ac-sharing-password-toggle"
+                  type="button"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowPassword(current => !current)}
+                >
+                  {showPassword
+                    ? <EyeSlashIcon size={18} aria-hidden="true" />
+                    : <EyeIcon size={18} aria-hidden="true" />}
+                </button>
+              )}
+            </div>
           </div>
           <div className="ac-form-actions">
             <button className="sv-secondary" type="button"
