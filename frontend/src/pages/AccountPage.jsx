@@ -1094,58 +1094,63 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
                 </span>
               )}
             </div>
-          </div>
 
-          {/* OTP field appears after clicking Verify email */}
-          {showOtp && !emailVerified && (
-            <div className="ac-field ac-otp-field">
-              <label htmlFor={`${idBase}-otp`}>Enter 4-digit OTP</label>
+            <div
+              className="ac-otp-reveal"
+              data-open={showOtp && !emailVerified}
+              inert={!showOtp || emailVerified}
+            >
+              <div className="ac-otp-clip">
+                <div className="ac-field ac-otp-field">
+                  <label htmlFor={`${idBase}-otp`}>Verification code</label>
 
-              <div className="ac-otp-row">
-                <input
-                  id={`${idBase}-otp`}
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  maxLength={4}
-                  placeholder="Enter OTP"
-                  value={otp}
-                  disabled={otpStatus === 'verifying'}
-                  onChange={event => handleOtpChange(event.target.value)}
-                  aria-describedby={`${idBase}-otp-hint`}
-                />
+                  <div className="ac-otp-row">
+                    <input
+                      id={`${idBase}-otp`}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      maxLength={4}
+                      placeholder="0000"
+                      value={otp}
+                      readOnly={otpStatus === 'verifying'}
+                      onChange={event => handleOtpChange(event.target.value)}
+                      aria-invalid={otpStatus === 'error'}
+                      aria-describedby={`${idBase}-otp-hint`}
+                    />
 
-                {otpStatus === 'verifying' && (
-                  <span className="ac-otp-loading" role="status" aria-label="Verifying OTP">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <circle
-                        cx="12"
-                        cy="12"
-                        r="9"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeDasharray="42 16"
-                      />
-                    </svg>
-                  </span>
-                )}
+                    <span className="ac-otp-loading" role="status">
+                      {otpStatus === 'verifying' && (
+                        <>
+                          <span className="ac-otp-sr-only">Verifying code</span>
+                          <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="9"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeDasharray="42 16"
+                            />
+                          </svg>
+                        </>
+                      )}
+                    </span>
+                  </div>
+
+                  <p id={`${idBase}-otp-hint`} className="ac-otp-hint">
+                    Enter the four-digit code. Demo code <strong>1234</strong>.
+                  </p>
+                </div>
               </div>
-
-              <p id={`${idBase}-otp-hint`} className="ac-hint">
-                For testing, use OTP: <strong>1234</strong>
-              </p>
             </div>
-          )}
 
-          {/* Verified message */}
-          {emailVerified && (
-            <div className="ac-otp-success" role="status">
-              <CheckCircleIcon size={18} weight="fill" />
-              <span>Email address verified successfully</span>
-            </div>
-          )}
+            <span className="ac-otp-sr-only" role="status">
+              {emailVerified ? 'Email verified. You can now set the password.' : ''}
+            </span>
+          </div>
 
           {/* Password field stays disabled until email verification */}
           <div className="ac-field">
@@ -1178,11 +1183,11 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
               )}
             </div>
 
-            {!emailVerified && (
-              <p className="ac-hint">
-                Verify the email address to enable the password field.
-              </p>
-            )}
+            <p className="ac-otp-hint">
+              {emailVerified
+                ? 'Use at least 8 characters.'
+                : 'Verify the email to set a password.'}
+            </p>
           </div>
 
           <div className="ac-form-actions">

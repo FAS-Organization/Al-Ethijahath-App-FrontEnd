@@ -1235,7 +1235,7 @@
     animation: none;
   }
 
-  .ac-page .sv-main *,
+  .ac-page .sv-main :where(:not(.ac-sharing-form, .ac-sharing-form *)),
   .ac-page .sv-dialog * {
     transition-duration: 0.01ms !important;
   }
@@ -1321,101 +1321,164 @@
 
 /* ---------- account sharing email verification ---------- */
 
+.ac-sharing-form {
+  --ac-sharing-ease: cubic-bezier(.23, 1, .32, 1);
+  animation: ac-sharing-enter 220ms var(--ac-sharing-ease) both;
+}
+
+.ac-sharing-form .ac-field input {
+  box-sizing: border-box;
+  border-radius: 10px;
+}
+
 .ac-sharing-email-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .ac-sharing-email-row > input {
-  flex: 1;
+  flex: 1 1 165px;
   min-width: 0;
 }
 
-.ac-verify-button {
+.ac-verify-button,
+.ac-email-verified {
+  box-sizing: border-box;
   min-height: 46px;
   flex-shrink: 0;
-  white-space: nowrap;
   padding-inline: 14px;
+  white-space: nowrap;
+  animation: ac-sharing-enter 180ms var(--ac-sharing-ease) both;
 }
 
-.ac-otp-field {
-  animation: ac-fade 250ms ease both;
-}
-
-.ac-otp-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.ac-otp-row > input {
-  width: 100%;
-  max-width: 220px;
-  letter-spacing: 5px;
-  font-weight: 600;
-}
-
-.ac-otp-row > input:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.ac-otp-loading {
-  display: inline-grid;
-  place-items: center;
-  width: 24px;
-  height: 24px;
+.ac-sharing-email-row .ac-verify-button {
+  border-color: color-mix(in srgb, var(--sv-accent) 25%, var(--sv-line));
+  background: var(--sv-accent-soft);
   color: var(--sv-accent);
+  transition: background-color 160ms ease, transform 140ms var(--ac-sharing-ease);
 }
 
-.ac-otp-loading svg {
-  width: 22px;
-  height: 22px;
-  animation: ac-otp-spin 800ms linear infinite;
+.ac-sharing-email-row .ac-verify-button:active:not(:disabled) {
+  transform: scale(.97);
 }
 
-@keyframes ac-otp-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.ac-otp-success,
 .ac-email-verified {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  gap: 6px;
+  border: 1px solid color-mix(in srgb, var(--sv-green) 24%, var(--sv-line));
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--sv-green) 8%, var(--sv-surface));
   color: var(--sv-green);
   font-size: 13px;
   font-weight: 600;
 }
 
-.ac-otp-success {
-  padding: 10px 12px;
-  border: 1px solid color-mix(in srgb, var(--sv-green) 25%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--sv-green) 8%, transparent);
+.ac-otp-reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition:
+    grid-template-rows 240ms var(--ac-sharing-ease),
+    opacity 170ms ease,
+    transform 240ms var(--ac-sharing-ease);
 }
 
-.ac-email-verified {
-  flex-shrink: 0;
+.ac-otp-reveal[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ac-otp-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ac-otp-field {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--sv-line);
+  border-radius: 12px;
+  background: var(--sv-surface);
+}
+
+.ac-otp-row {
+  position: relative;
+  width: min(100%, 164px);
+}
+
+.ac-otp-row > input {
+  padding-inline: 12px 36px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  letter-spacing: .25em;
+}
+
+.ac-otp-row > input::placeholder {
+  color: var(--sv-muted);
+  opacity: .65;
+}
+
+.ac-otp-loading {
+  position: absolute;
+  inset-inline-end: 10px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  transform: translateY(-50%);
+  color: var(--sv-accent);
+  pointer-events: none;
+}
+
+.ac-otp-loading svg {
+  width: 100%;
+  height: 100%;
+  animation: ac-otp-spin 800ms linear infinite;
+}
+
+.ac-otp-hint {
+  margin: 7px 0 0;
+  color: var(--sv-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.ac-otp-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
   white-space: nowrap;
 }
 
 .ac-sharing-form .ac-field input:disabled {
-  opacity: 0.55;
+  opacity: .65;
   cursor: not-allowed;
   background: var(--sv-soft);
 }
 
-@media (max-width: 480px) {
-  .ac-sharing-email-row {
-    align-items: stretch;
-    flex-direction: column;
+@keyframes ac-sharing-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
   }
 
-  .ac-verify-button {
-    width: 100%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ac-otp-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
