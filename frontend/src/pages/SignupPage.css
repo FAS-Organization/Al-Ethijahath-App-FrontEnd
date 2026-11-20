@@ -1168,15 +1168,15 @@
 }
 
 .signup-region {
-  --region-blue: 46 126 240;
-  --region-text: #174577;
+  --region-gold: 174 125 45;
+  --region-text: #493208;
   position: relative;
   min-width: 0;
 }
 
 .signup-shell[data-theme='dark'] .signup-region {
-  --region-blue: 105 173 255;
-  --region-text: #c6e2ff;
+  --region-gold: 224 179 90;
+  --region-text: #ffe3a8;
 }
 
 .signup-region-trigger {
@@ -1187,21 +1187,18 @@
   width: 100%;
   height: 50px;
   padding: 0 4px;
-  border: 1px solid rgb(var(--region-blue) / 34%);
+  border: 1px solid rgb(var(--region-gold) / 58%);
   border-radius: 12px;
-  background: linear-gradient(
-    160deg,
-    rgb(var(--region-blue) / 23%),
-    rgb(var(--region-blue) / 10%)
-  );
+  background: linear-gradient( 160deg, rgb(255 255 255), rgb(239 197 128 / 9%) );
+  color: var(--heading);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
-  color: var(--region-text);
-  font: 600 12px/1.15 Arial, sans-serif;
+  font: 700 14px/1.15 Arial, sans-serif;
   cursor: pointer;
 }
 
 .signup-region-trigger span {
   min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1211,7 +1208,8 @@
   .signup-region-trigger {
     flex-direction: column;
     gap: 2px;
-    font-size: 11px;
+    padding-inline: 2px;
+    font-size: 12px;
   }
 }
 
@@ -1280,21 +1278,16 @@
   border-radius: 9px;
   background: transparent;
   color: var(--signup-text);
-  font: 600 13px/1.2 Arial, sans-serif;
+  font: 600 14px/1.2 Arial, sans-serif;
   cursor: pointer;
 }
 
 .signup-region-options button:is(:hover, [aria-pressed='true']) {
-  background: rgb(var(--region-blue) / 14%);
+  background: rgb(var(--region-gold) / 14%);
 }
 
 .signup-region-options button:focus-visible {
   outline-offset: -3px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .signup-region-trigger svg,
-  .signup-region-options {
-    transition: none;
-  }
-}
+

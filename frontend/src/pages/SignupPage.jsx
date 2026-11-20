@@ -547,7 +547,7 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                           onClick={() => setRegionOpen(open => !open)}
                         >
                           <span>{region || 'Region'}</span>
-                          <CaretCircleDownIcon size={15} aria-hidden="true" />
+                          <CaretCircleDownIcon size={18} aria-hidden="true" />
                         </button>
                         <div
                           className="signup-region-options"
