@@ -19,15 +19,15 @@ const signupFields = [
   ['phone', 'Phone number', 'tel', 'tel'],
   ['password', 'Password', 'password', 'new-password'],
   ['confirmPassword', 'Confirm password', 'password', 'new-password'],
-  ['country', 'Country / Region', 'select', 'country-name'],
+  ['region', 'Region', 'select', 'address-level1'],
 ]
 
-const countries = [
-  'Afghanistan',
-  'Australia',
-  'Bahrain',
-].filter((country, index, list) =>
-  list.indexOf(country) === index
+const regions = [
+  'Dammam',
+  'Jeddah',
+  'Riyadh',
+].filter((region, index, list) =>
+  list.indexOf(region) === index
 ).sort((a, b) => a.localeCompare(b))
 
 const loginFields = [
@@ -398,10 +398,10 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
 
                       return (
                         <div
-                          className={`field ${name === 'country' ? 'field--full-width' : ''}`}
+                          className={`field ${name === 'region' ? 'field--full-width' : ''}`}
                           key={name}
                         >
-                          {name !== 'country' && (
+                          {name !== 'region' && (
                             <label htmlFor={name}>
                               {label}
                             </label>
@@ -425,11 +425,11 @@ export default function SignupPage({ onRegister, onLogin, theme = 'light', onTog
                                   Select a region
                                 </option>
 
-                                {countries.map(country => (
-                                  <option key={country} value={country}>
-                                    {country}
-                                  </option>
-                                ))}
+                                {regions.map(region => (
+                                <option key={region} value={region}>
+                                  {region}
+                                </option>
+                              ))}
                               </select>
                             ) : (
                               <input
