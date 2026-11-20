@@ -906,32 +906,124 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
+
+  // Email verification states
+  const [email, setEmail] = useState('')
+  const [showOtp, setShowOtp] = useState(false)
+  const [otp, setOtp] = useState('')
+  const [otpStatus, setOtpStatus] = useState('idle')
+
+  const otpTimer = useRef(null)
   const addRef = useRef(null)
+
+  useEffect(() => {
+    return () => clearTimeout(otpTimer.current)
+  }, [])
+
+  const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+  const emailVerified = otpStatus === 'verified'
+
+  function resetVerification() {
+    clearTimeout(otpTimer.current)
+    setShowOtp(false)
+    setOtp('')
+    setOtpStatus('idle')
+  }
+
+  function handleEmailChange(value) {
+    setEmail(value)
+    resetVerification()
+    setError('')
+  }
+
+  function startEmailVerification() {
+    if (!emailIsValid) return
+
+    setShowOtp(true)
+    setOtp('')
+    setOtpStatus('idle')
+    setError('')
+  }
+
+  function handleOtpChange(value) {
+    const digits = value.replace(/\D/g, '').slice(0, 4)
+
+    setOtp(digits)
+    setError('')
+
+    if (digits.length !== 4) {
+      setOtpStatus('idle')
+      return
+    }
+
+    // Automatically start the demo verification after 4 digits.
+    setOtpStatus('verifying')
+
+    otpTimer.current = setTimeout(() => {
+      if (digits === '1234') {
+        setOtpStatus('verified')
+      } else {
+        setOtpStatus('error')
+        setOtp('')
+        setError('Incorrect OTP. Please try again.')
+      }
+    }, 1200)
+  }
 
   function addUser(event) {
     event.preventDefault()
 
+    if (!emailVerified) {
+      setError('Please verify the email address before continuing.')
+      return
+    }
+
     const form = event.currentTarget
     const values = Object.fromEntries(new FormData(form))
+
     setError('')
     setNotice('')
+
     try {
       onSaveUser(values, editingEmail)
+
       form.reset()
       setAdding(false)
-      setNotice(editingEmail ? 'Demo service login updated.' : 'Demo service login created.')
+      setEditingEmail(null)
+      setEmail('')
+      resetVerification()
+      setShowPassword(false)
+
+      setNotice(
+        editingEmail
+          ? 'Demo service login updated.'
+          : 'Demo service login created.'
+      )
+
       addRef.current?.focus()
     } catch (problem) {
       setError(problem.message)
     }
   }
 
-  function openEditor(email = null) {
-    setEditingEmail(email)
+  function openEditor(emailToEdit = null) {
+    setEditingEmail(emailToEdit)
+    setEmail(emailToEdit ?? '')
     setShowPassword(false)
     setError('')
     setNotice('')
+    resetVerification()
     setAdding(true)
+  }
+
+  function closeEditor() {
+    setAdding(false)
+    setEditingEmail(null)
+    setEmail('')
+    setShowPassword(false)
+    setError('')
+    resetVerification()
+    addRef.current?.focus()
   }
 
   function toggleUser(user, enabled) {
@@ -946,7 +1038,10 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
         intro="Give someone a separate login to request service for your company."
       >
         {onSaveUser && (
-          <button ref={addRef} className="sv-primary" type="button"
+          <button
+            ref={addRef}
+            className="sv-primary"
+            type="button"
             aria-expanded={adding}
             onClick={() => openEditor()}
           >
@@ -961,19 +1056,115 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
       </p>
 
       {adding && (
-        <form key={editingEmail ?? "new"} className="ac-sharing-form" onSubmit={addUser}>
+        <form
+          key={editingEmail ?? 'new'}
+          className="ac-sharing-form"
+          onSubmit={addUser}
+        >
+          {/* Email field */}
           <div className="ac-field">
             <label htmlFor={`${idBase}-email`}>Login email</label>
-            <input id={`${idBase}-email`} name="email" type="email" autoComplete="off" defaultValue={editingEmail ?? ''} required />
+
+            <div className="ac-sharing-email-row">
+              <input
+                id={`${idBase}-email`}
+                name="email"
+                type="email"
+                autoComplete="off"
+                value={email}
+                onChange={event => handleEmailChange(event.target.value)}
+                required
+              />
+
+              {emailIsValid && !emailVerified && (
+                <button
+                  className="sv-secondary ac-verify-button"
+                  type="button"
+                  onClick={startEmailVerification}
+                  disabled={otpStatus === 'verifying'}
+                >
+                  Verify email
+                </button>
+              )}
+
+              {emailVerified && (
+                <span className="ac-email-verified">
+                  <CheckCircleIcon size={17} weight="fill" />
+                  Verified
+                </span>
+              )}
+            </div>
           </div>
+
+          {/* OTP field appears after clicking Verify email */}
+          {showOtp && !emailVerified && (
+            <div className="ac-field ac-otp-field">
+              <label htmlFor={`${idBase}-otp`}>Enter 4-digit OTP</label>
+
+              <div className="ac-otp-row">
+                <input
+                  id={`${idBase}-otp`}
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={4}
+                  placeholder="Enter OTP"
+                  value={otp}
+                  disabled={otpStatus === 'verifying'}
+                  onChange={event => handleOtpChange(event.target.value)}
+                  aria-describedby={`${idBase}-otp-hint`}
+                />
+
+                {otpStatus === 'verifying' && (
+                  <span className="ac-otp-loading" role="status" aria-label="Verifying OTP">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeDasharray="42 16"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </div>
+
+              <p id={`${idBase}-otp-hint`} className="ac-hint">
+                For testing, use OTP: <strong>1234</strong>
+              </p>
+            </div>
+          )}
+
+          {/* Verified message */}
+          {emailVerified && (
+            <div className="ac-otp-success" role="status">
+              <CheckCircleIcon size={18} weight="fill" />
+              <span>Email address verified successfully</span>
+            </div>
+          )}
+
+          {/* Password field stays disabled until email verification */}
           <div className="ac-field">
             <label htmlFor={`${idBase}-password`}>Initial password</label>
+
             <div className="ac-sharing-password">
-              <input id={`${idBase}-password`} name="password" type={showPassword ? 'text' : 'password'}
+              <input
+                id={`${idBase}-password`}
+                name="password"
+                type={showPassword ? 'text' : 'password'}
                 defaultValue={editingEmail ? getDemoPassword(editingEmail) : ''}
-                minLength={8} maxLength={128} autoComplete="new-password" required
+                minLength={8}
+                maxLength={128}
+                autoComplete="new-password"
+                disabled={!emailVerified}
+                required
               />
-              {editingEmail && (
+
+              {emailVerified && (
                 <button
                   className="ac-sharing-password-toggle"
                   type="button"
@@ -986,14 +1177,28 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
                 </button>
               )}
             </div>
+
+            {!emailVerified && (
+              <p className="ac-hint">
+                Verify the email address to enable the password field.
+              </p>
+            )}
           </div>
+
           <div className="ac-form-actions">
-            <button className="sv-secondary" type="button"
-              onClick={() => { setAdding(false); setError(''); addRef.current?.focus() }}
+            <button
+              className="sv-secondary"
+              type="button"
+              onClick={closeEditor}
             >
               Cancel
             </button>
-            <button className="sv-primary" type="submit">
+
+            <button
+              className="sv-primary"
+              type="submit"
+              disabled={!emailVerified}
+            >
               {editingEmail ? 'Save changes' : 'Create service login'}
             </button>
           </div>
@@ -1005,15 +1210,21 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
       ) : (
         <fieldset className="ac-switches ac-sharing-users">
           <legend>Service users</legend>
+
           {users.map((user, index) => (
             <div className="ac-sharing-user" key={user.email}>
-              <Switch id={`${idBase}-access-${index}`}
+              <Switch
+                id={`${idBase}-access-${index}`}
                 label={`Service access for ${user.email}`}
                 hint={user.isEnabled ? 'Active · Can request service' : 'Disabled'}
                 checked={user.isEnabled}
                 onChange={enabled => toggleUser(user, enabled)}
               />
-              <button className="ac-edit" type="button" aria-label={`Edit ${user.email}`}
+
+              <button
+                className="ac-edit"
+                type="button"
+                aria-label={`Edit ${user.email}`}
                 onClick={() => openEditor(user.email)}
               >
                 <PencilSimpleIcon size={16} aria-hidden="true" />
@@ -1023,7 +1234,13 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
           ))}
         </fieldset>
       )}
-      {onSaveUser && <Link className="sv-secondary" to="/">Try the demo login</Link>}
+
+      {onSaveUser && (
+        <Link className="sv-secondary" to="/">
+          Try the demo login
+        </Link>
+      )}
+
       {error && <p className="sv-error" role="alert">{error}</p>}
       {notice && <p className="ac-saved" role="status">{notice}</p>}
     </>

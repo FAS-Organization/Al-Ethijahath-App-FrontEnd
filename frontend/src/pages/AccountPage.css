@@ -1318,3 +1318,104 @@
   outline: 2px solid currentColor;
   outline-offset: -2px;
 }
+
+/* ---------- account sharing email verification ---------- */
+
+.ac-sharing-email-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ac-sharing-email-row > input {
+  flex: 1;
+  min-width: 0;
+}
+
+.ac-verify-button {
+  min-height: 46px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding-inline: 14px;
+}
+
+.ac-otp-field {
+  animation: ac-fade 250ms ease both;
+}
+
+.ac-otp-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ac-otp-row > input {
+  width: 100%;
+  max-width: 220px;
+  letter-spacing: 5px;
+  font-weight: 600;
+}
+
+.ac-otp-row > input:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.ac-otp-loading {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  color: var(--sv-accent);
+}
+
+.ac-otp-loading svg {
+  width: 22px;
+  height: 22px;
+  animation: ac-otp-spin 800ms linear infinite;
+}
+
+@keyframes ac-otp-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.ac-otp-success,
+.ac-email-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--sv-green);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.ac-otp-success {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--sv-green) 25%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--sv-green) 8%, transparent);
+}
+
+.ac-email-verified {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.ac-sharing-form .ac-field input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  background: var(--sv-soft);
+}
+
+@media (max-width: 480px) {
+  .ac-sharing-email-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ac-verify-button {
+    width: 100%;
+  }
+}
