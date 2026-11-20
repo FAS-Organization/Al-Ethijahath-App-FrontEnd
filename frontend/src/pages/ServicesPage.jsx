@@ -645,7 +645,7 @@ function todayValue() {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
 }
 
-function RequestDialog({ options, isDemo, onSubmit, onClose }) {
+function RequestDialog({ options, isDemo, onSubmit, onClose, allowPhoto = true, serviceOnly = false }) {
   const dialogRef = useRef(null)
   const sites = options?.sites || []
   const allEquipment = options?.equipment || []
@@ -808,11 +808,10 @@ function RequestDialog({ options, isDemo, onSubmit, onClose }) {
       {phase === 'done' ? (
         <div className="sv-dialog-done" role="status">
           <CheckCircleIcon size={44} weight="fill" aria-hidden="true" />
-          <h3>Request sent</h3>
-          <p>
-            We received your request and will confirm it shortly. You can
-            follow it on this page once it is accepted.
-          </p>
+          <h3>{serviceOnly && isDemo ? 'Request previewed' : 'Request sent'}</h3>
+          {!serviceOnly && (
+            <p>We received your request. You can follow it here once it is accepted.</p>
+          )}
           {isDemo && !onSubmit && (
             <p className="sv-dialog-demo">
               Preview mode: nothing was actually sent.
@@ -924,39 +923,41 @@ function RequestDialog({ options, isDemo, onSubmit, onClose }) {
               {errors.date && <p className="sv-error">{errors.date}</p>}
             </div>
               
-            <div className="sv-field">
-              <label htmlFor="sv-photo">
-                Photo <span>(optional)</span>
-              </label>
-              <div className="sv-upload" data-filled={Boolean(photo)}>
-                <label className="sv-upload-pick" htmlFor="sv-photo">
-                  <CameraIcon size={20} aria-hidden="true" />
-                  <span>{photo ? photo.name : 'Upload a photo of the problem'}</span>
+            {allowPhoto && (
+              <div className="sv-field">
+                <label htmlFor="sv-photo">
+                  Photo <span>(optional)</span>
                 </label>
-                <input
-                  id="sv-photo"
-                  data-field="photo"
-                  className="sv-upload-input"
-                  type="file"
-                  accept="image/*"
-                  disabled={sending}
-                  aria-invalid={Boolean(errors.photo)}
-                  onChange={choosePhoto}
-                />
-                {photo && (
-                  <button
-                    className="sv-upload-remove"
-                    type="button"
-                    aria-label="Remove photo"
+                <div className="sv-upload" data-filled={Boolean(photo)}>
+                  <label className="sv-upload-pick" htmlFor="sv-photo">
+                    <CameraIcon size={20} aria-hidden="true" />
+                    <span>{photo ? photo.name : 'Upload a photo of the problem'}</span>
+                  </label>
+                  <input
+                    id="sv-photo"
+                    data-field="photo"
+                    className="sv-upload-input"
+                    type="file"
+                    accept="image/*"
                     disabled={sending}
-                    onClick={() => setPhoto(null)}
-                  >
-                    <TrashIcon size={18} aria-hidden="true" />
-                  </button>
-                )}
+                    aria-invalid={Boolean(errors.photo)}
+                    onChange={choosePhoto}
+                  />
+                  {photo && (
+                    <button
+                      className="sv-upload-remove"
+                      type="button"
+                      aria-label="Remove photo"
+                      disabled={sending}
+                      onClick={() => setPhoto(null)}
+                    >
+                      <TrashIcon size={18} aria-hidden="true" />
+                    </button>
+                  )}
+                </div>
+                {errors.photo && <p className="sv-error">{errors.photo}</p>}
               </div>
-              {errors.photo && <p className="sv-error">{errors.photo}</p>}
-            </div>
+            )}
 
             {failure && (
               <p className="sv-error sv-error--box" role="alert">
@@ -1321,6 +1322,35 @@ export default function ServicesPage({
           />
           )}
       </div>
+    </div>
+  )
+}
+export function ServiceRequestOnlyPage({ theme, onSignOut }) {
+  const [requestOpen, setRequestOpen] = useState(false)
+
+  return (
+    <div className="sv-page" data-theme={theme}>
+      <main className="sv-content">
+        <section className="sv-heading">
+          <div>
+            <h1>Service jobs</h1>
+            <p>Preview how a service-only user requests service.</p>
+          </div>
+          <button className="sv-secondary" type="button" onClick={onSignOut}>Sign out</button>
+        </section>
+        <button className="sv-primary" type="button" onClick={() => setRequestOpen(true)}>
+          Request service
+        </button>
+        {requestOpen && (
+          <RequestDialog
+            options={SERVICES_PREVIEW_DATA.request_options}
+            allowPhoto={false}
+            serviceOnly
+            isDemo
+            onClose={() => setRequestOpen(false)}
+          />
+        )}
+      </main>
     </div>
   )
 }

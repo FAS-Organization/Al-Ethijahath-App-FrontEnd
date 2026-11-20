@@ -101,6 +101,7 @@ const SECTIONS = [
   { id: 'profile', label: 'Profile', icon: UserCircleIcon },
   { id: 'sites', label: 'Sites', icon: MapPinIcon },
   { id: 'notifications', label: 'Contact preferences', icon: BellRingingIcon },
+  { id: 'sharing', label: 'Account sharing', icon: UserIcon },
   { id: 'security', label: 'Security', icon: LockKeyIcon },
 ]
 
@@ -898,6 +899,102 @@ function Switch({ id, icon: Icon, label, hint, checked, onChange }) {
   )
 }
 
+function AccountSharingPanel({ users, onAddUser, onToggleUser }) {
+  const idBase = useId()
+  const [adding, setAdding] = useState(false)
+  const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const addRef = useRef(null)
+
+  function addUser(event) {
+    event.preventDefault()
+
+    const form = event.currentTarget
+    const values = Object.fromEntries(new FormData(form))
+    setError('')
+    setNotice('')
+    try {
+      onAddUser(values)
+      form.reset()
+      setAdding(false)
+      setNotice('Demo service login created.')
+      addRef.current?.focus()
+    } catch (problem) {
+      setError(problem.message)
+    }
+  }
+
+  function toggleUser(user, enabled) {
+    onToggleUser(user.email, enabled)
+    setNotice(`${user.email}: access ${enabled ? 'enabled' : 'disabled'}.`)
+  }
+
+  return (
+    <>
+      <PanelHead
+        title="Account sharing"
+        intro="Give someone a separate login to request service for your company."
+      >
+        {onAddUser && (
+          <button ref={addRef} className="sv-primary" type="button"
+            aria-expanded={adding}
+            onClick={() => { setAdding(current => !current); setError('') }}
+          >
+            <PlusIcon size={16} aria-hidden="true" />
+            Add service user
+          </button>
+        )}
+      </PanelHead>
+
+      <p className="ac-hint">
+        Demo only. Use temporary test credentials. Demo users last until this tab is refreshed.
+      </p>
+
+      {adding && (
+        <form className="ac-sharing-form" onSubmit={addUser}>
+          <div className="ac-field">
+            <label htmlFor={`${idBase}-email`}>Login email</label>
+            <input id={`${idBase}-email`} name="email" type="email" autoComplete="off" required />
+          </div>
+          <div className="ac-field">
+            <label htmlFor={`${idBase}-password`}>Initial password</label>
+            <input id={`${idBase}-password`} name="password" type="password"
+              minLength={8} maxLength={128} autoComplete="new-password" required
+            />
+          </div>
+          <div className="ac-form-actions">
+            <button className="sv-secondary" type="button"
+              onClick={() => { setAdding(false); setError(''); addRef.current?.focus() }}
+            >
+              Cancel
+            </button>
+            <button className="sv-primary" type="submit">Create service login</button>
+          </div>
+        </form>
+      )}
+
+      {users.length === 0 ? (
+        <p className="ac-hint">No service users added yet.</p>
+      ) : (
+        <fieldset className="ac-switches ac-sharing-users">
+          <legend>Service users</legend>
+          {users.map((user, index) => (
+            <Switch key={user.email} id={`${idBase}-access-${index}`}
+              label={`Service access for ${user.email}`}
+              hint={user.isEnabled ? 'Active · Can request service' : 'Disabled'}
+              checked={user.isEnabled}
+              onChange={enabled => toggleUser(user, enabled)}
+            />
+          ))}
+        </fieldset>
+      )}
+      {onAddUser && <Link className="sv-secondary" to="/">Try the demo login</Link>}
+      {error && <p className="sv-error" role="alert">{error}</p>}
+      {notice && <p className="ac-saved" role="status">{notice}</p>}
+    </>
+  )
+}
+
 function PreferencesPanel({ preferences, onSave }) {
   const idBase = useId()
   const [draft, setDraft] = useState(preferences)
@@ -1222,6 +1319,9 @@ export default function AccountPage({
   onSavePreferences,
   onChangePassword,
   onSignOut,
+  serviceUsers = [],
+  onAddServiceUser,
+  onToggleServiceUser,
 }) {
   const idBase = useId()
   const { theme = 'light' } = useOutletContext() ?? {}
@@ -1573,6 +1673,14 @@ export default function AccountPage({
                     <PreferencesPanel
                       preferences={account.preferences}
                       onSave={savePreferences}
+                    />
+                  )}
+
+                  {section === 'sharing' && (
+                    <AccountSharingPanel
+                      users={serviceUsers}
+                      onAddUser={onAddServiceUser}
+                      onToggleUser={onToggleServiceUser}
                     />
                   )}
 

@@ -1,12 +1,14 @@
 
 import {
   BrowserRouter,
+  Navigate,
   Routes,
   Route,
   useLocation,
+  useNavigate,
 } from 'react-router-dom'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ErrorBoundary from './components/ErrorBoundary'
 import ErrorPage, { ErrorPreviewPage } from './components/ErrorPage'
 import CustomerPortalLayout from './components/CustomerPortalLayout'
@@ -22,7 +24,7 @@ import DashboardPage from './pages/DashboardPage'
 import EquipmentPage from './pages/EquipmentPage'
 import QuotationsPage from './pages/QuotationsPage'
 import AmcSchedulePage from './pages/AmcSchedulePage'
-import ServicesPage from './pages/ServicesPage'
+import ServicesPage, { ServiceRequestOnlyPage } from './pages/ServicesPage'
 import InvoicesPage from './pages/InvoicesPage'
 import ExtraServicesPage from './pages/ExtraServicesPage'
 import DocumentsPage from './pages/DocumentsPage'
@@ -41,7 +43,42 @@ function initialTheme() {
 
 function AppRoutes() {
   const location = useLocation()
+  const navigate = useNavigate()
   const [theme, setTheme] = useState(initialTheme)
+  const [serviceUsers, setServiceUsers] = useState([])
+  const [previewLogin, setPreviewLogin] = useState(null)
+  const demoPasswords = useRef(new Map())
+
+  function addServiceUser({ email, password }) {
+    const login = email.trim().toLowerCase()
+    if (demoPasswords.current.has(login)) throw new Error('This email already has a demo login.')
+
+    demoPasswords.current.set(login, password)
+    setServiceUsers(current => [...current, { email: login, isEnabled: true }])
+  }
+
+  function toggleServiceUser(email, isEnabled) {
+    setServiceUsers(current => current.map(user =>
+      user.email === email ? { ...user, isEnabled } : user,
+    ))
+  }
+
+  function handleLogin({ email, password }) {
+    const login = email.trim().toLowerCase()
+    const user = serviceUsers.find(item => item.email === login)
+    if (!user || demoPasswords.current.get(login) !== password) {
+      throw new Error('Enter the demo email and password created in Account Sharing.')
+    }
+    if (!user.isEnabled) throw new Error('Service access for this demo login is disabled.')
+
+    setPreviewLogin(user.email)
+    navigate('/services', { replace: true })
+  }
+
+  function handleSignOut() {
+    setPreviewLogin(null)
+    navigate('/', { replace: true })
+  }
 
   function toggleTheme() {
     setTheme(current => current === 'light' ? 'dark' : 'light')
@@ -55,10 +92,26 @@ function AppRoutes() {
     }
   }, [theme])
 
+  if (previewLogin) {
+    return (
+      <ErrorBoundary resetKey={location.pathname}>
+        <Routes>
+          <Route path="/services" element={
+            <ServiceRequestOnlyPage
+              theme={theme}
+              onSignOut={handleSignOut}
+            />
+          } />
+          <Route path="*" element={<Navigate to="/services" replace />} />
+        </Routes>
+      </ErrorBoundary>
+    )
+  }
+
   return (
     <ErrorBoundary resetKey={location.pathname}>
       <Routes>
-        <Route path="/" element={<SignupPage theme={theme} onToggleTheme={toggleTheme} />} />
+        <Route path="/" element={<SignupPage theme={theme} onToggleTheme={toggleTheme} onLogin={handleLogin} />} />
 
         <Route element={<CustomerPortalLayout theme={theme} onToggleTheme={toggleTheme} />}>
           <Route path="/dashboard" element={<DashboardPage />} />
@@ -70,7 +123,13 @@ function AppRoutes() {
           <Route path="/extras" element={<ExtraServicesPage />} />    
           <Route path="/documents" element={<DocumentsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/account" element={<AccountPage />} />
+          <Route path="/account" element={
+            <AccountPage
+              serviceUsers={serviceUsers}
+              onAddServiceUser={addServiceUser}
+              onToggleServiceUser={toggleServiceUser}
+            />
+          } />
         </Route>
 
         {/* Preview any error page */}

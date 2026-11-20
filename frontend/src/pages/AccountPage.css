@@ -1262,3 +1262,13 @@
     transform: none;
   }
 }
+.ac-sharing-form {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 20px;
+  max-width: 440px;
+}
+
+.ac-sharing-users .ac-switch-text strong {
+  overflow-wrap: anywhere;
+}
