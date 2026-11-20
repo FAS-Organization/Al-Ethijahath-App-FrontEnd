@@ -2029,6 +2029,10 @@ body:has(.sc-page) {
   cursor: pointer;
   transition: background-color 220ms ease, color 220ms ease, box-shadow 220ms ease;
 }
+.sc-month:disabled {
+  cursor: not-allowed !important;
+  pointer-events: auto;
+}
 
 .sc-month[aria-pressed='true'] {
   background: var(--sc-button);
@@ -2122,7 +2126,7 @@ body:has(.sc-page) {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .sc-month:hover:not([aria-pressed='true']) {
+  .sc-month:hover:not([aria-pressed='true']):not(:disabled) {
     background: var(--sc-accent-soft);
     color: var(--sc-accent);
   }

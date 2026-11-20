@@ -225,8 +225,17 @@
 
 .fields {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 22px 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px 16px;
+}
+
+.field--full-width {
+  grid-column: 1 / -1;
+}
+
+/* Country dropdown occupies the complete form width */
+.field--full-width {
+  grid-column: 1 / -1;
 }
 
 .field {
@@ -235,8 +244,8 @@
 
 .field label {
   display: block;
-  margin-bottom: 9px;
-  font-size: 13px;
+  margin-bottom: 4px;
+  font-size: 12px;
   font-weight: 600;
   color: var(--heading);
 }
@@ -245,24 +254,161 @@
   position: relative;
 }
 
-.field input {
+.field input,
+.field select {
   width: 100%;
-  height: 48px;
-  padding: 0 12px;
+  height: 38px;
+  padding: 0 11px;
 
   border: 1px solid var(--signup-input-border);
   border-radius: 6px;
 
-  background: var(--pale);
+  background-color: var(--pale);
   color: var(--signup-text);
 
   font: inherit;
-  font-size: 16px;
+  font-size: 14px;
 
   transition:
     border-color 180ms ease,
     background-color 180ms ease;
 }
+
+
+.field select {
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%238f000d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+
+  appearance: none;
+  -webkit-appearance: none;
+
+  width: 100%;
+  min-height: 46px;
+  padding: 10px 34px 10px 12px;
+
+  border: 1px solid var(--line);
+  border-radius: 8px;
+
+  background: var(--pale) var(--select-chevron)
+    no-repeat right 11px center / 16px;
+
+  color: var(--signup-text);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+/* Dark mode dropdown arrow */
+.signup-shell[data-theme='dark'] .field select {
+  --select-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 6 4 4 4-4' fill='none' stroke='%23ed9299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+}
+
+/* Hover */
+.field select:hover:not(:disabled) {
+  border-color: var(--primary);
+}
+
+/* Focus */
+.field select:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+  background-color: var(--signup-input-focus);
+}
+
+/* Disabled */
+.field select:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+/* Dropdown options */
+.field select option {
+  background: var(--pale);
+  color: var(--signup-text);
+}
+
+/* Placeholder */
+.field select:invalid {
+  color: var(--body);
+}
+
+/* Validation */
+.field select[aria-invalid='true'] {
+  border-color: var(--signup-error);
+}
+
+/* Modern browser dropdown styling */
+@supports (appearance: base-select) and selector(::picker(select)) {
+  .field select,
+  .field select::picker(select) {
+    appearance: base-select;
+  }
+
+  .field select {
+    align-items: center;
+    background-image: none;
+  }
+
+  .field select::picker-icon {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    margin-inline-start: auto;
+    border-right: 2px solid var(--primary);
+    border-bottom: 2px solid var(--primary);
+    rotate: 45deg;
+    translate: 0 -2px;
+    content: '';
+  }
+
+  .field select:open {
+    border-color: var(--primary);
+  }
+
+  .field select:open::picker-icon {
+    rotate: 225deg;
+    translate: 0 2px;
+  }
+
+  .field select::picker(select) {
+    max-block-size: min(320px, 60dvh);
+    overflow-y: auto;
+    margin-block: 5px;
+    padding: 5px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--pale);
+    color: var(--signup-text);
+    box-shadow: 0 8px 24px rgb(40 35 33 / 12%);
+  }
+
+  .field select option {
+    min-height: 40px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .field select option:hover,
+  .field select option:focus-visible {
+    background: var(--ed-accent-soft);
+  }
+
+  .field select option:checked {
+    background: var(--ed-accent-soft);
+    color: var(--primary);
+    font-weight: 700;
+  }
+}
+
 
 .field input[autocomplete='new-password'] {
   padding-right: 52px;
@@ -294,6 +440,8 @@
   position: absolute;
   top: 2px;
   right: 2px;
+  width: 38px;
+  height: 36px;
 
   display: inline-flex;
   align-items: center;
@@ -360,8 +508,8 @@
 
 .submit-button {
   width: 100%;
-  height: 50px;
-  margin-top: 28px;
+  height: 42px;
+  margin-top: 13px;
 
   border: 0;
   border-radius: 6px;
@@ -582,15 +730,18 @@
 
 
 .registration h2 {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  font-size: 32px;
 }
 
 .form-intro {
-  margin-bottom: 18px;
+  margin-bottom: 10px;
+  font-size: 14px;
 }
 
 .required-note {
-  margin-bottom: 14px;
+  margin-bottom: 8px;
+  font-size: 11px;
 }
 
 .fields {
@@ -608,7 +759,7 @@
 /* Reserve consistent desktop height for either form */
 @media (min-width: 901px) {
   .auth-content {
-    min-height: 405px;
+    min-height: 0;
   }
 }
 
@@ -1148,146 +1299,111 @@
   }
 }
 
-.signup-submit-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 4fr);
-  gap: 8px;
-  margin-top: 22px;
-}
+/* Compact signup layout for laptop screens */
+@media (min-width: 901px) and (max-height: 850px) {
+  .registration-layout {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    gap: 65px;
+  }
 
-.signup-submit-row .submit-button {
-  margin-top: 0;
-  border: 1px solid rgb(255 255 255 / 18%);
-  border-radius: 12px;
-  background: linear-gradient(165deg, #bd3040, #8f000d);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 20%);
-}
+  .welcome-note {
+    margin-top: 35px;
+  }
 
-.signup-main:has(.signup-region-trigger[aria-expanded='true']) {
-  overflow: visible;
-}
+  .portal-footer {
+    padding-block: 10px;
+  }
 
-.signup-region {
-  --region-gold: 174 125 45;
-  --region-text: #493208;
-  position: relative;
-  min-width: 0;
-}
+  .portal-header {
+    height: 64px;
+  }
 
-.signup-shell[data-theme='dark'] .signup-region {
-  --region-gold: 224 179 90;
-  --region-text: #ffe3a8;
-}
-
-.signup-region-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  width: 100%;
-  height: 50px;
-  padding: 0 4px;
-  border: 1px solid rgb(var(--region-gold) / 58%);
-  border-radius: 12px;
-  background: linear-gradient( 160deg, rgb(255 255 255), rgb(239 197 128 / 9%) );
-  color: var(--heading);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%);
-  font: 700 14px/1.15 Arial, sans-serif;
-  cursor: pointer;
-}
-
-.signup-region-trigger span {
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@media (width <= 480px) {
-  .signup-region-trigger {
-    flex-direction: column;
-    gap: 2px;
-    padding-inline: 2px;
-    font-size: 12px;
+  .auth-switch-text button {
+    min-height: 34px;
   }
 }
 
-.signup-region-trigger[aria-invalid='true'] {
-  border-color: var(--signup-error);
-}
 
-.signup-region-trigger:disabled {
-  cursor: wait;
-  opacity: .65;
-}
+/* Compact desktop signup layout */
+@media (min-width: 901px) and (min-height: 650px) {
+  .registration-layout {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    align-items: center;
+  }
 
-.signup-region-trigger svg {
-  flex: none;
-  transition: transform 280ms cubic-bezier(.22, 1, .36, 1);
-}
+  .auth-content {
+    min-height: 0;
+  }
 
-.signup-region-trigger[aria-expanded='true'] svg {
-  transform: rotate(180deg);
-}
+  .registration h2 {
+    margin-bottom: 4px;
+    line-height: 1.15;
+  }
 
-.signup-region-options {
-  position: absolute;
-  inset: calc(100% + 6px) auto auto 0;
-  z-index: 4;
-  display: grid;
-  gap: 2px;
-  width: 168px;
-  padding: 4px;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: var(--pale);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 18%), 0 12px 28px rgb(24 13 16 / 20%);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-10px) scale(.985);
-  transform-origin: top left;
-  transition:
-    opacity 220ms ease,
-    transform 320ms cubic-bezier(.22, 1, .36, 1),
-    visibility 0s linear 320ms;
-}
+  .form-intro {
+    margin-bottom: 8px;
+    line-height: 1.35;
+  }
 
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .signup-region-options {
-    background: color-mix(in srgb, var(--pale) 88%, transparent);
-    -webkit-backdrop-filter: blur(16px) saturate(130%);
-    backdrop-filter: blur(16px) saturate(130%);
+  .required-note {
+    margin-bottom: 8px;
+    line-height: 1.2;
+  }
+
+  .fields {
+    row-gap: 10px;
+    column-gap: 18px;
+  }
+
+  .field label {
+    margin-bottom: 5px;
+    line-height: 1.2;
+  }
+
+  .field input,
+  .field select {
+    height: 44px;
+    box-sizing: border-box;
+  }
+
+  .field--full-width {
+    grid-column: 1 / -1;
+  }
+
+  .submit-button {
+    height: 48px;
+    margin-top: 14px;
+  }
+
+  .auth-switch-text {
+    margin-top: 12px;
   }
 }
 
-.signup-region-trigger[aria-expanded='true'] + .signup-region-options {
-  opacity: 1;
-  visibility: visible;
-  transform: none;
-  transition-delay: 0s;
+/* Give shorter desktop screens a little extra room */
+@media (min-width: 901px) and (max-height: 800px) {
+  .registration-layout {
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
+  .fields {
+    row-gap: 7px;
+  }
+
+  .field input,
+  .field select {
+    height: 41px;
+  }
+
+  .submit-button {
+    height: 44px;
+    margin-top: 10px;
+  }
+
+  .auth-switch-text {
+    margin-top: 8px;
+  }
 }
-
-.signup-region-options button {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: 44px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 9px;
-  background: transparent;
-  color: var(--signup-text);
-  font: 600 14px/1.2 Arial, sans-serif;
-  cursor: pointer;
-}
-
-.signup-region-options button:is(:hover, [aria-pressed='true']) {
-  background: rgb(var(--region-gold) / 14%);
-}
-
-.signup-region-options button:focus-visible {
-  outline-offset: -3px;
-}
-
-

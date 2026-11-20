@@ -989,6 +989,10 @@ function MonthlyReport({ appointments, equipmentById, siteById, summaries, relat
             className="sc-month"
             aria-pressed={month === index + 1}
             aria-label={`${MONTH_LONG[index]} ${year}`}
+            disabled={
+              year === Number(today.slice(0, 4)) &&
+              index + 1 > Number(today.slice(5, 7))
+            }
             onClick={() => pick(index + 1)}
           >
             {label}
