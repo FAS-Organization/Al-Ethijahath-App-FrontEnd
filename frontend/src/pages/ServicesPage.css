@@ -1878,3 +1878,6 @@ body:has(.sv-page) {
     transform: rotate(-4deg);
   }
 }
+.sv-locked-content {
+  opacity: .55;
+}

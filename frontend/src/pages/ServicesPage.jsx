@@ -993,6 +993,7 @@ export default function ServicesPage({
   onRequestReschedule,
   onOpenDocument,
   onOpenApproval,
+  serviceOnly = false,
 }) {
   const [searchParams] = useSearchParams()
   const initialServiceReference = searchParams.get('service') || ''
@@ -1107,6 +1108,15 @@ export default function ServicesPage({
             </button>
           </div>
 
+          {serviceOnly && (
+            <p className="sv-demo-notice">Service access only · Request a service to continue.</p>
+          )}
+
+          <div
+            className={serviceOnly ? 'sv-locked-content' : undefined}
+            style={serviceOnly ? undefined : { display: 'contents' }}
+            inert={serviceOnly}
+          >
           {loading && (
             <div className="sv-message" role="status">
               Loading your service jobs…
@@ -1311,46 +1321,20 @@ export default function ServicesPage({
             </>
           )}
 
+          </div>
+
           <div className="portal-page-footer-space" aria-hidden="true" />
         </main>
           {requestOpen && ready && (
           <RequestDialog
             options={data.request_options}
+            serviceOnly={serviceOnly}
             isDemo={Boolean(data.is_demo)}
             onSubmit={onRequestService}
             onClose={() => setRequestOpen(false)}
           />
           )}
       </div>
-    </div>
-  )
-}
-export function ServiceRequestOnlyPage({ theme, onSignOut }) {
-  const [requestOpen, setRequestOpen] = useState(false)
-
-  return (
-    <div className="sv-page" data-theme={theme}>
-      <main className="sv-content">
-        <section className="sv-heading">
-          <div>
-            <h1>Service jobs</h1>
-            <p>Preview how a service-only user requests service.</p>
-          </div>
-          <button className="sv-secondary" type="button" onClick={onSignOut}>Sign out</button>
-        </section>
-        <button className="sv-primary" type="button" onClick={() => setRequestOpen(true)}>
-          Request service
-        </button>
-        {requestOpen && (
-          <RequestDialog
-            options={SERVICES_PREVIEW_DATA.request_options}
-            allowPhoto={false}
-            serviceOnly
-            isDemo
-            onClose={() => setRequestOpen(false)}
-          />
-        )}
-      </main>
     </div>
   )
 }

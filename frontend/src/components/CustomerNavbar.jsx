@@ -51,6 +51,7 @@ export default function CustomerNavbar({
   customerName,
   unreadCount = 0,
   enabledPages = INITIAL_PAGES,
+  serviceOnly = false,
   onSignOut,
   theme = 'light',
   children,
@@ -186,7 +187,7 @@ export default function CustomerNavbar({
         <div id={menuId} className="ae-nav__body" data-open={expanded}>
           <div className="ae-nav__header">
             <NavLink className="ae-nav__brand" to="/dashboard" aria-label="Al Ethijahath customer overview"
-              onClick={() => setOpen(false)}>
+              inert={serviceOnly} onClick={() => setOpen(false)}>
               <img
                 src={theme === 'dark' ? '/images/logo-dark.webp' : '/images/logo.webp'}
                 alt="Al Ethijahath"
@@ -234,8 +235,8 @@ export default function CustomerNavbar({
                       </NavLink>
                     ) : (
                       <span className="ae-nav__link ae-nav__link--unavailable" aria-disabled="true"
-                        title="This page is not connected yet">
-                        {content}<span className="ae-nav__sr"> (not available yet)</span>
+                        title={serviceOnly ? 'Locked for service-only access' : 'This page is not connected yet'}>
+                        {content}<span className="ae-nav__sr">{serviceOnly ? ' (locked)' : ' (not available yet)'}</span>
                       </span>
                     )}
                   </li>
@@ -245,7 +246,7 @@ export default function CustomerNavbar({
           </nav>
 
           <div className="ae-nav__footer">
-            <button type="button" className="ae-nav__link" onClick={openSupport}
+            <button type="button" className="ae-nav__link" onClick={openSupport} disabled={serviceOnly}
               aria-haspopup="dialog">
               <HeadsetIcon size={21} aria-hidden="true" /><span>Support</span>
             </button>

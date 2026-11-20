@@ -899,9 +899,11 @@ function Switch({ id, icon: Icon, label, hint, checked, onChange }) {
   )
 }
 
-function AccountSharingPanel({ users, onAddUser, onToggleUser }) {
+function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword }) {
   const idBase = useId()
   const [adding, setAdding] = useState(false)
+  const [editingEmail, setEditingEmail] = useState(null)
+  const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [notice, setNotice] = useState('')
   const addRef = useRef(null)
@@ -914,14 +916,22 @@ function AccountSharingPanel({ users, onAddUser, onToggleUser }) {
     setError('')
     setNotice('')
     try {
-      onAddUser(values)
+      onSaveUser(values, editingEmail)
       form.reset()
       setAdding(false)
-      setNotice('Demo service login created.')
+      setNotice(editingEmail ? 'Demo service login updated.' : 'Demo service login created.')
       addRef.current?.focus()
     } catch (problem) {
       setError(problem.message)
     }
+  }
+
+  function openEditor(email = null) {
+    setEditingEmail(email)
+    setShowPassword(false)
+    setError('')
+    setNotice('')
+    setAdding(true)
   }
 
   function toggleUser(user, enabled) {
@@ -935,10 +945,10 @@ function AccountSharingPanel({ users, onAddUser, onToggleUser }) {
         title="Account sharing"
         intro="Give someone a separate login to request service for your company."
       >
-        {onAddUser && (
+        {onSaveUser && (
           <button ref={addRef} className="sv-primary" type="button"
             aria-expanded={adding}
-            onClick={() => { setAdding(current => !current); setError('') }}
+            onClick={() => openEditor()}
           >
             <PlusIcon size={16} aria-hidden="true" />
             Add service user
@@ -951,16 +961,22 @@ function AccountSharingPanel({ users, onAddUser, onToggleUser }) {
       </p>
 
       {adding && (
-        <form className="ac-sharing-form" onSubmit={addUser}>
+        <form key={editingEmail ?? "new"} className="ac-sharing-form" onSubmit={addUser}>
           <div className="ac-field">
             <label htmlFor={`${idBase}-email`}>Login email</label>
-            <input id={`${idBase}-email`} name="email" type="email" autoComplete="off" required />
+            <input id={`${idBase}-email`} name="email" type="email" autoComplete="off" defaultValue={editingEmail ?? ''} required />
           </div>
           <div className="ac-field">
             <label htmlFor={`${idBase}-password`}>Initial password</label>
-            <input id={`${idBase}-password`} name="password" type="password"
+            <input id={`${idBase}-password`} name="password" type={showPassword ? 'text' : 'password'}
+              defaultValue={editingEmail ? getDemoPassword(editingEmail) : ''}
               minLength={8} maxLength={128} autoComplete="new-password" required
             />
+            {editingEmail && (
+              <button className="ac-edit" type="button" onClick={() => setShowPassword(current => !current)}>
+                {showPassword ? 'Hide password' : 'Show password'}
+              </button>
+            )}
           </div>
           <div className="ac-form-actions">
             <button className="sv-secondary" type="button"
@@ -968,7 +984,9 @@ function AccountSharingPanel({ users, onAddUser, onToggleUser }) {
             >
               Cancel
             </button>
-            <button className="sv-primary" type="submit">Create service login</button>
+            <button className="sv-primary" type="submit">
+              {editingEmail ? 'Save changes' : 'Create service login'}
+            </button>
           </div>
         </form>
       )}
@@ -979,16 +997,24 @@ function AccountSharingPanel({ users, onAddUser, onToggleUser }) {
         <fieldset className="ac-switches ac-sharing-users">
           <legend>Service users</legend>
           {users.map((user, index) => (
-            <Switch key={user.email} id={`${idBase}-access-${index}`}
-              label={`Service access for ${user.email}`}
-              hint={user.isEnabled ? 'Active · Can request service' : 'Disabled'}
-              checked={user.isEnabled}
-              onChange={enabled => toggleUser(user, enabled)}
-            />
+            <div className="ac-sharing-user" key={user.email}>
+              <Switch id={`${idBase}-access-${index}`}
+                label={`Service access for ${user.email}`}
+                hint={user.isEnabled ? 'Active · Can request service' : 'Disabled'}
+                checked={user.isEnabled}
+                onChange={enabled => toggleUser(user, enabled)}
+              />
+              <button className="ac-edit" type="button" aria-label={`Edit ${user.email}`}
+                onClick={() => openEditor(user.email)}
+              >
+                <PencilSimpleIcon size={16} aria-hidden="true" />
+                Edit
+              </button>
+            </div>
           ))}
         </fieldset>
       )}
-      {onAddUser && <Link className="sv-secondary" to="/">Try the demo login</Link>}
+      {onSaveUser && <Link className="sv-secondary" to="/">Try the demo login</Link>}
       {error && <p className="sv-error" role="alert">{error}</p>}
       {notice && <p className="ac-saved" role="status">{notice}</p>}
     </>
@@ -1320,7 +1346,8 @@ export default function AccountPage({
   onChangePassword,
   onSignOut,
   serviceUsers = [],
-  onAddServiceUser,
+  onSaveServiceUser,
+  getDemoPassword,
   onToggleServiceUser,
 }) {
   const idBase = useId()
@@ -1679,7 +1706,8 @@ export default function AccountPage({
                   {section === 'sharing' && (
                     <AccountSharingPanel
                       users={serviceUsers}
-                      onAddUser={onAddServiceUser}
+                      onSaveUser={onSaveServiceUser}
+                      getDemoPassword={getDemoPassword}
                       onToggleUser={onToggleServiceUser}
                     />
                   )}

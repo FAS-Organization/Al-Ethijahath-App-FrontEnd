@@ -6,7 +6,7 @@ import CustomerNavbar from './CustomerNavbar'
 import PortalChat from './PortalChat'
 import PortalThemeToggle from './PortalThemeToggle'
 
-export default function CustomerPortalLayout({ theme, onToggleTheme }) {
+export default function CustomerPortalLayout({ theme, onToggleTheme, serviceOnly = false, onSignOut }) {
   const { pathname } = useLocation()
   const scrollPositions = useRef(new Map())
 
@@ -42,8 +42,11 @@ export default function CustomerPortalLayout({ theme, onToggleTheme }) {
         companyName={notifications?.company_name}
         customerName={notifications?.customer_name}
         theme={theme}
+        enabledPages={serviceOnly ? ['services'] : undefined}
+        serviceOnly={serviceOnly}
+        onSignOut={onSignOut}
       >
-        <div className="ed-top-actions">
+        <div className="ed-top-actions" inert={serviceOnly}>
           <a
             className="ed-dispatch"
             href="https://www.alethijahath.com/#dispatch-form"
@@ -77,7 +80,7 @@ export default function CustomerPortalLayout({ theme, onToggleTheme }) {
         <Outlet context={{ theme }} />
       </div>
 
-      <PortalChat />
+      {!serviceOnly && <PortalChat />}
     </>
   )
 }

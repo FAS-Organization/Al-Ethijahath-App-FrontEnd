@@ -24,7 +24,7 @@ import DashboardPage from './pages/DashboardPage'
 import EquipmentPage from './pages/EquipmentPage'
 import QuotationsPage from './pages/QuotationsPage'
 import AmcSchedulePage from './pages/AmcSchedulePage'
-import ServicesPage, { ServiceRequestOnlyPage } from './pages/ServicesPage'
+import ServicesPage from './pages/ServicesPage'
 import InvoicesPage from './pages/InvoicesPage'
 import ExtraServicesPage from './pages/ExtraServicesPage'
 import DocumentsPage from './pages/DocumentsPage'
@@ -49,12 +49,20 @@ function AppRoutes() {
   const [previewLogin, setPreviewLogin] = useState(null)
   const demoPasswords = useRef(new Map())
 
-  function addServiceUser({ email, password }) {
+  function saveServiceUser({ email, password }, previousEmail = null) {
     const login = email.trim().toLowerCase()
-    if (demoPasswords.current.has(login)) throw new Error('This email already has a demo login.')
 
+    if (login !== previousEmail && demoPasswords.current.has(login)) {
+      throw new Error('This email already has a demo login.')
+    }
+
+    if (previousEmail && previousEmail !== login) demoPasswords.current.delete(previousEmail)
     demoPasswords.current.set(login, password)
-    setServiceUsers(current => [...current, { email: login, isEnabled: true }])
+    setServiceUsers(current => (
+      previousEmail
+        ? current.map(user => user.email === previousEmail ? { ...user, email: login } : user)
+        : [...current, { email: login, isEnabled: true }]
+    ))
   }
 
   function toggleServiceUser(email, isEnabled) {
@@ -96,12 +104,16 @@ function AppRoutes() {
     return (
       <ErrorBoundary resetKey={location.pathname}>
         <Routes>
-          <Route path="/services" element={
-            <ServiceRequestOnlyPage
+          <Route element={
+            <CustomerPortalLayout
               theme={theme}
+              onToggleTheme={toggleTheme}
+              serviceOnly
               onSignOut={handleSignOut}
             />
-          } />
+          }>
+            <Route path="/services" element={<ServicesPage serviceOnly />} />
+          </Route>
           <Route path="*" element={<Navigate to="/services" replace />} />
         </Routes>
       </ErrorBoundary>
@@ -126,7 +138,8 @@ function AppRoutes() {
           <Route path="/account" element={
             <AccountPage
               serviceUsers={serviceUsers}
-              onAddServiceUser={addServiceUser}
+              onSaveServiceUser={saveServiceUser}
+              getDemoPassword={email => demoPasswords.current.get(email) ?? ''}
               onToggleServiceUser={toggleServiceUser}
             />
           } />
