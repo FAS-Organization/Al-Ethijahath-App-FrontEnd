@@ -1347,7 +1347,8 @@
 .ac-email-verified {
   box-sizing: border-box;
   min-height: 46px;
-  flex-shrink: 0;
+  flex: 0 0 124px;
+  justify-content: center;
   padding-inline: 14px;
   white-space: nowrap;
   animation: ac-sharing-enter 180ms var(--ac-sharing-ease) both;
@@ -1381,11 +1382,11 @@
   display: grid;
   grid-template-rows: 0fr;
   opacity: 0;
-  transform: translateY(-5px);
+  transform: translateY(-4px);
   transition:
-    grid-template-rows 240ms var(--ac-sharing-ease),
-    opacity 170ms ease,
-    transform 240ms var(--ac-sharing-ease);
+    grid-template-rows 260ms cubic-bezier(.25, .8, .25, 1),
+    opacity 160ms ease,
+    transform 260ms var(--ac-sharing-ease);
 }
 
 .ac-otp-reveal[data-open='true'] {
@@ -1401,19 +1402,20 @@
 
 .ac-otp-field {
   margin-top: 10px;
-  padding: 12px;
+  padding: 14px;
   border: 1px solid var(--sv-line);
   border-radius: 12px;
-  background: var(--sv-surface);
+  background: color-mix(in srgb, var(--sv-soft) 65%, var(--sv-surface));
 }
 
 .ac-otp-row {
   position: relative;
-  width: min(100%, 164px);
+  width: min(100%, 172px);
 }
 
 .ac-otp-row > input {
   padding-inline: 12px 36px;
+  background: var(--sv-surface);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
   letter-spacing: .25em;

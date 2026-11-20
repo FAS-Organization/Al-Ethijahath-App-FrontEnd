@@ -1374,12 +1374,19 @@ body:has(.sv-page) {
   .sv-main *:not(
     .sv-step--done .sv-step-dot,
     .sv-step--done .sv-step-dot > svg,
-    .sv-step-ring path
+    .sv-step-ring path,
+    .ac-sharing-form,
+    .ac-sharing-form *
   ) {
     animation: none !important;
   }
 
-  .sv-main *:not(.sv-summary-item, .sv-summary-icon) {
+  .sv-main *:not(
+    .sv-summary-item,
+    .sv-summary-icon,
+    .ac-sharing-form,
+    .ac-sharing-form *
+  ) {
     transition: none !important;
   }
 }
