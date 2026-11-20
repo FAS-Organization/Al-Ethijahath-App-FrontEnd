@@ -1264,9 +1264,31 @@
 }
 .ac-sharing-form {
   display: grid;
-  gap: 14px;
-  margin-bottom: 20px;
+  grid-template-rows: 0fr;
   max-width: 440px;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    grid-template-rows 260ms cubic-bezier(.25, .8, .25, 1),
+    opacity 170ms ease,
+    transform 260ms var(--ac-sharing-ease);
+}
+
+.ac-sharing-form[data-open='true'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ac-sharing-form-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.ac-sharing-fields {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 20px;
 }
 
 .ac-sharing-users .ac-switch-text strong {
@@ -1323,7 +1345,6 @@
 
 .ac-sharing-form {
   --ac-sharing-ease: cubic-bezier(.23, 1, .32, 1);
-  animation: ac-sharing-enter 220ms var(--ac-sharing-ease) both;
 }
 
 .ac-sharing-form .ac-field input {

@@ -902,6 +902,7 @@ function Switch({ id, icon: Icon, label, hint, checked, onChange }) {
 function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword }) {
   const idBase = useId()
   const [adding, setAdding] = useState(false)
+  const [closing, setClosing] = useState(false)
   const [editingEmail, setEditingEmail] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -915,6 +916,7 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
 
   const otpTimer = useRef(null)
   const addRef = useRef(null)
+  const editorFormRef = useRef(null)
 
   useEffect(() => {
     return () => clearTimeout(otpTimer.current)
@@ -986,27 +988,21 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
 
     try {
       onSaveUser(values, editingEmail)
-
-      form.reset()
-      setAdding(false)
-      setEditingEmail(null)
-      setEmail('')
-      resetVerification()
-      setShowPassword(false)
+      closeEditor()
 
       setNotice(
         editingEmail
           ? 'Demo service login updated.'
           : 'Demo service login created.'
       )
-
-      addRef.current?.focus()
     } catch (problem) {
       setError(problem.message)
     }
   }
 
   function openEditor(emailToEdit = null) {
+    editorFormRef.current?.reset()
+    setClosing(false)
     setEditingEmail(emailToEdit)
     setEmail(emailToEdit ?? '')
     setShowPassword(false)
@@ -1017,13 +1013,22 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
   }
 
   function closeEditor() {
+    clearTimeout(otpTimer.current)
     setAdding(false)
-    setEditingEmail(null)
-    setEmail('')
+    setClosing(true)
     setShowPassword(false)
     setError('')
-    resetVerification()
     addRef.current?.focus()
+  }
+
+  function finishClosingEditor(event) {
+    if (!closing || event.target !== event.currentTarget ||
+        event.propertyName !== 'grid-template-rows') return
+
+    setClosing(false)
+    setEditingEmail(null)
+    setEmail('')
+    resetVerification()
   }
 
   function toggleUser(user, enabled) {
@@ -1055,12 +1060,20 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
         Demo only. Use temporary test credentials. Demo users last until this tab is refreshed.
       </p>
 
-      {adding && (
-        <form
-          key={editingEmail ?? 'new'}
-          className="ac-sharing-form"
-          onSubmit={addUser}
-        >
+      <div
+        className="ac-sharing-form"
+        data-open={adding}
+        inert={!adding}
+        onTransitionEnd={finishClosingEditor}
+      >
+        <div className="ac-sharing-form-clip">
+          {(adding || closing) && (
+            <form
+              ref={editorFormRef}
+              key={editingEmail ?? 'new'}
+              className="ac-sharing-fields"
+              onSubmit={addUser}
+            >
           {/* Email field */}
           <div className="ac-field">
             <label htmlFor={`${idBase}-email`}>Login email</label>
@@ -1169,7 +1182,7 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
                 required
               />
 
-              {emailVerified && (
+              {(editingEmail || emailVerified) && (
                 <button
                   className="ac-sharing-password-toggle"
                   type="button"
@@ -1207,8 +1220,10 @@ function AccountSharingPanel({ users, onSaveUser, onToggleUser, getDemoPassword 
               {editingEmail ? 'Save changes' : 'Create service login'}
             </button>
           </div>
-        </form>
-      )}
+            </form>
+          )}
+        </div>
+      </div>
 
       {users.length === 0 ? (
         <p className="ac-hint">No service users added yet.</p>
