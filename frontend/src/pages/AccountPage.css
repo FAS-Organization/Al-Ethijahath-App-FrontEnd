@@ -1437,6 +1437,12 @@
   border-radius: 10px;
 }
 
+.ac-sharing-form .ac-field input:is([name='email'], [name='password']):focus {
+  outline: 2px solid var(--sv-accent);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+
 .ac-sharing-email-row {
   display: flex;
   align-items: stretch;
