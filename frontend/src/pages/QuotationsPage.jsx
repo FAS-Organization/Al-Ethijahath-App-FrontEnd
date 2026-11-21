@@ -1083,7 +1083,7 @@ export default function QuotationsPage({
                 )
 
                 const statusLabel = {
-                  pending_approval: 'Awaiting signature',
+                  pending_approval: 'Awaiting Approval',
                   approved: 'Approved',
                   superseded: 'Previous version',
                 }[report.status]
